@@ -1,0 +1,5 @@
+pakcage main
+
+func main() {
+    
+}

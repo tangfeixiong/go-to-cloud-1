@@ -1,0 +1,51 @@
+{
+  "apiVersion": "v1",
+  "kind": "Build",
+  "metadata": {
+    "name": "build101",
+    "creationTimestamp": null,
+    "labels": {
+      "ci": "build101"
+    }
+  },
+  "Spec": {
+    "ServiceAccount": "",
+    "Source": {
+      "Binary": null,
+      "Dockerfile": null,
+      "Git": null,
+      "Images": null,
+      "ContextDir": "",
+      "SourceSecret": null,
+      "Secrets": null
+    },
+    "Revision": null,
+    "Strategy": {
+      "DockerStrategy": null,
+      "SourceStrategy": null,
+      "CustomStrategy": null
+    },
+    "Output": {
+      "To": null,
+      "PushSecret": null
+    },
+    "Resources": {},
+    "PostCommit": {
+      "Command": null,
+      "Args": null,
+      "Script": ""
+    },
+    "CompletionDeadlineSeconds": null
+  },
+  "Status": {
+    "Phase": "",
+    "Cancelled": false,
+    "Reason": "",
+    "Message": "",
+    "StartTimestamp": null,
+    "CompletionTimestamp": null,
+    "Duration": 0,
+    "OutputDockerImageReference": "",
+    "Config": null
+  }
+}

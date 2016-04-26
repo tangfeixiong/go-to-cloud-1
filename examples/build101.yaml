@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Build
+metadata:
+  creationTimestamp: null
+  name: build101
+  labels:
+    app: build101
+    ci: build101
+    name: build101
+# name: build101
+# labels: 
+#   ci: build101
+Spec:
+  CompletionDeadlineSeconds: null
+  Output:
+    PushSecret: null
+    To: null
+  PostCommit:
+    Args: null
+    Command: null
+    Script: ""
+  Resources: {}
+  Revision: null
+  ServiceAccount: ""
+  Source:
+    Binary: null
+    ContextDir: ""
+    Dockerfile: null
+    Git: null
+    Images: null
+    Secrets: null
+    SourceSecret: null
+  Strategy:
+    CustomStrategy: null
+    DockerStrategy: null
+    SourceStrategy: null
+Status:
+  Cancelled: false
+  CompletionTimestamp: null
+  Config: null
+  Duration: 0
+  Message: ""
+  OutputDockerImageReference: ""
+  Phase: ""
+  Reason: ""
+  StartTimestamp: null
