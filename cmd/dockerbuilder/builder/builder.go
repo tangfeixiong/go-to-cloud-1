@@ -39,7 +39,7 @@ type builderConfig struct {
 	buildsClient    client.BuildInterface
 }
 
-func newDockerBuilderConfig() (*builderConfig, error) {
+func newBuilderConfigWithDockerfile(dockerBuildRoot string) (*builderConfig, error) {
 	cfg := &builderConfig{}
 
 	masterVersion := os.Getenv(api.OriginVersion)
@@ -50,6 +50,7 @@ func newDockerBuilderConfig() (*builderConfig, error) {
 		glog.V(2).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
 	}
 
+    var err error
 	// dockerClient and dockerEndpoint (DOCKER_HOST)
 	// usually not set, defaults to docker socket
 	cfg.dockerClient, cfg.dockerEndpoint, err = dockerutil.NewHelper().GetClient()

@@ -81,7 +81,16 @@ func fillBuildSpec(spec *oapi.BuildSpec) {
 }
 
 func fillBuildSource(src *oapi.BuildSource) {
-  
+  s := `From alpine`
+  src.Dockerfile = &s
+}
+
+func createGitBuildSource() *oapi.GitBuildSource {
+    s := &oapi.GitBuildSource {
+        URI: "http://github.com/stackdocker/container-ops.git",
+        Ref: "gogs",
+    }
+    return s
 }
 
 func fillBuildOutput(out *oapi.BuildOutput) {
@@ -95,8 +104,8 @@ func fillBuildPostCommitSpec(commit *oapi.BuildPostCommitSpec) {
 func TestExportBuildConfig(t *testing.T) {
     
     o := oapi.BuildConfig { }
-    o.TypeMeta.Kind = "Build"
     o.TypeMeta.APIVersion = "v1"
+    o.TypeMeta.Kind = "BuildConfig"
     
     o.ObjectMeta.Name = "buildconfig101"
     o.ObjectMeta.Labels = make(map[string]string)
@@ -106,7 +115,7 @@ func TestExportBuildConfig(t *testing.T) {
     fillBuildSpec(&o.Spec.BuildSpec)
     
     b := new(bytes.Buffer)
-    var err = codec.JSON.Encode(b).One(o)
+    err := codec.JSON.Encode(b).One(o)
     if err != nil {
         t.Errorf("Could not encode JSON object: %s", err)
     }
@@ -175,4 +184,76 @@ Status:
   Phase: ""
   Reason: ""
   StartTimestamp: null
+`
+
+var jsonBuildConfig = `
+{
+  "kind": "BuildConfig",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "ruby-sample-build",
+    "creationTimestamp": null,
+    "labels": {
+      "name": "ruby-sample-build"
+    }
+  },
+  "spec": {
+    "triggers": [
+      {
+        "type": "github",
+        "github": {
+          "secret": "secret101"
+        }
+      },
+      {
+        "type": "generic",
+        "generic": {
+          "secret": "secret101"
+        }
+      },
+      {
+        "type": "imageChange",
+        "imageChange": {}
+      },
+      {
+        "type": "ConfigChange"
+      }
+    ],
+    "source": {
+      "type": "Git",
+      "git": {
+        "uri": "git://github.com/openshift/origin.git",
+        "ref": "/tree/master/examples/hello-openshift"
+      }
+    },
+    "strategy": {
+      "type": "Docker",
+      "dockerStrategy": {
+        "from": {
+          "kind": "ImageStreamTag",
+          "name": "ruby-22-centos7:latest"
+        },
+        "env": [
+          {
+            "name": "EXAMPLE",
+            "value": "sample-app"
+          }
+        ]
+      }
+    },
+    "output": {
+      "to": {
+        "kind": "ImageStreamTag",
+        "name": "origin-ruby-sample:latest"
+      }
+    },
+    "postCommit": {
+      "args": ["bundle", "exec", "rake", "test"]
+    },
+    "resources": {}
+  },
+  "status": {
+    "lastVersion": 0
+  }
+}
 `
