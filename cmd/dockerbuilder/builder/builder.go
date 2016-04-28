@@ -5,6 +5,7 @@ package builder
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,7 +15,8 @@ import (
 
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/restclient"
-	"k8s.io/kubernetes/pkg/runtime"
+    "k8s.io/kubernetes/pkg/runtime"
+    "k8s.io/kubernetes/pkg/util/crypto"
 
 	s2iapi "github.com/openshift/source-to-image/pkg/api"
 
@@ -39,10 +41,20 @@ type builderConfig struct {
 	buildsClient    client.BuildInterface
 }
 
-func newBuilderConfigWithDockerfile(dockerBuildRoot string) (*builderConfig, error) {
+func newBuilderConfigWithDockerfile(buildStr string) (*builderConfig, error) {
 	cfg := &builderConfig{}
+	var err error
 
-	masterVersion := os.Getenv(api.OriginVersion)
+	// build (BUILD)
+	//buildStr := os.Getenv("BUILD")
+	glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
+	cfg.build = &api.Build{}
+	if err = runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
+		return nil, fmt.Errorf("unable to parse build: %v", err)
+	}
+
+	//masterVersion := os.Getenv(api.OriginVersion)
+	masterVersion := "v1.3.0-alpha.0-52-gbc1ddaa"
 	thisVersion := version.Get().String()
 	if len(masterVersion) != 0 && masterVersion != thisVersion {
 		glog.Warningf("Master version %q does not match Builder image version %q", masterVersion, thisVersion)
@@ -50,7 +62,6 @@ func newBuilderConfigWithDockerfile(dockerBuildRoot string) (*builderConfig, err
 		glog.V(2).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
 	}
 
-    var err error
 	// dockerClient and dockerEndpoint (DOCKER_HOST)
 	// usually not set, defaults to docker socket
 	cfg.dockerClient, cfg.dockerEndpoint, err = dockerutil.NewHelper().GetClient()
@@ -61,7 +72,8 @@ func newBuilderConfigWithDockerfile(dockerBuildRoot string) (*builderConfig, err
 	// buildsClient (KUBERNETES_SERVICE_HOST, KUBERNETES_SERVICE_PORT)
 	clientConfig, err := restclient.InClusterConfig()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get client config: %v", err)
+		//return nil, fmt.Errorf("failed to get client config: %v", err)
+		clientConfig, _ = InClusterConfig()
 	}
 	osClient, err := client.New(clientConfig)
 	if err != nil {
@@ -71,6 +83,39 @@ func newBuilderConfigWithDockerfile(dockerBuildRoot string) (*builderConfig, err
 
 	return cfg, nil
 }
+
+// InClusterConfig returns a config object which uses the service account
+// kubernetes gives to pods. It's intended for clients that expect to be
+// running inside a pod running on kuberenetes. It will return an error if
+// called from a process not running in a kubernetes environment.
+func InClusterConfig() (*restclient.Config, error) {
+	//host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
+	host, port := "172.17.4.50", "443"
+	if len(host) == 0 || len(port) == 0 {
+		return nil, fmt.Errorf("unable to load in-cluster configuration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be defined")
+	}
+
+	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/" + kapi.ServiceAccountTokenKey)
+	if err != nil {
+	//	return nil, err
+	    glog.Errorf("token: %s", err)
+	}
+	tlsClientConfig := restclient.TLSClientConfig{}
+	rootCAFile := "/var/run/secrets/kubernetes.io/serviceaccount/" + kapi.ServiceAccountRootCAKey
+	if _, err := crypto.CertPoolFromFile(rootCAFile); err != nil {
+		glog.Errorf("Expected to load root CA config from %s, but got err: %v", rootCAFile, err)
+	} else {
+		tlsClientConfig.CAFile = rootCAFile
+	}
+
+	return &restclient.Config{
+		// TODO: switch to using cluster DNS.
+		Host:            "https://" + net.JoinHostPort(host, port),
+		BearerToken:     string(token),
+		TLSClientConfig: tlsClientConfig,
+	}, nil
+}
+
 
 func newBuilderConfigFromEnvironment() (*builderConfig, error) {
 	cfg := &builderConfig{}
@@ -178,11 +223,13 @@ func (c *builderConfig) execute(b builder) error {
 		return fmt.Errorf("failed to retrieve cgroup limits: %v", err)
 	}
 	glog.V(2).Infof("Running build with cgroup limits: %#v", *cgLimits)
+	glog.Infof("git: %+v, %+v, cgroup: %+v", gitEnv, gitClient, cgLimits)
 
 	if err := b.Build(c.dockerClient, c.dockerEndpoint, c.buildsClient, c.build, gitClient, cgLimits); err != nil {
 		return fmt.Errorf("build error: %v", err)
 	}
 
+    glog.Infof("Build: %+v", c.build)
 	if c.build.Spec.Output.To == nil || len(c.build.Spec.Output.To.Name) == 0 {
 		glog.Warning("Build does not have an Output defined, no output image was pushed to a registry.")
 	}
@@ -219,6 +266,7 @@ type dockerBuilder struct{}
 
 // Build starts a Docker build.
 func (dockerBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *api.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error {
+	glog.Info("Go to docker build ...")
 	return bld.NewDockerBuilder(dockerClient, buildsClient, build, gitClient, cgLimits).Build()
 }
 
@@ -230,7 +278,18 @@ func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient
 }
 
 func runBuild(builder builder) {
-	cfg, err := newBuilderConfigFromEnvironment()
+    wd, err := os.Getwd()
+    if err != nil {
+        glog.Fatalf("Could not get PWD: %s", err)
+    }
+    fmt.Println(wd)
+    b, err := ioutil.ReadFile(wd + "/examples/build101.yaml")
+    if err != nil {
+        glog.Fatalf("Could not get YAML content: %s", err)
+    }
+    fmt.Println(string(b))
+	cfg, err := newBuilderConfigWithDockerfile(string(b))
+	//cfg, err := newBuilderConfigFromEnvironment()
 	if err != nil {
 		glog.Fatalf("Cannot setup builder configuration: %v", err)
 	}
