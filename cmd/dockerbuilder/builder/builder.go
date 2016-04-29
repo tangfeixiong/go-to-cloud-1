@@ -18,7 +18,7 @@ import (
     "k8s.io/kubernetes/pkg/runtime"
     "k8s.io/kubernetes/pkg/util/crypto"
 
-	s2iapi "github.com/openshift/source-to-image/pkg/api"
+	//s2iapi "github.com/openshift/source-to-image/pkg/api"
 
 	"github.com/openshift/origin/pkg/build/api"
 	bld "github.com/openshift/origin/pkg/build/builder"
