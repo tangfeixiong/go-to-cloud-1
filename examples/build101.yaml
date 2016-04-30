@@ -3,7 +3,8 @@ apiVersion: v1
 kind: Build
 metadata:
   creationTimestamp: null
-  name: build101
+  name: nc-alpine
+  namespace: tangfeixiong
   labels:
     app: build101
     ci: build101

@@ -1,7 +1,7 @@
-
 package builder
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -40,7 +40,7 @@ type builderConfig struct {
 	buildsClient    client.BuildInterface
 }
 
-func newBuilderConfigWithDockerfile(buildStr string) (*builderConfig, error) {
+func newBuilderFromDockerfileWithJSON(buildStr string) (*builderConfig, error) {
 	cfg := &builderConfig{}
 	var err error
 
@@ -48,9 +48,18 @@ func newBuilderConfigWithDockerfile(buildStr string) (*builderConfig, error) {
 	//buildStr := os.Getenv("BUILD")
 	glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
 	cfg.build = &api.Build{}
+
 	if err = runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
 		return nil, fmt.Errorf("unable to parse build: %v", err)
 	}
+	if cfg.build.Spec.Source.Dockerfile == nil {
+		glog.V(9).Infoln("decode from encoding/json")
+		if err = json.Unmarshal([]byte(buildStr), cfg.build); err != nil {
+			glog.V(9).Infof("decode error: %s", err)
+			return nil, err
+		}
+	}
+	glog.V(7).Infof("tangfx > build: %+v, source: %+v, dockerfile: %s", cfg.build, cfg.build.Spec.Source, *cfg.build.Spec.Source.Dockerfile)
 
 	//masterVersion := os.Getenv(api.OriginVersion)
 	masterVersion := "v1.3.0-alpha.0-52-gbc1ddaa"
@@ -278,16 +287,16 @@ func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient
 func runBuild(builder builder) {
 	wd, err := os.Getwd()
 	if err != nil {
-		glog.Fatalf("Could not get PWD: %s", err)
+		panic(err)
 	}
-	f := wd + "/examples/build101.json"
-	fmt.Println(f)
+	//f := wd + "/examples/build101.json"
+	f := wd + "/examples/github101.json"
+	glog.V(9).Infof("path: %s", f)
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
-		glog.Fatalf("Could not get JSON content: %s", err)
+		panic(err)
 	}
-	fmt.Println(string(b))
-	cfg, err := newBuilderConfigWithDockerfile(string(b))
+	cfg, err := newBuilderFromDockerfileWithJSON(string(b))
 	//cfg, err := newBuilderConfigFromEnvironment()
 	if err != nil {
 		glog.Fatalf("Cannot setup builder configuration: %v", err)
