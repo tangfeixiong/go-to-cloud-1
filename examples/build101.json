@@ -12,7 +12,7 @@
     "ServiceAccount": "",
     "Source": {
       "Binary": null,
-      "Dockerfile": null,
+      "Dockerfile": "FROM alpine:latest\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]",
       "Git": null,
       "Images": null,
       "ContextDir": "",

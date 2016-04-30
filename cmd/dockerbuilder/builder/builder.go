@@ -1,7 +1,6 @@
 
 package builder
 
-
 import (
 	"fmt"
 	"io/ioutil"
@@ -15,8 +14,8 @@ import (
 
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/restclient"
-    "k8s.io/kubernetes/pkg/runtime"
-    "k8s.io/kubernetes/pkg/util/crypto"
+	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/util/crypto"
 
 	s2iapi "github.com/openshift/source-to-image/pkg/api"
 
@@ -97,8 +96,8 @@ func InClusterConfig() (*restclient.Config, error) {
 
 	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/" + kapi.ServiceAccountTokenKey)
 	if err != nil {
-	//	return nil, err
-	    glog.Errorf("token: %s", err)
+		//	return nil, err
+		glog.Errorf("token: %s", err)
 	}
 	tlsClientConfig := restclient.TLSClientConfig{}
 	rootCAFile := "/var/run/secrets/kubernetes.io/serviceaccount/" + kapi.ServiceAccountRootCAKey
@@ -115,7 +114,6 @@ func InClusterConfig() (*restclient.Config, error) {
 		TLSClientConfig: tlsClientConfig,
 	}, nil
 }
-
 
 func newBuilderConfigFromEnvironment() (*builderConfig, error) {
 	cfg := &builderConfig{}
@@ -229,7 +227,7 @@ func (c *builderConfig) execute(b builder) error {
 		return fmt.Errorf("build error: %v", err)
 	}
 
-    glog.Infof("Build: %+v", c.build)
+	glog.Infof("Build: %+v", c.build)
 	if c.build.Spec.Output.To == nil || len(c.build.Spec.Output.To.Name) == 0 {
 		glog.Warning("Build does not have an Output defined, no output image was pushed to a registry.")
 	}
@@ -278,16 +276,17 @@ func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient
 }
 
 func runBuild(builder builder) {
-    wd, err := os.Getwd()
-    if err != nil {
-        glog.Fatalf("Could not get PWD: %s", err)
-    }
-    fmt.Println(wd)
-    b, err := ioutil.ReadFile(wd + "/examples/build101.yaml")
-    if err != nil {
-        glog.Fatalf("Could not get YAML content: %s", err)
-    }
-    fmt.Println(string(b))
+	wd, err := os.Getwd()
+	if err != nil {
+		glog.Fatalf("Could not get PWD: %s", err)
+	}
+	f := wd + "/examples/build101.json"
+	fmt.Println(f)
+	b, err := ioutil.ReadFile(f)
+	if err != nil {
+		glog.Fatalf("Could not get JSON content: %s", err)
+	}
+	fmt.Println(string(b))
 	cfg, err := newBuilderConfigWithDockerfile(string(b))
 	//cfg, err := newBuilderConfigFromEnvironment()
 	if err != nil {
