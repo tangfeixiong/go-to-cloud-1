@@ -9,8 +9,9 @@ metadata:
     app: build101
     ci: build101
     name: build101
-# name: build101
-# labels: 
+# Name: build101
+# Namespace: tangfeixiong 
+# Labels: 
 #   ci: build101
 Spec:
   CompletionDeadlineSeconds: null

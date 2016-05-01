@@ -9,31 +9,36 @@
       "ci": "build101"
     }
   },
-  "Spec": {
+  "spec": {
     "ServiceAccount": "",
-    "Source": {
+    "source": {
       "Binary": null,
-      "Dockerfile": "FROM alpine:latest\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]",
-      "Git": {
+      "dockerfile": "FROM alpine:edge\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]",
+      "git": {
 		"uri": "https://github.com/appropriate/docker-nc.git",
 		"ref": "master"
 	  },
       "Images": null,
-      "ContextDir": "edge",
+      "contextDir": "edge",
       "SourceSecret": null,
       "Secrets": null
     },
     "Revision": null,
-    "Strategy": {
-      "DockerStrategy": {
+    "strategy": {
+      "dockerStrategy": {
 		"forcePull": false
 	  },
       "SourceStrategy": null,
       "CustomStrategy": null
     },
-    "Output": {
-      "To": null,
-      "PushSecret": null
+    "output": {
+      "to": {
+		"kind": "DockerImage",
+        "name": "docker.io/tangfeixiong/netcat-alpine:latest"
+	  },
+      "PushSecret": {
+		"name": "docker.io"
+	  }
     },
     "Resources": {},
     "PostCommit": {
@@ -44,14 +49,14 @@
     "CompletionDeadlineSeconds": null
   },
   "Status": {
-    "Phase": "",
+    "phase": "",
     "Cancelled": false,
     "Reason": "",
     "Message": "",
     "StartTimestamp": null,
     "CompletionTimestamp": null,
     "Duration": 0,
-    "OutputDockerImageReference": "",
+    "outputDockerImageReference": "",
     "Config": null
   }
 }
