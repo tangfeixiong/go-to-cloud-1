@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: nc
+  namespace: tangfeixiong
+  selfLink: /oapi/v1/namespaces/tangfeixiong/buildconfigs/nc
+  uid: 0df23fd6-1189-11e6-be81-080027242396
+  resourceVersion: '7741'
+  creationTimestamp: '2016-05-03T23:45:02Z'
+  labels:
+    build: nc
+  annotations:
+    openshift.io/generated-by: OpenShiftNewBuild
+spec:
+  triggers:
+    -
+      type: GitHub
+      github:
+        secret: _gjJEr_YsMvmdP5tk4oG
+    -
+      type: Generic
+      generic:
+        secret: D0d1xdWD0wHuB6T2tMq7
+    -
+      type: ConfigChange
+    -
+      type: ImageChange
+      imageChange:
+        lastTriggeredImageID: 'alpine@sha256:629213db18c2a25ed77ca8a70038263fafafe712a9292559fb853d48d3936c4e'
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/tangfeixiong/docker-nc.git'
+      ref: master
+    contextDir: edge
+    secrets: []
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: 'alpine:edge'
+  output:
+    to:
+      kind: DockerImage
+      name: 'qingyuanos.com/admin/nc:latest'
+    pushSecret:
+      name: qingyuanos
+  resources: {  }
+  postCommit: {  }
+status:
+  lastVersion: 11

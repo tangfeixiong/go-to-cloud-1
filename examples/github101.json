@@ -15,7 +15,7 @@
       "Binary": null,
       "dockerfile": "FROM alpine:edge\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]",
       "git": {
-		"uri": "https://github.com/appropriate/docker-nc.git",
+		"uri": "https://github.com/tangfeixiong/docker-nc.git",
 		"ref": "master"
 	  },
       "Images": null,

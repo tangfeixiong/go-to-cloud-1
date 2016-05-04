@@ -1,0 +1,82 @@
+{
+  "apiVersion": "v1",
+  "kind": "BuildConfig",
+  "metadata": {
+    "name": "hello-openshift",
+	"namespace": "admin",
+    "creationTimestamp": null,
+    "labels": {
+      "ci": "build101"
+    }
+  },
+  "spec": {
+    "triggers": [ 
+	  {
+		"type": "ConfigChange"
+	  },
+      {
+        "type": "GitHub",
+        "github": {
+          "secret": "secret101"
+		}
+	  },
+      {
+        "type": "Generic",
+        "generic": {
+          "secret": "secret101"
+		}
+	  },
+      {
+        "type": "ImageChange"
+	  }
+	],
+    "serviceAccount": "builder",
+    "source": {
+      "Binary": null,
+      "dockerfile": "FROM scratch\nMAINTAINER Jessica Forrester <jforrest@redhat.com>\nADD bin/hello-openshift\n/hello-openshift\nEXPOSE 8080 8888\nENTRYPOINT [\"/hello-openshift\"]",
+      "Git": null,
+      "Images": null,
+      "contextDir": "/data/src/github.com/openshift/origin",
+      "SourceSecret": null,
+      "Secrets": null
+    },
+    "Revision": null,
+    "strategy": {
+      "DockerStrategy": {
+		"dockerfilePath": "examples/hello-openshift/",
+		"forcePull": false,
+		"noCache": true
+	  },
+      "SourceStrategy": null,
+      "CustomStrategy": null
+    },
+    "Output": {
+    "output": {
+      "to": {
+		"kind": "DockerImage",
+        "name": "docker.io/tangfeixiong/hello-openshift:latest"
+	  },
+      "pushSecret": {
+		"name": "admin"
+	  }
+    },
+    "Resources": {},
+    "PostCommit": {
+      "Command": null,
+      "Args": null,
+      "Script": ""
+    },
+    "CompletionDeadlineSeconds": null
+  },
+  "Status": {
+    "Phase": "",
+    "Cancelled": false,
+    "Reason": "",
+    "Message": "",
+    "StartTimestamp": null,
+    "CompletionTimestamp": null,
+    "Duration": 0,
+    "OutputDockerImageReference": "",
+    "Config": null
+  }
+}
