@@ -27,9 +27,9 @@ func kubectl() *cobra.Command {
     return cli.CommandFor("kubectl")
 }
 
-func login() {
+func login() *cobra.Command {
     f := clientcmd.New(pflag.CommandLine)
     //f := clientcmd.New(cmds.PersistentFlags())
     
-    command := cmd.NewCmdLogin("login", f, os.Stdin, os.Stdout)
+    return cmd.NewCmdLogin("login", f, os.Stdin, os.Stdout)
 }
