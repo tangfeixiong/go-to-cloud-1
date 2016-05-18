@@ -4,7 +4,7 @@
  Author <tangfx128@gmail.com>
 */
 
-package app
+package servers
 
 import (
     _ "fmt"
@@ -17,21 +17,21 @@ import (
 
 )
 
-type AppCtxInterface interface {
+type ApiServerInterface interface {
 	Dispatch()
 }
 
-type ApiServer struct {
+type apiServer struct {
     Port string
     //Ip   string
 }
 
 func NewApiServer() *ApiServer {
-    s := ApiServer{
+    s := apiServer{
         Port: "8080",
     }
 	
-	if port := os.Getenv("PORT"); port != nil {
+	if port := os.Getenv("PORT"); port != "" {
 	    s.Port = port
 	} 
     

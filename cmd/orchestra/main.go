@@ -1,5 +1,0 @@
-pakcage main
-
-func main() {
-    
-}

@@ -7,23 +7,21 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"runtime"
 	"time"
-
-	"github.com/tangfeixiong/go-to-cloud-1/cmd/imgb/app/server"
+	
+	"github.com/tangfeixiong/go-to-cloud-1/cmd/cib/app"
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	s := server.NewApiServer()
-
-	if err := s.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
+    basename := filepath.Base(os.Args[0])
+	if err := app.Start(basename); err != nil {
 		os.Exit(1)
 	}
 }

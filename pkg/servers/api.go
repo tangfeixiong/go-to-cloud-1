@@ -1,20 +1,23 @@
 
-package app
+package servers
 
 import (
+	"log"
+	"os"
+	"time"
 
     restful "github.com/emicklei/go-restful"
     
     "golang.org/x/net/context"
-
 )
 
-type ScopeCtxInterface interface {
+type UserCtxInterface interface {
     BasicAuthentication() (username, password string)
 }
 
 type user struct {
     Id                          string
+    Name                        string
     *basicAuth
 }
 
@@ -23,7 +26,7 @@ type x509Auth struct { certificateAuthority string}
 type tlsAuth struct { clientCertificate, clientKey string }
 
 type userResource struct {
-	AppCtx                      AppCtxInterface
+	ApiServerCtx                ApiServerInterface
     // normally one would use DAO (data access object)
     users                       map[string]user
     user                        *user
@@ -31,7 +34,6 @@ type userResource struct {
     // io
     request                     *restful.Request
     response                    *restful.Response
-    develop                     string
 }
 
 var (
@@ -61,9 +63,8 @@ func (u userResource) createImage(request *restful.Request, response *restful.Re
 	}
 	defer cancel() // Cancel ctx as soon as handleSearch returns.
 
-    u.develop = example.DevelopFromRequest(request.Request)
-    ctx = example.NewContextR2(ctx, &u)
-    
+    // according kapi.Context, namespaceKey=0, userKey=1
+	context.WithValue(ctx, 2, &u)
 }
 
 func (u userResource) Register() {
@@ -71,9 +72,9 @@ func (u userResource) Register() {
 /*
  Services of building Dockerfile and image, ACI
 */
-    ws = new(restful.WebService)
+    ws := new(restful.WebService)
 	ws.
-		Path("/imgf/").
+		Path("/api/v1").
 		Consumes(restful.MIME_JSON, restful.MIME_XML).
 		Produces(restful.MIME_JSON, restful.MIME_XML) // you can specify this per route as well
 		
