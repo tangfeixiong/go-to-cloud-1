@@ -284,7 +284,7 @@ func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient
 	return bld.NewS2IBuilder(dockerClient, sock, buildsClient, build, gitClient, cgLimits).Build()
 }
 
-func runBuild(builder builder) {
+func runBuildDifferently(builder builder) {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -297,7 +297,19 @@ func runBuild(builder builder) {
 		panic(err)
 	}
 	cfg, err := newBuilderFromDockerfileWithJSON(string(b))
+
 	//cfg, err := newBuilderConfigFromEnvironment()
+	if err != nil {
+		glog.Fatalf("Cannot setup builder configuration: %v", err)
+	}
+	err = cfg.execute(builder)
+	if err != nil {
+		glog.Fatalf("Error: %v", err)
+	}
+}
+
+func runBuild(builder builder) {
+	cfg, err := newBuilderConfigFromEnvironment()
 	if err != nil {
 		glog.Fatalf("Cannot setup builder configuration: %v", err)
 	}
@@ -309,7 +321,8 @@ func runBuild(builder builder) {
 
 // RunDockerBuild creates a docker builder and runs its build
 func RunDockerBuild() {
-	runBuild(dockerBuilder{})
+	//runBuild(dockerBuilder{})
+	runBuildDifferently(dockerBuilder{})
 }
 
 // RunSTIBuild creates a STI builder and runs its build

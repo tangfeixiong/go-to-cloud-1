@@ -49,7 +49,7 @@
     "CompletionDeadlineSeconds": null
   },
   "Status": {
-    "phase": "",
+    "phase": "New",
     "Cancelled": false,
     "Reason": "",
     "Message": "",

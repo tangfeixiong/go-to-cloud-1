@@ -1,3 +1,9 @@
+*.qcow2
+*.img
+openshift.local.etcd
+openshift.local.volumes
+secrets
+
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a

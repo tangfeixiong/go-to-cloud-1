@@ -1,6 +1,6 @@
 /*
  Copyright 2016, All rights reserved.
- 
+
  Author <tangfx128@gmail.com>
 */
 
@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"time"
-	
+
 	"github.com/tangfeixiong/go-to-cloud-1/cmd/cib/app"
 )
 
@@ -20,8 +20,9 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	rand.Seed(time.Now().UTC().UnixNano())
 
-    basename := filepath.Base(os.Args[0])
-	if err := app.Start(basename); err != nil {
-		os.Exit(1)
-	}
+	basename := filepath.Base(os.Args[0])
+	app.Start(basename)
+	//if err := app.Start(basename); err != nil {
+	//	os.Exit(1)
+	//}
 }
