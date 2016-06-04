@@ -1,0 +1,35 @@
+{
+  "kind": "ProjectList",
+  "apiVersion": "v1",
+  "metadata": {
+    "selfLink": "/oapi/v1/projects"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "tangfeixiong",
+        "selfLink": "/oapi/v1/projects/tangfeixiong",
+        "uid": "d9f90743-1718-11e6-a967-080027242396",
+        "resourceVersion": "5239",
+        "creationTimestamp": "2016-05-11T01:36:58Z",
+        "annotations": {
+          "openshift.io/description": "",
+          "openshift.io/display-name": "",
+          "openshift.io/requester": "tangfeixiong",
+          "openshift.io/sa.scc.mcs": "s0:c7,c4",
+          "openshift.io/sa.scc.supplemental-groups": "1000050000/10000",
+          "openshift.io/sa.scc.uid-range": "1000050000/10000"
+        }
+      },
+      "spec": {
+        "finalizers": [
+          "openshift.io/origin",
+          "kubernetes"
+        ]
+      },
+      "status": {
+        "phase": "Active"
+      }
+    }
+  ]
+}

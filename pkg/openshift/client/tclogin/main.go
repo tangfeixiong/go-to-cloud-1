@@ -25,19 +25,22 @@ func main() {
 	//	if err := client.LoginWithBasicAuth("tangfeixiong", "tangfeixiong"); err != nil {
 	//		log.Fatalln(err)
 	//	}
-	//	os.Exit(0)
 
-	if err := client.ShowUsers(); err != nil {
+	if err := client.DoBasicAuth(); err != nil {
 		log.Fatal(err)
 	}
 
-	if err := client.ShowSelf(); err != nil {
-		log.Fatal(err)
-	}
+	//	if err := client.ShowUsers(); err != nil {
+	//		log.Fatal(err)
+	//	}
 
-	if err := client.ShowProjects(); err != nil {
-		log.Fatal(err)
-	}
+	//	if err := client.ShowSelf(); err != nil {
+	//		log.Fatal(err)
+	//	}
+
+	//	if err := client.ShowProjects(); err != nil {
+	//		log.Fatal(err)
+	//	}
 
 	os.Exit(0)
 }

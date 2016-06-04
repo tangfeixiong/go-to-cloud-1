@@ -13,20 +13,24 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	// buildapi "github.com/openshift/origin/pkg/build/api"
+	_ "github.com/openshift/origin/pkg/api/install"
+	//buildapi "github.com/openshift/origin/pkg/build/api"
 	"github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/cli"
 	"github.com/openshift/origin/pkg/cmd/cli/cmd"
+	"github.com/openshift/origin/pkg/cmd/cli/config"
 	"github.com/openshift/origin/pkg/cmd/flagtypes"
 	configapi "github.com/openshift/origin/pkg/cmd/server/api"
 	"github.com/openshift/origin/pkg/cmd/templates"
 	cmdutil "github.com/openshift/origin/pkg/cmd/util"
 	osclientcmd "github.com/openshift/origin/pkg/cmd/util/clientcmd"
+	_ "github.com/openshift/origin/pkg/cmd/util/tokencmd"
 	newcmd "github.com/openshift/origin/pkg/generate/app/cmd"
 	_ "github.com/openshift/origin/pkg/generate/git"
 	userapi "github.com/openshift/origin/pkg/user/api"
 
 	kapi "k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 	// kapierrors "k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
@@ -35,6 +39,8 @@ import (
 	clientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
 	// kubecmdconfig "k8s.io/kubernetes/pkg/kubectl/cmd/config"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	_ "k8s.io/kubernetes/pkg/runtime"
+	_ "k8s.io/kubernetes/pkg/runtime/serializer/json"
 )
 
 var (
@@ -50,7 +56,7 @@ var (
 	oclientcrt string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.crt"
 	oclientkey string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.key"
 
-	//token string = "IqEFJ7eK2_Pls4JHItvMPLBqGcuct5ogPN6NrapH20s"
+	// token string = "IqEFJ7eK2_Pls4JHItvMPLBqGcuct5ogPN6NrapH20s"
 
 	oconfigPath    string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig"
 	oconfigContext string = "default/172-17-4-50:30448/system:admin"
@@ -185,6 +191,10 @@ var rootCommand = &cobra.Command{
 func init() {
 	flagtypes.GLog(rootCommand.PersistentFlags())
 
+}
+
+func overrideRootCommand() {
+
 	flags := pflag.NewFlagSet("", pflag.ContinueOnError)
 	//f := osclientcmd.New(flags)
 	cmds := cli.NewCommandCLI("oc", "oc", os.Stdin, os.Stdout, os.Stderr)
@@ -210,7 +220,7 @@ func init() {
 	}
 	if val := cmds.PersistentFlags().Lookup("loglevel"); val != nil {
 		fmt.Println("configed")
-		val.Value.Set("5")
+		val.Value.Set("10")
 	} else {
 		fmt.Println("setting")
 		val = cmds.PersistentFlags().VarPF(intValue{5}, "loglevel", "", "")
@@ -220,27 +230,6 @@ func init() {
 	cmds.AddCommand(cmd.NewCmdOptions(os.Stdout))
 
 	rootCommand = cmds
-}
-
-func overrideFlag(name string, action *cobra.Command) *cobra.Command {
-	flags := pflag.NewFlagSet("", pflag.ContinueOnError)
-	//f := osclientcmd.New(flags)
-	cmds := cli.NewCommandCLI("oc", "oc", os.Stdin, os.Stdout, os.Stderr)
-	cmds.Aliases = []string{"oc"}
-	cmds.Use = "oc"
-	cmds.Short = "openshift client"
-	flags.VisitAll(func(flag *pflag.Flag) {
-		if f := cmds.PersistentFlags().Lookup(flag.Name); f == nil {
-			glog.V(5).Infof("flag: %v", flag.Name)
-			cmds.PersistentFlags().AddFlag(flag)
-		} else {
-			glog.V(5).Infof("already registered flag %s", flag.Name)
-		}
-	})
-	//cmds.PersistentFlags().Var(flags.Lookup("config").Value, "kubeconfig", "Specify a kubeconfig file to define the configuration")
-	templates.ActsAsRootCommand(cmds, []string{name})
-	cmds.AddCommand(cmd.NewCmdOptions(os.Stdout))
-	return cmds
 }
 
 func ShowUsers() error {
@@ -264,6 +253,53 @@ func ShowUsers() error {
 		return err
 	}
 	logger.Println(result)
+	return nil
+}
+
+func DoBasicAuth() error {
+	clientConfig := &restclient.Config{}
+	serverNormalized, err := config.NormalizeServerURL("https://172.17.4.50:30448")
+	if err != nil {
+		return err
+	}
+	clientConfig.Host = serverNormalized
+	clientConfig.CAFile = oca
+	clientConfig.CertFile = oclientcrt
+	clientConfig.KeyFile = oclientkey
+	clientConfig.GroupVersion = &unversioned.GroupVersion{Group: "", Version: "v1"}
+	clientConfig.APIPath = "/oapi"
+	clientConfig.Codec = kapi.Codecs.LegacyCodec(*clientConfig.GroupVersion, kapi.SchemeGroupVersion)
+	//clientConfig.Codec = kapi.Codecs.CodecForVersions(json.NewYAMLSerializer(json.DefaultMetaFactory, nil, nil), kapi.Codecs.UniversalDeserializer(), []unversioned.GroupVersion{*clientConfig.GroupVersion}, []unversioned.GroupVersion{*clientConfig.GroupVersion})
+	//clientConfig.Codec = kapi.Codecs.CodecForVersions(json.NewYAMLSerializer(json.DefaultMetaFactory, nil, nil), []unversioned.GroupVersion{*clientConfig.GroupVersion}, []unversioned.GroupVersion{*clientConfig.GroupVersion})
+	logger.Printf("simple config: %+v\n", clientConfig)
+
+	//clientConfig.Username = "tangfeixiong"
+	//clientConfig.Password = "tangfeixiong"
+	//	token, err := tokencmd.RequestToken(clientConfig, os.Stdin, clientConfig.Username, clientConfig.Password)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	logger.Printf("current token: %+v\n", token)
+	//	clientConfig.BearerToken = token
+
+	clientConfig.BearerToken = "IqEFJ7eK2_Pls4JHItvMPLBqGcuct5ogPN6NrapH20s"
+	clientConfig.Username = ""
+	clientConfig.Password = ""
+
+	clientK8s, err := restclient.RESTClientFor(clientConfig)
+	if err != nil {
+		return err
+	}
+
+	osClient := &client.Client{clientK8s}
+
+	me, err := osClient.Projects().List(kapi.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	logger.Printf("Result: %+v\n", me)
+
 	return nil
 }
 
