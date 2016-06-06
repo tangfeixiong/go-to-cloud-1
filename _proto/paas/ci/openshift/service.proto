@@ -1,0 +1,138 @@
+syntax = "proto3";
+package paas.ci.openshift.service;
+
+option go_package = "openshift";
+
+service SimpleService {
+	rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
+
+	rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
+
+	rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+
+	rpc LookupProjects(LookupProjectsRequest) returns (LookupProjectsResponse);
+
+	rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
+
+	rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
+
+	//rpc BuildDockerImage(BuildDockerImageRequest) returns (stream BuildDockerImageResponse) {
+	//}
+
+	//rpc RebuildDockerImage(RebuildDockerImageRequest) returns (stream RebuildDockerImageResponse) {
+	//}
+
+	//rpc CatBuildMessage(CatBuildMessageRequest) returns (CatBuildMessageResponse) {
+	//}
+
+	//rpc RmBuildMessage(RmBuildMessageRequest) returns (RmBuildMessageResponse) {
+	//}
+
+	//rpc CpDockerfileBuildSource(CpDockerfileBuildSourceRequest) returns (CpDockerfileBuildSourceResponse) {
+	//}
+
+	//rpc CatDockerfileBuildSource(CatDockerfileBuildSourceRequest) returns (CatDockerfileBuildSourceResponse) {
+	//}
+
+	//rpc ViDockerfileBuildSource(ViDockerfileBuildSourceRequest) returns (ViDockerfileBuildSourceResponse) {
+	//}
+
+	//rpc RmDockerfileBuildSource(RmDockerfileBuildSourceRequest) returns (RmDockerfileBuildSourceResponse) {
+	//}
+}
+
+message EnterWorkspaceRequest {
+	string username = 1;
+	
+	string credentials = 2;
+}
+
+message EnterWorkspaceResponse {
+	string identifier  = 1;
+}
+
+message LeaveWorkspaceRequest {
+	string username = 1;
+	
+	string identifier = 2;
+}
+
+message LeaveWorkspaceResponse {
+	int64 flag  = 1;
+}
+
+message CreateProjectRequest {
+	string identifier  = 1;
+	
+	string projectID  = 2;
+	
+	string projectName  = 3;
+	
+	string description  = 4;
+}
+
+message CreateProjectResponse {
+	string apiVersion = 1;
+	
+	string kind = 2;
+	
+	bytes projectJSON = 3;
+}
+
+message LookupProjectsRequest {
+	string identifier  = 1;
+}
+
+message LookupProjectsResponse {
+	string apiVersion = 1;
+	
+	string kind = 2;
+	
+	bytes projectsJSON = 3;
+}
+
+message OpenProjectRequest {
+	string identifier  = 1;
+	
+	string projectID  = 2;
+}
+
+message OpenProjectResponse {
+	string apiVersion = 1;
+	
+	string kind = 2;
+	
+	bytes projectJSON = 3;
+}
+
+message DeleteProjectRequest {
+	string identifier  = 1;
+	
+	string projectID  = 2;
+}
+
+message DeleteProjectResponse {
+	int64 flag = 1;
+}
+
+message BuildDockerImageRequest {
+	string dockerfileContent = 1;
+	
+	string contextArchive = 2;
+	
+	string gitrepo = 3;
+	
+	string binaryStream = 4;
+}
+
+message GitRepo {
+	string site = 1;
+	
+	string uri = 2;
+	
+	string ref = 3;
+	
+	string contextPath = 4;
+	
+	string dockerFile = 5;
+}

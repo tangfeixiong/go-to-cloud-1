@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/helm/helm-classic/codec"
 
@@ -58,14 +59,15 @@ func main() {
 	}
 
 	osClient := &client.Client{osRestClient}
-	result, err := osClient.Projects().List(kapi.ListOptions{})
+
+	result, err := osClient.ProjectRequests().List(kapi.ListOptions{})
 	if err != nil {
 		logger.Fatal(err)
 	}
 	log.Printf("result: %+v\n", result)
 
 	//result = &projectapi.ProjectList{}
-	b, err := osRestClient.Get().Resource("projects").VersionedParams(&kapi.ListOptions{}, kapi.ParameterCodec).DoRaw()
+	b, err := osRestClient.Get().Resource("projectRequests").VersionedParams(&kapi.ListOptions{}, kapi.ParameterCodec).DoRaw()
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -76,32 +78,41 @@ func main() {
 		logger.Fatalf("Could not set up helm classic codec object: %s\n", err)
 	}
 
-	var obj projectapi.ProjectList
+	var obj unversioned.Status
 	if err := hobj.Object(&obj); err != nil {
 		logger.Fatalf("Could not decode into openshift object: %s\n", err)
 	}
 
-	var olist kapi.List
-	olist.Kind = "ProjectList"
-	olist.APIVersion = "v1"
+	log.Printf("ProjectRequest: %+v\n", obj)
 
-	var kobj runtime.Object
-	for i := 0; i < len(obj.Items); i += 1 {
-		v := &obj.Items[i]
-		v.Kind = "Project"
-		v.APIVersion = "v1"
-
-		var buf bytes.Buffer
-		if err := codec.JSON.Encode(&buf).One(v); err != nil {
-			logger.Fatalf("Could not encode with openshift object: %s\n", err)
-		}
-		log.Println(buf.String())
-
-		kobj = v
-		olist.Items = append(olist.Items, kobj)
-		log.Println(kobj.(*projectapi.Project))
+	if !strings.EqualFold(obj.Status, "Success") {
+		os.Exit(1)
 	}
 
-	log.Printf("ProjectList: %+v\n%+v\n", olist, obj)
-	os.Exit(0)
+	pr := new(projectapi.ProjectRequest)
+	pr.Kind = "ProjectRequest"
+	pr.APIVersion = "v1"
+	pr.Name = "gogogo"
+	pr.DisplayName = "gogogo"
+	pr.Description = "gogogo"
+
+	result1, err := osClient.ProjectRequests().Create(pr)
+	if err != nil {
+		if strings.EqualFold(err.Error(), "encoding is not allowed for this codec: *recognizer.decoder") {
+			var buf bytes.Buffer
+			if err := codec.JSON.Encode(&buf).One(pr); err != nil {
+				logger.Fatalf("Could not set up encoder: %+v\n", err)
+			}
+			//so if failure (already exist), return unversioned.Status
+			//{"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"project \"gogogo\" already exists","reason":"AlreadyExists","details":{"name":"gogogo","kind":"project"},"code":409}
+			b, err = osRestClient.Post().Resource("projectRequests").Body(buf.Bytes()).DoRaw()
+			if err != nil {
+				logger.Fatalf("Bad request to create project: %+v\n", err)
+			}
+		} else {
+			logger.Fatalf("Could not request to create project: %+v\n", err)
+		}
+	}
+
+	log.Println(result1, "\n", string(b))
 }
