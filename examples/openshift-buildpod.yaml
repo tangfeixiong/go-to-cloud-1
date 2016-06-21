@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    openshift.io/build.name: netcat-http
+  creationTimestamp: 2016-06-19T06:02:28Z
+  labels:
+    openshift.io/build.name: netcat-http
+  name: netcat-http-build
+  namespace: tangfeixiong
+  resourceVersion: "46129068"
+  selfLink: /api/v1/namespaces/tangfeixiong/pods/netcat-http-build
+  uid: 6765cdf9-35e3-11e6-945e-0800274654e7
+spec:
+  containers:
+  - args:
+    - --loglevel=5
+    env:
+    - name: BUILD
+      value: |
+        {"kind":"Build","apiVersion":"v1","metadata":{"name":"netcat-http","namespace":"tangfeixiong","selfLink":"/oapi/v1/namespaces/tangfeixiong/builds/netcat-http","uid":"67593e22-35e3-11e6-b977-12fd6dcab3cd","resourceVersion":"153","creationTimestamp":"2016-06-19T06:02:28Z","labels":{"openshift.io/build-config.name":"tangfeixiong"},"annotations":{"openshift.io/build.number":"1"}},"spec":{"source":{"type":"Git","dockerfile":"\"FROM alpine:edge\\nRUN apk add --update netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\\nCOPY entrypoint.sh /\\nENTRYPOINT [\\\"/entrypoint.sh\\\"]\\nCMD [\\\"nc\\\"]\"","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git","ref":"master"},"contextDir":"latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"alpine:edge"}}},"output":{"to":{"kind":"DockerImage","name":"docker.io/tangfeixiong/nc-http-dev:latest"},"pushSecret":{"name":"tangfeixiong"}},"resources":{},"postCommit":{},"triggeredBy":null},"status":{"phase":"New","outputDockerImageReference":"docker.io/tangfeixiong/nc-http-dev:latest"}}
+    - name: BUILD_LOGLEVEL
+      value: "5"
+    - name: SOURCE_REPOSITORY
+      value: https://github.com/tangfeixiong/docker-nc.git
+    - name: SOURCE_URI
+      value: https://github.com/tangfeixiong/docker-nc.git
+    - name: SOURCE_CONTEXT_DIR
+      value: latest
+    - name: SOURCE_REF
+      value: master
+    - name: ORIGIN_VERSION
+      value: v1.3.0-alpha.1-39-gde8130a-dirty
+    - name: PUSH_DOCKERCFG_PATH
+      value: /var/run/secrets/openshift.io/push
+    image: openshift/origin-docker-builder:v1.3.0-alpha.1
+    imagePullPolicy: IfNotPresent
+    name: docker-build
+    resources: {}
+    securityContext:
+      privileged: true
+    terminationMessagePath: /dev/termination-log
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-socket
+    - mountPath: /var/run/secrets/openshift.io/push
+      name: tangfeixiong-push
+      readOnly: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-o4cdz
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  imagePullSecrets:
+  - name: default-dockercfg-nr9yp
+  nodeName: 172.17.4.50
+  restartPolicy: Never
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  volumes:
+  - hostPath:
+      path: /var/run/docker.sock
+    name: docker-socket
+  - name: tangfeixiong-push
+    secret:
+      secretName: tangfeixiong
+  - name: default-token-o4cdz
+    secret:
+      secretName: default-token-o4cdz
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: 2016-06-19T06:02:42Z
+    message: 'containers with unready status: [docker-build]'
+    reason: ContainersNotReady
+    status: "False"
+    type: Ready
+  containerStatuses:
+  - containerID: docker://bfb55433c32073432c69c6f1e07e970229afa45bca9867556670813bd8f16336
+    image: openshift/origin-docker-builder:v1.3.0-alpha.1
+    imageID: docker://51ecec804276d57e75c6b482bd7be55b3e00702354ecdbcdf2b3d8513fff9738
+    lastState: {}
+    name: docker-build
+    ready: false
+    restartCount: 0
+    state:
+      terminated:
+        containerID: docker://bfb55433c32073432c69c6f1e07e970229afa45bca9867556670813bd8f16336
+        exitCode: 255
+        finishedAt: 2016-06-19T06:02:41Z
+        reason: Error
+        startedAt: 2016-06-19T06:02:32Z
+  hostIP: 172.17.4.50
+  phase: Failed
+  podIP: 172.17.0.20
+  startTime: 2016-06-19T06:02:29Z

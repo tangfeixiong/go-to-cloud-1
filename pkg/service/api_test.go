@@ -1,53 +1,38 @@
-/*
- Copyright 2016, All rights reserved.
- 
- Author <tangfx128@gmail.com>
-*/
-
-package servers
+package service
 
 import (
-    _ "fmt"
-    "log"
-    "net/http"
-    "os"
-    
-    restful "github.com/emicklei/go-restful"
-    "github.com/emicklei/go-restful/swagger"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 
+	restful "github.com/emicklei/go-restful"
+	"github.com/emicklei/go-restful/swagger"
 )
 
-type ApiServerInterface interface {
-	Dispatch()
-}
-
 type apiServer struct {
-    Port string
-    //Ip   string
+	Port string
+	//Ip   string
 }
 
-func NewApiServer() *ApiServer {
-    s := apiServer{
-        Port: "8080",
-    }
-	
+func NewApiServer() *apiServer {
+	s := apiServer{
+		Port: "8080",
+	}
+
 	if port := os.Getenv("PORT"); port != "" {
-	    s.Port = port
-	} 
-    
-    return &s
+		s.Port = port
+	}
+
+	return &s
 }
 
-func (s *ApiServer) Dispatch() {
-	
-}
-
-func (s *ApiServer) Run() error {
-    // to see what happens in the package, uncomment the following
+func (s *apiServer) Run() {
+	// to see what happens in the package, uncomment the following
 	restful.TraceLogger(log.New(os.Stdout, "[restful] ", log.LstdFlags|log.Lshortfile))
 
-	ctx := userResource { AppCtx: s }
-	ctx.Register()
+	res := UserResource{}
+	res.Register(nil, nil)
 	//wsContainer := restful.NewContainer()
 	//ctx.Register(wsContainer)
 
@@ -67,12 +52,12 @@ func (s *ApiServer) Run() error {
 
 	//log.Printf("start listening on localhost:8080")
 	//log.Fatal(http.ListenAndServe(":8080", nil))
-	
-	log.Printf("Start Listening on port %s\n", s.Port)
-	err := http.ListenAndServe(":" + s.Port, nil)
-	
+
+	fmt.Printf("Start Listening on port %s\n", s.Port)
+	if err := http.ListenAndServe(":"+s.Port, nil); err != nil {
+		log.Fatal(err)
+	}
+
 	//server := &http.Server{Addr: ":8080", Handler: wsContainer}
 	//log.Fatal(server.ListenAndServe())
-	    
-	return err
 }

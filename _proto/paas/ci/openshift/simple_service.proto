@@ -1,16 +1,16 @@
 syntax = "proto3";
 
 import "google/protobuf/any.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
 
 package paas.ci.openshift;
 
 option go_package = "openshift";
 
-service ArbitraryService {
+service SimpleService {
+	rpc CreateOriginProjectArbitrary(CreateOriginProjectArbitraryRequest) returns (CreateOriginProjectArbitraryResponse);
+
+	rpc FindProject(FindProjectRequest) returns (FindProjectResponse);
+
 	rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
 
 	rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
@@ -46,6 +46,14 @@ service ArbitraryService {
 
 	//rpc RmDockerfileBuildSource(RmDockerfileBuildSourceRequest) returns (RmDockerfileBuildSourceResponse) {
 	//}
+}
+
+message CreateOriginProjectArbitraryRequest {
+    google.protobuf.Any project = 1;
+}
+
+message CreateOriginProjectArbitraryResponse {
+	google.protobuf.Any project = 1;
 }
 
 message EnterWorkspaceRequest {
@@ -96,6 +104,16 @@ message LookupProjectsResponse {
 	string kind = 2;
 	
 	bytes projectsJSON = 3;
+}
+
+message FindProjectRequest {
+	string name = 1;
+}
+
+message FindProjectResponse {
+	string name = 1;
+	
+	google.protobuf.Any project = 2;
 }
 
 message OpenProjectRequest {

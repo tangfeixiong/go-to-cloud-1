@@ -8,23 +8,25 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/api/paas/ci/openshift"
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/server"
+	_ "github.com/tangfeixiong/go-to-cloud-1/pkg/server"
 )
-
-type appliance struct {
-}
 
 var (
-	errNotFound   error = errors.New("not found")
-	errUnexpected error = errors.New("unexpected")
+	errNotFound       error = errors.New("not found")
+	errNotImplemented error = errors.New("not implemented")
+	errUnexpected     error = errors.New("unexpected")
 
-	Appliance appliance
+	oss = &ossvc{}
 )
 
-func init() {
-	openshift.RegisterSimpleServiceServer(server.ApiServer.GrpcRootServer, Appliance)
+type ossvc struct {
 }
 
-func (app *appliance) EnterWorkspace(context.Context, *openshift.EnterWorkspaceRequest) (*openshift.EnterWorkspaceResponse, error) {
+func init() {
+	//openshift.RegisterSimpleServiceServer(server.ApiServer.GrpcRootServer, oss)
+}
 
+func (oss *ossvc) EnterWorkspace(context.Context, *openshift.EnterWorkspaceRequest) (*openshift.EnterWorkspaceResponse, error) {
+	glog.Info("grpc request")
+	return nil, errNotImplemented
 }

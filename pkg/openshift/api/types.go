@@ -5,6 +5,10 @@ import (
 	kapi "k8s.io/kubernetes/pkg/api"
 )
 
+var (
+	FinalizerVender kapi.FinalizerName = "qingyuanos.io/harpoon"
+)
+
 type DockerImageBuild struct {
 	DockerfileContent    string
 	GitSourcedDockerfile *GitSourcedDockerfile
@@ -15,7 +19,7 @@ type DockerImageBuild struct {
 	Env                  []kapi.EnvVar
 	Repo                 string
 	PushCredential       BasicAuth
-	PullSecretName       string
+	PushSecretName       string
 	Trigger              *buildapi.BuildTriggerPolicy
 }
 
