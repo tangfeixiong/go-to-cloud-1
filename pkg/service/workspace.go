@@ -5,7 +5,7 @@ import (
 
 	_ "google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/api/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
 )
 
 func (u *UserResource) EnterWorkspace(ctx context.Context, in *openshift.EnterWorkspaceRequest) (*openshift.EnterWorkspaceResponse, error) {

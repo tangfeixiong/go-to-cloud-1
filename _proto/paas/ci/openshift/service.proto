@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-import "google/protobuf/any.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
+// import "google/protobuf/any.proto";
+// import "google/protobuf/duration.proto";
+// import "google/protobuf/struct.proto";
+// import "google/protobuf/timestamp.proto";
+// import "google/protobuf/wrappers.proto";
 
 package paas.ci.openshift;
 
 option go_package = "openshift";
 
-service ArbitraryService {
+service SimpleService {
 	rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
 
 	rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);

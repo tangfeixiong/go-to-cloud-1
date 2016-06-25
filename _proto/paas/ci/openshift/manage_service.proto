@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+//import "google/protobuf/any.proto";
+
+package paas.ci.openshift;
+
+option go_package = "openshift";
+
+service SimpleManageService {
+	rpc CreateOriginProject(CreateOriginProjectRequest) returns (CreateOriginProjectResponse);
+
+	rpc CreateOriginProjectArbitrary(CreateOriginProjectArbitraryRequest) returns (CreateOriginProjectArbitraryResponse);
+
+	rpc FindProject(FindProjectRequest) returns (FindProjectResponse);
+
+	//rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
+
+	//rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
+
+	//rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+
+	//rpc LookupProjects(LookupProjectsRequest) returns (LookupProjectsResponse);
+
+	//rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
+
+	//rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
+
+	//rpc BuildDockerImage(BuildDockerImageRequest) returns (stream BuildDockerImageResponse) {
+	//}
+
+	//rpc RebuildDockerImage(RebuildDockerImageRequest) returns (stream RebuildDockerImageResponse) {
+	//}
+
+	//rpc CatBuildMessage(CatBuildMessageRequest) returns (CatBuildMessageResponse) {
+	//}
+
+	//rpc RmBuildMessage(RmBuildMessageRequest) returns (RmBuildMessageResponse) {
+	//}
+
+	//rpc CpDockerfileBuildSource(CpDockerfileBuildSourceRequest) returns (CpDockerfileBuildSourceResponse) {
+	//}
+
+	//rpc CatDockerfileBuildSource(CatDockerfileBuildSourceRequest) returns (CatDockerfileBuildSourceResponse) {
+	//}
+
+	//rpc ViDockerfileBuildSource(ViDockerfileBuildSourceRequest) returns (ViDockerfileBuildSourceResponse) {
+	//}
+
+	//rpc RmDockerfileBuildSource(RmDockerfileBuildSourceRequest) returns (RmDockerfileBuildSourceResponse) {
+	//}
+}
+
+message CreateOriginProjectRequest {
+    string name = 1;
+	
+	repeated string finalizers = 2;
+}
+
+message CreateOriginProjectResponse {
+	//google.protobuf.Any project = 1;
+	
+	string id = 1;
+	string phase = 2;
+}
+
+message CreateOriginProjectArbitraryRequest {
+    //google.protobuf.Any project = 1;
+
+	bytes odefv1RawData = 1;
+}
+
+message CreateOriginProjectArbitraryResponse {
+	//google.protobuf.Any project = 1;
+
+	bytes odefv1RawData = 1;
+}
+
+message FindProjectRequest {
+	string name = 1;
+}
+
+message FindProjectResponse {
+	//google.protobuf.Any project = 1;
+	
+	bytes odefv1RawData = 1;
+}

@@ -3,11 +3,22 @@ package service
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"testing"
+	"time"
 
 	restful "github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
+
+	"github.com/golang/glog"
+
+	"golang.org/x/net/context"
+
+	"google.golang.org/grpc"
+
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
 )
 
 type apiServer struct {
@@ -60,4 +71,65 @@ func (s *apiServer) Run() {
 
 	//server := &http.Server{Addr: ":8080", Handler: wsContainer}
 	//log.Fatal(server.ListenAndServe())
+}
+
+var (
+	grpcServer *grpc.Server
+)
+
+func startServerGRPC() {
+
+	lstn, err := net.Listen("tcp", ":8086")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
+		os.Exit(1)
+	}
+
+	grpcServer = grpc.NewServer()
+	openshift.RegisterSimpleServiceServer(grpcServer, Usrs)
+	openshift.RegisterSimpleManageServiceServer(grpcServer, Usrs)
+
+	fmt.Printf("grpc server is running on %s\n", "")
+
+	if err := grpcServer.Serve(lstn); err != nil {
+		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
+		os.Exit(1)
+	}
+
+	glog.Info("quit application\n")
+
+}
+
+func stopServerGRPC() {
+	if grpcServer != nil {
+		time.Sleep(1000)
+		grpcServer.Stop()
+	}
+}
+
+func TestFindProjectGRPC(t *testing.T) {
+	go startServerGRPC()
+	grpcFindProject()
+	time.Sleep(1200)
+	stopServerGRPC()
+}
+
+func grpcFindProject() {
+	conn, err := grpc.Dial(":8086", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	c := openshift.NewSimpleManageServiceClient(conn)
+
+	// Contact the server and print out its response.
+	req := &openshift.FindProjectRequest{
+		Name: "tangfeixiong",
+	}
+
+	resp, err := c.FindProject(context.Background(), req)
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	log.Printf("Greeting: %+v, %s", resp, string(resp.Odefv1RawData))
 }

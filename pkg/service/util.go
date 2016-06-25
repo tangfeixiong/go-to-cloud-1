@@ -6,4 +6,5 @@ import (
 
 var (
 	errNotImplemented error = errors.New("Not Implemented")
+	errUnexpected     error = errors.New("Unexpected")
 )

@@ -1,16 +1,49 @@
 package service
 
 import (
+	"errors"
 	"time"
 
 	restful "github.com/emicklei/go-restful"
+
+	//google_protobuf "github.com/golang/protobuf/ptypes/any"
 
 	"golang.org/x/net/context"
 
 	_ "google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/api/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
 )
+
+func (u *UserResource) CreateOriginProject(context.Context, *openshift.CreateOriginProjectRequest) (*openshift.CreateOriginProjectResponse, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) CreateOriginProjectArbitrary(context.Context, *openshift.CreateOriginProjectArbitraryRequest) (*openshift.CreateOriginProjectArbitraryResponse, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) FindProject(ctx context.Context, req *openshift.FindProjectRequest) (*openshift.FindProjectResponse, error) {
+	if req.Name == "" {
+		return nil, errors.New("Unexpected")
+	}
+	raw, obj, err := client.RetrieveProject(req.Name)
+	if err != nil {
+		return nil, err
+	}
+	if len(raw) == 0 || obj == nil {
+		return nil, errUnexpected
+	}
+	resp := &openshift.FindProjectResponse{
+		Odefv1RawData: raw,
+		//Project: &google_protobuf.Any{
+		//	TypeUrl: "type.googleapis.com/github.com/openshift/origin/pkg/project/api/v1",
+		//	Value:   raw,
+		//},
+	}
+	return resp, nil
+}
 
 func (u *UserResource) createProject(request *restful.Request, response *restful.Response) {
 	// ctx is the Context for this handler. Calling cancel closes the

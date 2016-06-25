@@ -12,7 +12,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/api/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/service"
 )
 
@@ -37,6 +37,7 @@ func (s *APIContextServer) GRPCServer(server *grpc.Server) *APIContextServer {
 	}
 	s.grpcServer = server
 	openshift.RegisterSimpleServiceServer(server, service.Usrs)
+	openshift.RegisterSimpleManageServiceServer(server, service.Usrs)
 	return s
 }
 
