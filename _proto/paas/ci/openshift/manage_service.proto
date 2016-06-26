@@ -5,6 +5,8 @@ syntax = "proto3";
 package paas.ci.openshift;
 
 option go_package = "openshift";
+option java_package = "com.qingyuanos.core.googleprotobuf.openshiftapis";
+option java_outer_classname = "ProjectAndBuild";
 
 service SimpleManageService {
 	rpc CreateOriginProject(CreateOriginProjectRequest) returns (CreateOriginProjectResponse);
