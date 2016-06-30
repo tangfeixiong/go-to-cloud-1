@@ -3,6 +3,9 @@
 openshift.local.etcd
 openshift.local.volumes
 secrets
+_maven_compile/google-protobuf-plus-grpc/target/classes
+_maven_compile/google-protobuf-plus-grpc/target/*.jar
+.gradle
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o

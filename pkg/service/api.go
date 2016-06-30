@@ -8,6 +8,9 @@ import (
 
 	restful "github.com/emicklei/go-restful"
 	"github.com/emicklei/go-restful/swagger"
+	"github.com/gengo/grpc-gateway/runtime"
+
+	"golang.org/x/net/context"
 )
 
 type user struct {
@@ -25,6 +28,10 @@ type UserResource struct {
 	users     map[string]user
 	user      *user
 	workspace string
+
+	ContextBase context.Context
+	HttpMuxs    []*http.ServeMux
+	GatewayMux  *runtime.ServeMux
 }
 
 var (
@@ -79,7 +86,7 @@ func (u *UserResource) todo(request *restful.Request, response *restful.Response
 	response.Write(blankEntity)
 }
 
-func Run() {
+func Run() error {
 	// to see what happens in the package, uncomment the following
 	restful.TraceLogger(log.New(os.Stdout, "[restful] ", log.LstdFlags|log.Lshortfile))
 
@@ -111,11 +118,11 @@ func Run() {
 	//swagger.RegisterSwaggerService(config, wsContainer)
 	swagger.RegisterSwaggerService(config, restful.DefaultContainer)
 
-	log.Printf("start listening on %s:8085", "")
-	log.Fatal(http.ListenAndServe(":8085", nil))
-
 	//server := &http.Server{Addr: ":8080", Handler: wsContainer}
 	//log.Fatal(server.ListenAndServe())
+
+	log.Printf("start listening on %s:8085", "")
+	return http.ListenAndServe(":8085", nil)
 }
 
 //type handler func(request *restful.Request, response *restful.Response)

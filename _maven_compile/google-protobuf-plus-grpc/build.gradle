@@ -1,0 +1,74 @@
+//task wrapper(type: Wrapper) {
+//    gradleVersion = '2.12'
+//}
+apply plugin: 'java'
+apply plugin: 'com.google.protobuf'
+
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+  dependencies {
+    // ASSUMES GRADLE 2.12 OR HIGHER. Use plugin version 0.7.5 with earlier
+    // gradle versions
+    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.7'
+    //classpath 'com.google.protobuf:protobuf-gradle-plugin:0.7.8-SNAPSHOT'
+  }
+}
+
+protobuf {
+  protoc {
+    // The version of protoc must match protobuf-java. If you don't depend on
+    // protobuf-java directly, you will be transitively depending on the
+    // protobuf-java version that grpc depends on.
+    //path = '/usr/local/bin/protoc'
+    //artifact = "com.google.protobuf:protoc:3.0.0-beta-2"
+    path = '/usr/local/bin/protoc'
+  }
+  plugins {
+    grpc {
+      artifact = 'io.grpc:protoc-gen-grpc-java:0.14.1'
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc {}
+    }
+  }
+}
+
+sourceSets {
+  main {
+    proto {
+      // In addition to the default 'src/main/proto'
+      srcDir 'src/main/protobuf'
+      srcDir 'src/main/protocolbuffers'
+      // In addition to the default '**/*.proto' (use with caution).
+      // Using an extension other than 'proto' is NOT recommended,
+      // because when proto files are published along with class files, we can
+      // only tell the type of a file from its extension.
+      include '**/*.protodevel'
+    }
+    java {
+     
+    }
+  }
+  test {
+    proto {
+      // In addition to the default 'src/test/proto'
+      srcDir 'src/test/protocolbuffers'
+    }
+  }
+}
+
+task printDeps(dependsOn: build) << {
+  configurations.each { println it }
+  sourceSets.each { println it.getCompileTaskName("proto") }
+  sourceSets.each { println it.getCompileTaskName("java") }
+  sourceSets.each { println it }
+  println tasks['generateProto'].source
+  println tasks['compileJava'].source
+  println project.buildDir
+  println project.buildDir.path
+}

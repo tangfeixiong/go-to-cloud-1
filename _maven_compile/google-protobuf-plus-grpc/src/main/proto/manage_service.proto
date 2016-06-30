@@ -1,30 +1,21 @@
 syntax = "proto3";
 
 //import "google/protobuf/any.proto";
-import "google/api/annotations.proto";
 
-package paas.ci.openshift;
+package openshift;
 
-option go_package = "openshift";
+//option go_package = "openshift";
+option java_multiple_files = true;
 option java_package = "com.qingyuanos.core.googleprotobuf.openshiftapis";
 option java_outer_classname = "ProjectAndBuild";
+option objc_class_prefix = "OS";
 
 service SimpleManageService {
-	rpc CreateOriginProject(CreateOriginProjectRequest) returns (CreateOriginProjectResponse){
-		option (google.api.http) = {
-          put: "/v1/odib/projects/{name}"
-          body: "*"
-        };
-	}
+	rpc CreateOriginProject(CreateOriginProjectRequest) returns (CreateOriginProjectResponse) { }
 
-	rpc CreateOriginProjectArbitrary(CreateOriginProjectArbitraryRequest) returns (CreateOriginProjectArbitraryResponse) {
-		option (google.api.http) = {
-          post: "/v1/odib/projects"
-          body: "*"
-        };		
-	}
+	rpc CreateOriginProjectArbitrary(CreateOriginProjectArbitraryRequest) returns (CreateOriginProjectArbitraryResponse) {}
 
-	rpc FindProject(FindProjectRequest) returns (FindProjectResponse);
+	rpc FindProject(FindProjectRequest) returns (FindProjectResponse) {}
 
 	//rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
 
@@ -64,7 +55,7 @@ service SimpleManageService {
 }
 
 message CreateOriginProjectRequest {
-    string name = 1;
+        string name = 1;
 	
 	repeated string finalizers = 2;
 }
