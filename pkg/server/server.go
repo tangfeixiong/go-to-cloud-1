@@ -6,8 +6,11 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"path"
 	"strings"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/emicklei/go-restful"
@@ -83,11 +86,11 @@ func runGrpcServer() error {
 func newGateway(ctx context.Context, opts ...runtime.ServeMuxOption) (http.Handler, error) {
 	mux := runtime.NewServeMux(opts...)
 	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
-	err := openshift.RegisterSimpleManageServiceHandlerFromEndpoint(ctx, mux, "localhost:8087", dialOpts)
+	err := openshift.RegisterSimpleManageServiceHandlerFromEndpoint(ctx, mux, "localhost:8086", dialOpts)
 	if err != nil {
 		return nil, err
 	}
-	//err = openshift.RegisterStreamServiceHandlerFromEndpoint(ctx, mux, "localhost:8087", dialOpts)
+	//err = openshift.RegisterStreamServiceHandlerFromEndpoint(ctx, mux, *abeEndpoint, dialOpts)
 	//if err != nil {
 	//	return nil, err
 	//}
@@ -154,29 +157,37 @@ func runGrpcGateway(address string, opts ...runtime.ServeMuxOption) error {
 	service.Usrs.HttpMuxs = []*http.ServeMux{mux}
 	service.Usrs.GatewayMux = gw.(*runtime.ServeMux)
 
-	http.ListenAndServe(address, allowCORS(mux))
-	return nil
+	return http.ListenAndServe(address, allowCORS(mux))
 }
 
 func Run() {
+	var wg sync.WaitGroup
+	wg.Add(1)
 	errCh := make(chan error, 2)
 	go func() {
 		if err := runGrpcServer(); err != nil {
 			errCh <- fmt.Errorf("cannot run gRPC service: %v", err)
+			//APIServer.grpcServer.Stop()
+			APIServer.grpcServer = nil
 		}
 	}()
 
 	go func() {
-		if err := runGrpcGateway(":8080"); err != nil {
+		time.Sleep(1000 * time.Millisecond)
+		if APIServer.grpcServer == nil {
+			wg.Done()
+			return
+		}
+		APIServer.grpcGateway = service.Usrs
+		if err := runGrpcGateway(":8087"); err != nil {
 			errCh <- fmt.Errorf("cannot run gateway service: %v", err)
-		} else {
-			APIServer.grpcGateway = service.Usrs
+			wg.Done()
 		}
 	}()
 
 	ch := make(chan int, 1)
 	go func() {
-		time.Sleep(100 * time.Millisecond)
+		wg.Wait()
 		if err := service.Run(); err != nil {
 			fmt.Printf("Could not start REST service: %s\n", err)
 			ch <- 1
@@ -191,5 +202,11 @@ func Run() {
 		os.Exit(1)
 	case status := <-ch:
 		os.Exit(status)
+	default:
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
+
+		// Block until a signal is received.
+		<-c
 	}
 }
