@@ -7,7 +7,6 @@
 
 	It is generated from these files:
 		paas/ci/openshift/manage_service.proto
-		paas/ci/openshift/service.proto
 
 	It has these top-level messages:
 		CreateOriginProjectRequest
@@ -16,26 +15,49 @@
 		CreateOriginProjectArbitraryResponse
 		FindProjectRequest
 		FindProjectResponse
-		EnterWorkspaceRequest
-		EnterWorkspaceResponse
-		LeaveWorkspaceRequest
-		LeaveWorkspaceResponse
-		CreateProjectRequest
-		CreateProjectResponse
-		LookupProjectsRequest
-		LookupProjectsResponse
-		OpenProjectRequest
-		OpenProjectResponse
 		DeleteProjectRequest
 		DeleteProjectResponse
-		BuildDockerImageRequest
-		GitRepo
+		SourceControlUser
+		GitSourceRevision
+		SourceRevision
+		BuildPostCommitSpec
+		BuildOutput
+		JenkinsPipelineBuildStrategy
+		SecretSpec
+		CustomBuildStrategy
+		SourceBuildStrategy
+		DockerBuildStrategy
+		BuildStrategy
+		SecretBuildSource
+		ImageSourcePath
+		ImageSource
+		GitBuildSource
+		BinaryBuildSource
+		BuildSource
+		OsoCommonSpec
+		WebHookTrigger
+		ImageChangeTrigger
+		OsoBuildTriggerPolicy
+		GenericWebHookCause
+		GitHubWebHookCause
+		ImageChangeCause
+		OsoBuildTriggerCause
+		OsoBuildStatus
+		DockerBuildConfigRequestData
+		DockerBuildConfigResponseData
+		DockerBuildRequestData
+		DockerBuildResponseData
+		RawData
 */
 package openshift
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import _ "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api"
+import github_com_openshift_origin_pkg_build_api_v1 "github.com/openshift/origin/pkg/build/api/v1"
+import k8s_io_kubernetes_pkg_api_unversioned "k8s.io/kubernetes/pkg/api/unversioned"
+import k8s_io_kubernetes_pkg_api_v1 "k8s.io/kubernetes/pkg/api/v1"
 
 import (
 	context "golang.org/x/net/context"
@@ -52,6 +74,163 @@ var _ = math.Inf
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 const _ = proto.ProtoPackageIsVersion1
+
+type BuildStrategy_OsoBuildStrategyType int32
+
+const (
+	BuildStrategy_Docker          BuildStrategy_OsoBuildStrategyType = 0
+	BuildStrategy_Source          BuildStrategy_OsoBuildStrategyType = 1
+	BuildStrategy_Custom          BuildStrategy_OsoBuildStrategyType = 2
+	BuildStrategy_JenkinsPipeline BuildStrategy_OsoBuildStrategyType = 3
+)
+
+var BuildStrategy_OsoBuildStrategyType_name = map[int32]string{
+	0: "Docker",
+	1: "Source",
+	2: "Custom",
+	3: "JenkinsPipeline",
+}
+var BuildStrategy_OsoBuildStrategyType_value = map[string]int32{
+	"Docker":          0,
+	"Source":          1,
+	"Custom":          2,
+	"JenkinsPipeline": 3,
+}
+
+func (x BuildStrategy_OsoBuildStrategyType) String() string {
+	return proto.EnumName(BuildStrategy_OsoBuildStrategyType_name, int32(x))
+}
+func (BuildStrategy_OsoBuildStrategyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{18, 0}
+}
+
+type BuildSource_OsoBuildSourceType int32
+
+const (
+	BuildSource_Git        BuildSource_OsoBuildSourceType = 0
+	BuildSource_Dockerfile BuildSource_OsoBuildSourceType = 1
+	BuildSource_Binary     BuildSource_OsoBuildSourceType = 2
+	BuildSource_Image      BuildSource_OsoBuildSourceType = 3
+	BuildSource_None       BuildSource_OsoBuildSourceType = 4
+)
+
+var BuildSource_OsoBuildSourceType_name = map[int32]string{
+	0: "Git",
+	1: "Dockerfile",
+	2: "Binary",
+	3: "Image",
+	4: "None",
+}
+var BuildSource_OsoBuildSourceType_value = map[string]int32{
+	"Git":        0,
+	"Dockerfile": 1,
+	"Binary":     2,
+	"Image":      3,
+	"None":       4,
+}
+
+func (x BuildSource_OsoBuildSourceType) String() string {
+	return proto.EnumName(BuildSource_OsoBuildSourceType_name, int32(x))
+}
+func (BuildSource_OsoBuildSourceType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{24, 0}
+}
+
+type OsoBuildTriggerPolicy_OsoBuildTriggerType int32
+
+const (
+	OsoBuildTriggerPolicy_GitHub       OsoBuildTriggerPolicy_OsoBuildTriggerType = 0
+	OsoBuildTriggerPolicy_Generic      OsoBuildTriggerPolicy_OsoBuildTriggerType = 1
+	OsoBuildTriggerPolicy_ImageChange  OsoBuildTriggerPolicy_OsoBuildTriggerType = 2
+	OsoBuildTriggerPolicy_ConfigChange OsoBuildTriggerPolicy_OsoBuildTriggerType = 3
+	OsoBuildTriggerPolicy_GoGits       OsoBuildTriggerPolicy_OsoBuildTriggerType = 4
+)
+
+var OsoBuildTriggerPolicy_OsoBuildTriggerType_name = map[int32]string{
+	0: "GitHub",
+	1: "Generic",
+	2: "ImageChange",
+	3: "ConfigChange",
+	4: "GoGits",
+}
+var OsoBuildTriggerPolicy_OsoBuildTriggerType_value = map[string]int32{
+	"GitHub":       0,
+	"Generic":      1,
+	"ImageChange":  2,
+	"ConfigChange": 3,
+	"GoGits":       4,
+}
+
+func (x OsoBuildTriggerPolicy_OsoBuildTriggerType) String() string {
+	return proto.EnumName(OsoBuildTriggerPolicy_OsoBuildTriggerType_name, int32(x))
+}
+func (OsoBuildTriggerPolicy_OsoBuildTriggerType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{28, 0}
+}
+
+type OsoBuildStatus_OsoBuildPhase int32
+
+const (
+	OsoBuildStatus_New       OsoBuildStatus_OsoBuildPhase = 0
+	OsoBuildStatus_Pending   OsoBuildStatus_OsoBuildPhase = 1
+	OsoBuildStatus_Running   OsoBuildStatus_OsoBuildPhase = 2
+	OsoBuildStatus_Complete  OsoBuildStatus_OsoBuildPhase = 3
+	OsoBuildStatus_Failed    OsoBuildStatus_OsoBuildPhase = 4
+	OsoBuildStatus_Error     OsoBuildStatus_OsoBuildPhase = 5
+	OsoBuildStatus_Cancelled OsoBuildStatus_OsoBuildPhase = 6
+)
+
+var OsoBuildStatus_OsoBuildPhase_name = map[int32]string{
+	0: "New",
+	1: "Pending",
+	2: "Running",
+	3: "Complete",
+	4: "Failed",
+	5: "Error",
+	6: "Cancelled",
+}
+var OsoBuildStatus_OsoBuildPhase_value = map[string]int32{
+	"New":       0,
+	"Pending":   1,
+	"Running":   2,
+	"Complete":  3,
+	"Failed":    4,
+	"Error":     5,
+	"Cancelled": 6,
+}
+
+func (x OsoBuildStatus_OsoBuildPhase) String() string {
+	return proto.EnumName(OsoBuildStatus_OsoBuildPhase_name, int32(x))
+}
+func (OsoBuildStatus_OsoBuildPhase) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{33, 0}
+}
+
+type DockerBuildConfigRequestData_OsoBuildRunPolicy int32
+
+const (
+	DockerBuildConfigRequestData_Parallel         DockerBuildConfigRequestData_OsoBuildRunPolicy = 0
+	DockerBuildConfigRequestData_Serial           DockerBuildConfigRequestData_OsoBuildRunPolicy = 1
+	DockerBuildConfigRequestData_SerialLatestOnly DockerBuildConfigRequestData_OsoBuildRunPolicy = 2
+)
+
+var DockerBuildConfigRequestData_OsoBuildRunPolicy_name = map[int32]string{
+	0: "Parallel",
+	1: "Serial",
+	2: "SerialLatestOnly",
+}
+var DockerBuildConfigRequestData_OsoBuildRunPolicy_value = map[string]int32{
+	"Parallel":         0,
+	"Serial":           1,
+	"SerialLatestOnly": 2,
+}
+
+func (x DockerBuildConfigRequestData_OsoBuildRunPolicy) String() string {
+	return proto.EnumName(DockerBuildConfigRequestData_OsoBuildRunPolicy_name, int32(x))
+}
+func (DockerBuildConfigRequestData_OsoBuildRunPolicy) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{34, 0}
+}
 
 type CreateOriginProjectRequest struct {
 	Name       string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -117,6 +296,841 @@ func (m *FindProjectResponse) String() string            { return proto.CompactT
 func (*FindProjectResponse) ProtoMessage()               {}
 func (*FindProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{5} }
 
+type DeleteProjectRequest struct {
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *DeleteProjectRequest) Reset()         { *m = DeleteProjectRequest{} }
+func (m *DeleteProjectRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteProjectRequest) ProtoMessage()    {}
+func (*DeleteProjectRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{6}
+}
+
+type DeleteProjectResponse struct {
+	Flag int64 `protobuf:"varint,1,opt,name=flag,proto3" json:"flag,omitempty"`
+}
+
+func (m *DeleteProjectResponse) Reset()         { *m = DeleteProjectResponse{} }
+func (m *DeleteProjectResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteProjectResponse) ProtoMessage()    {}
+func (*DeleteProjectResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{7}
+}
+
+type SourceControlUser struct {
+	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (m *SourceControlUser) Reset()                    { *m = SourceControlUser{} }
+func (m *SourceControlUser) String() string            { return proto.CompactTextString(m) }
+func (*SourceControlUser) ProtoMessage()               {}
+func (*SourceControlUser) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{8} }
+
+type GitSourceRevision struct {
+	Commit    string             `protobuf:"bytes,1,opt,name=commit,proto3" json:"commit,omitempty"`
+	Author    *SourceControlUser `protobuf:"bytes,2,opt,name=author" json:"author,omitempty"`
+	Committer *SourceControlUser `protobuf:"bytes,3,opt,name=committer" json:"committer,omitempty"`
+	Message   string             `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (m *GitSourceRevision) Reset()                    { *m = GitSourceRevision{} }
+func (m *GitSourceRevision) String() string            { return proto.CompactTextString(m) }
+func (*GitSourceRevision) ProtoMessage()               {}
+func (*GitSourceRevision) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{9} }
+
+func (m *GitSourceRevision) GetAuthor() *SourceControlUser {
+	if m != nil {
+		return m.Author
+	}
+	return nil
+}
+
+func (m *GitSourceRevision) GetCommitter() *SourceControlUser {
+	if m != nil {
+		return m.Committer
+	}
+	return nil
+}
+
+type SourceRevision struct {
+	Type string             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Git  *GitSourceRevision `protobuf:"bytes,2,opt,name=git" json:"git,omitempty"`
+}
+
+func (m *SourceRevision) Reset()                    { *m = SourceRevision{} }
+func (m *SourceRevision) String() string            { return proto.CompactTextString(m) }
+func (*SourceRevision) ProtoMessage()               {}
+func (*SourceRevision) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{10} }
+
+func (m *SourceRevision) GetGit() *GitSourceRevision {
+	if m != nil {
+		return m.Git
+	}
+	return nil
+}
+
+type BuildPostCommitSpec struct {
+	Command []string `protobuf:"bytes,1,rep,name=command" json:"command,omitempty"`
+	Args    []string `protobuf:"bytes,2,rep,name=args" json:"args,omitempty"`
+	Script  string   `protobuf:"bytes,3,opt,name=script,proto3" json:"script,omitempty"`
+}
+
+func (m *BuildPostCommitSpec) Reset()         { *m = BuildPostCommitSpec{} }
+func (m *BuildPostCommitSpec) String() string { return proto.CompactTextString(m) }
+func (*BuildPostCommitSpec) ProtoMessage()    {}
+func (*BuildPostCommitSpec) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{11}
+}
+
+type BuildOutput struct {
+	To         *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=to" json:"to,omitempty"`
+	PushSecret *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pushSecret" json:"pushSecret,omitempty"`
+}
+
+func (m *BuildOutput) Reset()                    { *m = BuildOutput{} }
+func (m *BuildOutput) String() string            { return proto.CompactTextString(m) }
+func (*BuildOutput) ProtoMessage()               {}
+func (*BuildOutput) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{12} }
+
+func (m *BuildOutput) GetTo() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.To
+	}
+	return nil
+}
+
+func (m *BuildOutput) GetPushSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.PushSecret
+	}
+	return nil
+}
+
+type JenkinsPipelineBuildStrategy struct {
+	JenkinsfilePath string `protobuf:"bytes,1,opt,name=jenkinsfilePath,proto3" json:"jenkinsfilePath,omitempty"`
+	Jenkinsfile     string `protobuf:"bytes,2,opt,name=jenkinsfile,proto3" json:"jenkinsfile,omitempty"`
+}
+
+func (m *JenkinsPipelineBuildStrategy) Reset()         { *m = JenkinsPipelineBuildStrategy{} }
+func (m *JenkinsPipelineBuildStrategy) String() string { return proto.CompactTextString(m) }
+func (*JenkinsPipelineBuildStrategy) ProtoMessage()    {}
+func (*JenkinsPipelineBuildStrategy) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{13}
+}
+
+type SecretSpec struct {
+	SecretSource *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,1,opt,name=secretSource" json:"secretSource,omitempty"`
+	MountPath    string                                             `protobuf:"bytes,2,opt,name=mountPath,proto3" json:"mountPath,omitempty"`
+}
+
+func (m *SecretSpec) Reset()                    { *m = SecretSpec{} }
+func (m *SecretSpec) String() string            { return proto.CompactTextString(m) }
+func (*SecretSpec) ProtoMessage()               {}
+func (*SecretSpec) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{14} }
+
+func (m *SecretSpec) GetSecretSource() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.SecretSource
+	}
+	return nil
+}
+
+type CustomBuildStrategy struct {
+	From               *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
+	PullSecret         *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pullSecret" json:"pullSecret,omitempty"`
+	Env                []*k8s_io_kubernetes_pkg_api_v1.EnvVar             `protobuf:"bytes,3,rep,name=env" json:"env,omitempty"`
+	ExposeDockerSocket bool                                               `protobuf:"varint,4,opt,name=exposeDockerSocket,proto3" json:"exposeDockerSocket,omitempty"`
+	ForcePull          bool                                               `protobuf:"varint,5,opt,name=forcePull,proto3" json:"forcePull,omitempty"`
+	Secrets            []*SecretSpec                                      `protobuf:"bytes,6,rep,name=secrets" json:"secrets,omitempty"`
+	BuildAPIVersion    string                                             `protobuf:"bytes,7,opt,name=buildAPIVersion,proto3" json:"buildAPIVersion,omitempty"`
+}
+
+func (m *CustomBuildStrategy) Reset()         { *m = CustomBuildStrategy{} }
+func (m *CustomBuildStrategy) String() string { return proto.CompactTextString(m) }
+func (*CustomBuildStrategy) ProtoMessage()    {}
+func (*CustomBuildStrategy) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{15}
+}
+
+func (m *CustomBuildStrategy) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.From
+	}
+	return nil
+}
+
+func (m *CustomBuildStrategy) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.PullSecret
+	}
+	return nil
+}
+
+func (m *CustomBuildStrategy) GetEnv() []*k8s_io_kubernetes_pkg_api_v1.EnvVar {
+	if m != nil {
+		return m.Env
+	}
+	return nil
+}
+
+func (m *CustomBuildStrategy) GetSecrets() []*SecretSpec {
+	if m != nil {
+		return m.Secrets
+	}
+	return nil
+}
+
+type SourceBuildStrategy struct {
+	From        *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
+	PullSecret  *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pullSecret" json:"pullSecret,omitempty"`
+	Env         []*k8s_io_kubernetes_pkg_api_v1.EnvVar             `protobuf:"bytes,3,rep,name=env" json:"env,omitempty"`
+	Scripts     string                                             `protobuf:"bytes,4,opt,name=scripts,proto3" json:"scripts,omitempty"`
+	Incremental bool                                               `protobuf:"varint,5,opt,name=incremental,proto3" json:"incremental,omitempty"`
+	ForcePull   bool                                               `protobuf:"varint,6,opt,name=forcePull,proto3" json:"forcePull,omitempty"`
+}
+
+func (m *SourceBuildStrategy) Reset()         { *m = SourceBuildStrategy{} }
+func (m *SourceBuildStrategy) String() string { return proto.CompactTextString(m) }
+func (*SourceBuildStrategy) ProtoMessage()    {}
+func (*SourceBuildStrategy) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{16}
+}
+
+func (m *SourceBuildStrategy) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.From
+	}
+	return nil
+}
+
+func (m *SourceBuildStrategy) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.PullSecret
+	}
+	return nil
+}
+
+func (m *SourceBuildStrategy) GetEnv() []*k8s_io_kubernetes_pkg_api_v1.EnvVar {
+	if m != nil {
+		return m.Env
+	}
+	return nil
+}
+
+type DockerBuildStrategy struct {
+	From           *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
+	PullSecret     *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pullSecret" json:"pullSecret,omitempty"`
+	NoCache        bool                                               `protobuf:"varint,3,opt,name=noCache,proto3" json:"noCache,omitempty"`
+	Env            []*k8s_io_kubernetes_pkg_api_v1.EnvVar             `protobuf:"bytes,4,rep,name=env" json:"env,omitempty"`
+	ForcePull      bool                                               `protobuf:"varint,5,opt,name=forcePull,proto3" json:"forcePull,omitempty"`
+	DockerfilePath string                                             `protobuf:"bytes,6,opt,name=dockerfilePath,proto3" json:"dockerfilePath,omitempty"`
+}
+
+func (m *DockerBuildStrategy) Reset()         { *m = DockerBuildStrategy{} }
+func (m *DockerBuildStrategy) String() string { return proto.CompactTextString(m) }
+func (*DockerBuildStrategy) ProtoMessage()    {}
+func (*DockerBuildStrategy) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{17}
+}
+
+func (m *DockerBuildStrategy) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.From
+	}
+	return nil
+}
+
+func (m *DockerBuildStrategy) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.PullSecret
+	}
+	return nil
+}
+
+func (m *DockerBuildStrategy) GetEnv() []*k8s_io_kubernetes_pkg_api_v1.EnvVar {
+	if m != nil {
+		return m.Env
+	}
+	return nil
+}
+
+type BuildStrategy struct {
+	Type                    string                             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	DockerStrategy          *DockerBuildStrategy               `protobuf:"bytes,2,opt,name=dockerStrategy" json:"dockerStrategy,omitempty"`
+	SourceStrategy          *SourceBuildStrategy               `protobuf:"bytes,3,opt,name=sourceStrategy" json:"sourceStrategy,omitempty"`
+	CustomStrategy          *CustomBuildStrategy               `protobuf:"bytes,4,opt,name=customStrategy" json:"customStrategy,omitempty"`
+	JenkinsPipelineStrategy *JenkinsPipelineBuildStrategy      `protobuf:"bytes,5,opt,name=jenkinsPipelineStrategy" json:"jenkinsPipelineStrategy,omitempty"`
+	OsoBuildStrategyType    BuildStrategy_OsoBuildStrategyType `protobuf:"varint,6,opt,name=osoBuildStrategyType,proto3,enum=paas.ci.openshift.BuildStrategy_OsoBuildStrategyType" json:"osoBuildStrategyType,omitempty"`
+}
+
+func (m *BuildStrategy) Reset()                    { *m = BuildStrategy{} }
+func (m *BuildStrategy) String() string            { return proto.CompactTextString(m) }
+func (*BuildStrategy) ProtoMessage()               {}
+func (*BuildStrategy) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{18} }
+
+func (m *BuildStrategy) GetDockerStrategy() *DockerBuildStrategy {
+	if m != nil {
+		return m.DockerStrategy
+	}
+	return nil
+}
+
+func (m *BuildStrategy) GetSourceStrategy() *SourceBuildStrategy {
+	if m != nil {
+		return m.SourceStrategy
+	}
+	return nil
+}
+
+func (m *BuildStrategy) GetCustomStrategy() *CustomBuildStrategy {
+	if m != nil {
+		return m.CustomStrategy
+	}
+	return nil
+}
+
+func (m *BuildStrategy) GetJenkinsPipelineStrategy() *JenkinsPipelineBuildStrategy {
+	if m != nil {
+		return m.JenkinsPipelineStrategy
+	}
+	return nil
+}
+
+type SecretBuildSource struct {
+	Secret         *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,1,opt,name=secret" json:"secret,omitempty"`
+	DestinationDir string                                             `protobuf:"bytes,2,opt,name=destinationDir,proto3" json:"destinationDir,omitempty"`
+}
+
+func (m *SecretBuildSource) Reset()                    { *m = SecretBuildSource{} }
+func (m *SecretBuildSource) String() string            { return proto.CompactTextString(m) }
+func (*SecretBuildSource) ProtoMessage()               {}
+func (*SecretBuildSource) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{19} }
+
+func (m *SecretBuildSource) GetSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.Secret
+	}
+	return nil
+}
+
+type ImageSourcePath struct {
+	SourcePath     string `protobuf:"bytes,1,opt,name=sourcePath,proto3" json:"sourcePath,omitempty"`
+	DestinationDir string `protobuf:"bytes,2,opt,name=destinationDir,proto3" json:"destinationDir,omitempty"`
+}
+
+func (m *ImageSourcePath) Reset()                    { *m = ImageSourcePath{} }
+func (m *ImageSourcePath) String() string            { return proto.CompactTextString(m) }
+func (*ImageSourcePath) ProtoMessage()               {}
+func (*ImageSourcePath) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{20} }
+
+type ImageSource struct {
+	From       *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
+	Paths      []*ImageSourcePath                                 `protobuf:"bytes,2,rep,name=paths" json:"paths,omitempty"`
+	PullSecret *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,3,opt,name=pullSecret" json:"pullSecret,omitempty"`
+}
+
+func (m *ImageSource) Reset()                    { *m = ImageSource{} }
+func (m *ImageSource) String() string            { return proto.CompactTextString(m) }
+func (*ImageSource) ProtoMessage()               {}
+func (*ImageSource) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{21} }
+
+func (m *ImageSource) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.From
+	}
+	return nil
+}
+
+func (m *ImageSource) GetPaths() []*ImageSourcePath {
+	if m != nil {
+		return m.Paths
+	}
+	return nil
+}
+
+func (m *ImageSource) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.PullSecret
+	}
+	return nil
+}
+
+type GitBuildSource struct {
+	Uri        string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
+	Ref        string `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
+	HttpProxy  string `protobuf:"bytes,3,opt,name=httpProxy,proto3" json:"httpProxy,omitempty"`
+	HttpsProxy string `protobuf:"bytes,4,opt,name=httpsProxy,proto3" json:"httpsProxy,omitempty"`
+}
+
+func (m *GitBuildSource) Reset()                    { *m = GitBuildSource{} }
+func (m *GitBuildSource) String() string            { return proto.CompactTextString(m) }
+func (*GitBuildSource) ProtoMessage()               {}
+func (*GitBuildSource) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{22} }
+
+type BinaryBuildSource struct {
+	AsFile string `protobuf:"bytes,1,opt,name=asFile,proto3" json:"asFile,omitempty"`
+}
+
+func (m *BinaryBuildSource) Reset()                    { *m = BinaryBuildSource{} }
+func (m *BinaryBuildSource) String() string            { return proto.CompactTextString(m) }
+func (*BinaryBuildSource) ProtoMessage()               {}
+func (*BinaryBuildSource) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{23} }
+
+type BuildSource struct {
+	Type               string                                             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Binary             *BinaryBuildSource                                 `protobuf:"bytes,2,opt,name=binary" json:"binary,omitempty"`
+	Dockerfile         string                                             `protobuf:"bytes,3,opt,name=dockerfile,proto3" json:"dockerfile,omitempty"`
+	Git                *GitBuildSource                                    `protobuf:"bytes,4,opt,name=git" json:"git,omitempty"`
+	Images             []*ImageSource                                     `protobuf:"bytes,5,rep,name=images" json:"images,omitempty"`
+	ContextDir         string                                             `protobuf:"bytes,6,opt,name=contextDir,proto3" json:"contextDir,omitempty"`
+	SourceSecret       *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,7,opt,name=sourceSecret" json:"sourceSecret,omitempty"`
+	Secrets            []*SecretBuildSource                               `protobuf:"bytes,8,rep,name=secrets" json:"secrets,omitempty"`
+	OsoBuildSourceType BuildSource_OsoBuildSourceType                     `protobuf:"varint,9,opt,name=osoBuildSourceType,proto3,enum=paas.ci.openshift.BuildSource_OsoBuildSourceType" json:"osoBuildSourceType,omitempty"`
+}
+
+func (m *BuildSource) Reset()                    { *m = BuildSource{} }
+func (m *BuildSource) String() string            { return proto.CompactTextString(m) }
+func (*BuildSource) ProtoMessage()               {}
+func (*BuildSource) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{24} }
+
+func (m *BuildSource) GetBinary() *BinaryBuildSource {
+	if m != nil {
+		return m.Binary
+	}
+	return nil
+}
+
+func (m *BuildSource) GetGit() *GitBuildSource {
+	if m != nil {
+		return m.Git
+	}
+	return nil
+}
+
+func (m *BuildSource) GetImages() []*ImageSource {
+	if m != nil {
+		return m.Images
+	}
+	return nil
+}
+
+func (m *BuildSource) GetSourceSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
+	if m != nil {
+		return m.SourceSecret
+	}
+	return nil
+}
+
+func (m *BuildSource) GetSecrets() []*SecretBuildSource {
+	if m != nil {
+		return m.Secrets
+	}
+	return nil
+}
+
+type OsoCommonSpec struct {
+	ServiceAccount            string                                             `protobuf:"bytes,1,opt,name=serviceAccount,proto3" json:"serviceAccount,omitempty"`
+	Source                    *BuildSource                                       `protobuf:"bytes,2,opt,name=source" json:"source,omitempty"`
+	Revision                  *SourceRevision                                    `protobuf:"bytes,3,opt,name=revision" json:"revision,omitempty"`
+	Strategy                  *BuildStrategy                                     `protobuf:"bytes,4,opt,name=strategy" json:"strategy,omitempty"`
+	Output                    *BuildOutput                                       `protobuf:"bytes,5,opt,name=output" json:"output,omitempty"`
+	Resources                 *k8s_io_kubernetes_pkg_api_v1.ResourceRequirements `protobuf:"bytes,6,opt,name=resources" json:"resources,omitempty"`
+	PostCommit                *BuildPostCommitSpec                               `protobuf:"bytes,7,opt,name=postCommit" json:"postCommit,omitempty"`
+	CompletionDeadlineSeconds int64                                              `protobuf:"varint,8,opt,name=completionDeadlineSeconds,proto3" json:"completionDeadlineSeconds,omitempty"`
+}
+
+func (m *OsoCommonSpec) Reset()                    { *m = OsoCommonSpec{} }
+func (m *OsoCommonSpec) String() string            { return proto.CompactTextString(m) }
+func (*OsoCommonSpec) ProtoMessage()               {}
+func (*OsoCommonSpec) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{25} }
+
+func (m *OsoCommonSpec) GetSource() *BuildSource {
+	if m != nil {
+		return m.Source
+	}
+	return nil
+}
+
+func (m *OsoCommonSpec) GetRevision() *SourceRevision {
+	if m != nil {
+		return m.Revision
+	}
+	return nil
+}
+
+func (m *OsoCommonSpec) GetStrategy() *BuildStrategy {
+	if m != nil {
+		return m.Strategy
+	}
+	return nil
+}
+
+func (m *OsoCommonSpec) GetOutput() *BuildOutput {
+	if m != nil {
+		return m.Output
+	}
+	return nil
+}
+
+func (m *OsoCommonSpec) GetResources() *k8s_io_kubernetes_pkg_api_v1.ResourceRequirements {
+	if m != nil {
+		return m.Resources
+	}
+	return nil
+}
+
+func (m *OsoCommonSpec) GetPostCommit() *BuildPostCommitSpec {
+	if m != nil {
+		return m.PostCommit
+	}
+	return nil
+}
+
+type WebHookTrigger struct {
+	Secret   string `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
+	AllowEnv bool   `protobuf:"varint,2,opt,name=allowEnv,proto3" json:"allowEnv,omitempty"`
+}
+
+func (m *WebHookTrigger) Reset()                    { *m = WebHookTrigger{} }
+func (m *WebHookTrigger) String() string            { return proto.CompactTextString(m) }
+func (*WebHookTrigger) ProtoMessage()               {}
+func (*WebHookTrigger) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{26} }
+
+type ImageChangeTrigger struct {
+	LastTriggeredImageID string                                        `protobuf:"bytes,1,opt,name=lastTriggeredImageID,proto3" json:"lastTriggeredImageID,omitempty"`
+	From                 *k8s_io_kubernetes_pkg_api_v1.ObjectReference `protobuf:"bytes,2,opt,name=from" json:"from,omitempty"`
+}
+
+func (m *ImageChangeTrigger) Reset()                    { *m = ImageChangeTrigger{} }
+func (m *ImageChangeTrigger) String() string            { return proto.CompactTextString(m) }
+func (*ImageChangeTrigger) ProtoMessage()               {}
+func (*ImageChangeTrigger) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{27} }
+
+func (m *ImageChangeTrigger) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.From
+	}
+	return nil
+}
+
+type OsoBuildTriggerPolicy struct {
+	Type                string                                    `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Github              *WebHookTrigger                           `protobuf:"bytes,2,opt,name=github" json:"github,omitempty"`
+	Generic             *WebHookTrigger                           `protobuf:"bytes,3,opt,name=generic" json:"generic,omitempty"`
+	ImageChange         *ImageChangeTrigger                       `protobuf:"bytes,4,opt,name=imageChange" json:"imageChange,omitempty"`
+	OsoBuildTriggerType OsoBuildTriggerPolicy_OsoBuildTriggerType `protobuf:"varint,5,opt,name=osoBuildTriggerType,proto3,enum=paas.ci.openshift.OsoBuildTriggerPolicy_OsoBuildTriggerType" json:"osoBuildTriggerType,omitempty"`
+}
+
+func (m *OsoBuildTriggerPolicy) Reset()         { *m = OsoBuildTriggerPolicy{} }
+func (m *OsoBuildTriggerPolicy) String() string { return proto.CompactTextString(m) }
+func (*OsoBuildTriggerPolicy) ProtoMessage()    {}
+func (*OsoBuildTriggerPolicy) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{28}
+}
+
+func (m *OsoBuildTriggerPolicy) GetGithub() *WebHookTrigger {
+	if m != nil {
+		return m.Github
+	}
+	return nil
+}
+
+func (m *OsoBuildTriggerPolicy) GetGeneric() *WebHookTrigger {
+	if m != nil {
+		return m.Generic
+	}
+	return nil
+}
+
+func (m *OsoBuildTriggerPolicy) GetImageChange() *ImageChangeTrigger {
+	if m != nil {
+		return m.ImageChange
+	}
+	return nil
+}
+
+type GenericWebHookCause struct {
+	Revision *SourceRevision `protobuf:"bytes,1,opt,name=revision" json:"revision,omitempty"`
+	Secret   string          `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+}
+
+func (m *GenericWebHookCause) Reset()         { *m = GenericWebHookCause{} }
+func (m *GenericWebHookCause) String() string { return proto.CompactTextString(m) }
+func (*GenericWebHookCause) ProtoMessage()    {}
+func (*GenericWebHookCause) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{29}
+}
+
+func (m *GenericWebHookCause) GetRevision() *SourceRevision {
+	if m != nil {
+		return m.Revision
+	}
+	return nil
+}
+
+type GitHubWebHookCause struct {
+	Revision *SourceRevision `protobuf:"bytes,1,opt,name=revision" json:"revision,omitempty"`
+	Secret   string          `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+}
+
+func (m *GitHubWebHookCause) Reset()                    { *m = GitHubWebHookCause{} }
+func (m *GitHubWebHookCause) String() string            { return proto.CompactTextString(m) }
+func (*GitHubWebHookCause) ProtoMessage()               {}
+func (*GitHubWebHookCause) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{30} }
+
+func (m *GitHubWebHookCause) GetRevision() *SourceRevision {
+	if m != nil {
+		return m.Revision
+	}
+	return nil
+}
+
+type ImageChangeCause struct {
+	ImageID string                                        `protobuf:"bytes,1,opt,name=imageID,proto3" json:"imageID,omitempty"`
+	FromRef *k8s_io_kubernetes_pkg_api_v1.ObjectReference `protobuf:"bytes,2,opt,name=fromRef" json:"fromRef,omitempty"`
+}
+
+func (m *ImageChangeCause) Reset()                    { *m = ImageChangeCause{} }
+func (m *ImageChangeCause) String() string            { return proto.CompactTextString(m) }
+func (*ImageChangeCause) ProtoMessage()               {}
+func (*ImageChangeCause) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{31} }
+
+func (m *ImageChangeCause) GetFromRef() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.FromRef
+	}
+	return nil
+}
+
+type OsoBuildTriggerCause struct {
+	Message          string               `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	GenericWebHook   *GenericWebHookCause `protobuf:"bytes,2,opt,name=genericWebHook" json:"genericWebHook,omitempty"`
+	GithubWebHook    *GitHubWebHookCause  `protobuf:"bytes,3,opt,name=githubWebHook" json:"githubWebHook,omitempty"`
+	ImageChangeBuild *ImageChangeCause    `protobuf:"bytes,4,opt,name=imageChangeBuild" json:"imageChangeBuild,omitempty"`
+}
+
+func (m *OsoBuildTriggerCause) Reset()         { *m = OsoBuildTriggerCause{} }
+func (m *OsoBuildTriggerCause) String() string { return proto.CompactTextString(m) }
+func (*OsoBuildTriggerCause) ProtoMessage()    {}
+func (*OsoBuildTriggerCause) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{32}
+}
+
+func (m *OsoBuildTriggerCause) GetGenericWebHook() *GenericWebHookCause {
+	if m != nil {
+		return m.GenericWebHook
+	}
+	return nil
+}
+
+func (m *OsoBuildTriggerCause) GetGithubWebHook() *GitHubWebHookCause {
+	if m != nil {
+		return m.GithubWebHook
+	}
+	return nil
+}
+
+func (m *OsoBuildTriggerCause) GetImageChangeBuild() *ImageChangeCause {
+	if m != nil {
+		return m.ImageChangeBuild
+	}
+	return nil
+}
+
+type OsoBuildStatus struct {
+	Phase                      string                                        `protobuf:"bytes,1,opt,name=phase,proto3" json:"phase,omitempty"`
+	Cancelled                  bool                                          `protobuf:"varint,2,opt,name=cancelled,proto3" json:"cancelled,omitempty"`
+	Reason                     string                                        `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+	Message                    string                                        `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	StartTimestamp             *k8s_io_kubernetes_pkg_api_unversioned.Time   `protobuf:"bytes,5,opt,name=startTimestamp" json:"startTimestamp,omitempty"`
+	CompletionTimestamp        *k8s_io_kubernetes_pkg_api_unversioned.Time   `protobuf:"bytes,6,opt,name=completionTimestamp" json:"completionTimestamp,omitempty"`
+	Duration                   int64                                         `protobuf:"varint,7,opt,name=duration,proto3" json:"duration,omitempty"`
+	OutputDockerImageReference string                                        `protobuf:"bytes,8,opt,name=outputDockerImageReference,proto3" json:"outputDockerImageReference,omitempty"`
+	Config                     *k8s_io_kubernetes_pkg_api_v1.ObjectReference `protobuf:"bytes,9,opt,name=config" json:"config,omitempty"`
+	OsoBuildPhase              OsoBuildStatus_OsoBuildPhase                  `protobuf:"varint,10,opt,name=osoBuildPhase,proto3,enum=paas.ci.openshift.OsoBuildStatus_OsoBuildPhase" json:"osoBuildPhase,omitempty"`
+}
+
+func (m *OsoBuildStatus) Reset()                    { *m = OsoBuildStatus{} }
+func (m *OsoBuildStatus) String() string            { return proto.CompactTextString(m) }
+func (*OsoBuildStatus) ProtoMessage()               {}
+func (*OsoBuildStatus) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{33} }
+
+func (m *OsoBuildStatus) GetStartTimestamp() *k8s_io_kubernetes_pkg_api_unversioned.Time {
+	if m != nil {
+		return m.StartTimestamp
+	}
+	return nil
+}
+
+func (m *OsoBuildStatus) GetCompletionTimestamp() *k8s_io_kubernetes_pkg_api_unversioned.Time {
+	if m != nil {
+		return m.CompletionTimestamp
+	}
+	return nil
+}
+
+func (m *OsoBuildStatus) GetConfig() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
+	if m != nil {
+		return m.Config
+	}
+	return nil
+}
+
+type DockerBuildConfigRequestData struct {
+	Name              string                                         `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ProjectName       string                                         `protobuf:"bytes,2,opt,name=projectName,proto3" json:"projectName,omitempty"`
+	Triggers          []*OsoBuildTriggerPolicy                       `protobuf:"bytes,3,rep,name=triggers" json:"triggers,omitempty"`
+	RunPolicy         string                                         `protobuf:"bytes,4,opt,name=runPolicy,proto3" json:"runPolicy,omitempty"`
+	CommonSpec        *OsoCommonSpec                                 `protobuf:"bytes,5,opt,name=commonSpec" json:"commonSpec,omitempty"`
+	OsoBuildRunPolicy DockerBuildConfigRequestData_OsoBuildRunPolicy `protobuf:"varint,6,opt,name=osoBuildRunPolicy,proto3,enum=paas.ci.openshift.DockerBuildConfigRequestData_OsoBuildRunPolicy" json:"osoBuildRunPolicy,omitempty"`
+	Labels            map[string]string                              `protobuf:"bytes,7,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Annotations       map[string]string                              `protobuf:"bytes,8,rep,name=annotations" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (m *DockerBuildConfigRequestData) Reset()         { *m = DockerBuildConfigRequestData{} }
+func (m *DockerBuildConfigRequestData) String() string { return proto.CompactTextString(m) }
+func (*DockerBuildConfigRequestData) ProtoMessage()    {}
+func (*DockerBuildConfigRequestData) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{34}
+}
+
+func (m *DockerBuildConfigRequestData) GetTriggers() []*OsoBuildTriggerPolicy {
+	if m != nil {
+		return m.Triggers
+	}
+	return nil
+}
+
+func (m *DockerBuildConfigRequestData) GetCommonSpec() *OsoCommonSpec {
+	if m != nil {
+		return m.CommonSpec
+	}
+	return nil
+}
+
+func (m *DockerBuildConfigRequestData) GetLabels() map[string]string {
+	if m != nil {
+		return m.Labels
+	}
+	return nil
+}
+
+func (m *DockerBuildConfigRequestData) GetAnnotations() map[string]string {
+	if m != nil {
+		return m.Annotations
+	}
+	return nil
+}
+
+type DockerBuildConfigResponseData struct {
+	State    int64                                    `protobuf:"varint,1,opt,name=state,proto3" json:"state,omitempty"`
+	Metadata *k8s_io_kubernetes_pkg_api_v1.ObjectMeta `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
+}
+
+func (m *DockerBuildConfigResponseData) Reset()         { *m = DockerBuildConfigResponseData{} }
+func (m *DockerBuildConfigResponseData) String() string { return proto.CompactTextString(m) }
+func (*DockerBuildConfigResponseData) ProtoMessage()    {}
+func (*DockerBuildConfigResponseData) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{35}
+}
+
+func (m *DockerBuildConfigResponseData) GetMetadata() *k8s_io_kubernetes_pkg_api_v1.ObjectMeta {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type DockerBuildRequestData struct {
+	Name        string                        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ProjectName string                        `protobuf:"bytes,2,opt,name=projectName,proto3" json:"projectName,omitempty"`
+	ConfigSpec  *DockerBuildConfigRequestData `protobuf:"bytes,3,opt,name=configSpec" json:"configSpec,omitempty"`
+	TriggeredBy []*OsoBuildTriggerCause       `protobuf:"bytes,4,rep,name=triggeredBy" json:"triggeredBy,omitempty"`
+	Labels      map[string]string             `protobuf:"bytes,5,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Annotations map[string]string             `protobuf:"bytes,6,rep,name=annotations" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (m *DockerBuildRequestData) Reset()         { *m = DockerBuildRequestData{} }
+func (m *DockerBuildRequestData) String() string { return proto.CompactTextString(m) }
+func (*DockerBuildRequestData) ProtoMessage()    {}
+func (*DockerBuildRequestData) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{36}
+}
+
+func (m *DockerBuildRequestData) GetConfigSpec() *DockerBuildConfigRequestData {
+	if m != nil {
+		return m.ConfigSpec
+	}
+	return nil
+}
+
+func (m *DockerBuildRequestData) GetTriggeredBy() []*OsoBuildTriggerCause {
+	if m != nil {
+		return m.TriggeredBy
+	}
+	return nil
+}
+
+func (m *DockerBuildRequestData) GetLabels() map[string]string {
+	if m != nil {
+		return m.Labels
+	}
+	return nil
+}
+
+func (m *DockerBuildRequestData) GetAnnotations() map[string]string {
+	if m != nil {
+		return m.Annotations
+	}
+	return nil
+}
+
+type DockerBuildResponseData struct {
+	Result       *OsoBuildStatus                          `protobuf:"bytes,1,opt,name=result" json:"result,omitempty"`
+	ConfigResult *DockerBuildConfigResponseData           `protobuf:"bytes,2,opt,name=configResult" json:"configResult,omitempty"`
+	Metadata     *k8s_io_kubernetes_pkg_api_v1.ObjectMeta `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
+}
+
+func (m *DockerBuildResponseData) Reset()         { *m = DockerBuildResponseData{} }
+func (m *DockerBuildResponseData) String() string { return proto.CompactTextString(m) }
+func (*DockerBuildResponseData) ProtoMessage()    {}
+func (*DockerBuildResponseData) Descriptor() ([]byte, []int) {
+	return fileDescriptorManageService, []int{37}
+}
+
+func (m *DockerBuildResponseData) GetResult() *OsoBuildStatus {
+	if m != nil {
+		return m.Result
+	}
+	return nil
+}
+
+func (m *DockerBuildResponseData) GetConfigResult() *DockerBuildConfigResponseData {
+	if m != nil {
+		return m.ConfigResult
+	}
+	return nil
+}
+
+func (m *DockerBuildResponseData) GetMetadata() *k8s_io_kubernetes_pkg_api_v1.ObjectMeta {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type RawData struct {
+	ObjectName  string `protobuf:"bytes,1,opt,name=objectName,proto3" json:"objectName,omitempty"`
+	ObjectBytes []byte `protobuf:"bytes,2,opt,name=objectBytes,proto3" json:"objectBytes,omitempty"`
+}
+
+func (m *RawData) Reset()                    { *m = RawData{} }
+func (m *RawData) String() string            { return proto.CompactTextString(m) }
+func (*RawData) ProtoMessage()               {}
+func (*RawData) Descriptor() ([]byte, []int) { return fileDescriptorManageService, []int{38} }
+
 func init() {
 	proto.RegisterType((*CreateOriginProjectRequest)(nil), "paas.ci.openshift.CreateOriginProjectRequest")
 	proto.RegisterType((*CreateOriginProjectResponse)(nil), "paas.ci.openshift.CreateOriginProjectResponse")
@@ -124,6 +1138,44 @@ func init() {
 	proto.RegisterType((*CreateOriginProjectArbitraryResponse)(nil), "paas.ci.openshift.CreateOriginProjectArbitraryResponse")
 	proto.RegisterType((*FindProjectRequest)(nil), "paas.ci.openshift.FindProjectRequest")
 	proto.RegisterType((*FindProjectResponse)(nil), "paas.ci.openshift.FindProjectResponse")
+	proto.RegisterType((*DeleteProjectRequest)(nil), "paas.ci.openshift.DeleteProjectRequest")
+	proto.RegisterType((*DeleteProjectResponse)(nil), "paas.ci.openshift.DeleteProjectResponse")
+	proto.RegisterType((*SourceControlUser)(nil), "paas.ci.openshift.SourceControlUser")
+	proto.RegisterType((*GitSourceRevision)(nil), "paas.ci.openshift.GitSourceRevision")
+	proto.RegisterType((*SourceRevision)(nil), "paas.ci.openshift.SourceRevision")
+	proto.RegisterType((*BuildPostCommitSpec)(nil), "paas.ci.openshift.BuildPostCommitSpec")
+	proto.RegisterType((*BuildOutput)(nil), "paas.ci.openshift.BuildOutput")
+	proto.RegisterType((*JenkinsPipelineBuildStrategy)(nil), "paas.ci.openshift.JenkinsPipelineBuildStrategy")
+	proto.RegisterType((*SecretSpec)(nil), "paas.ci.openshift.SecretSpec")
+	proto.RegisterType((*CustomBuildStrategy)(nil), "paas.ci.openshift.CustomBuildStrategy")
+	proto.RegisterType((*SourceBuildStrategy)(nil), "paas.ci.openshift.SourceBuildStrategy")
+	proto.RegisterType((*DockerBuildStrategy)(nil), "paas.ci.openshift.DockerBuildStrategy")
+	proto.RegisterType((*BuildStrategy)(nil), "paas.ci.openshift.BuildStrategy")
+	proto.RegisterType((*SecretBuildSource)(nil), "paas.ci.openshift.SecretBuildSource")
+	proto.RegisterType((*ImageSourcePath)(nil), "paas.ci.openshift.ImageSourcePath")
+	proto.RegisterType((*ImageSource)(nil), "paas.ci.openshift.ImageSource")
+	proto.RegisterType((*GitBuildSource)(nil), "paas.ci.openshift.GitBuildSource")
+	proto.RegisterType((*BinaryBuildSource)(nil), "paas.ci.openshift.BinaryBuildSource")
+	proto.RegisterType((*BuildSource)(nil), "paas.ci.openshift.BuildSource")
+	proto.RegisterType((*OsoCommonSpec)(nil), "paas.ci.openshift.OsoCommonSpec")
+	proto.RegisterType((*WebHookTrigger)(nil), "paas.ci.openshift.WebHookTrigger")
+	proto.RegisterType((*ImageChangeTrigger)(nil), "paas.ci.openshift.ImageChangeTrigger")
+	proto.RegisterType((*OsoBuildTriggerPolicy)(nil), "paas.ci.openshift.OsoBuildTriggerPolicy")
+	proto.RegisterType((*GenericWebHookCause)(nil), "paas.ci.openshift.GenericWebHookCause")
+	proto.RegisterType((*GitHubWebHookCause)(nil), "paas.ci.openshift.GitHubWebHookCause")
+	proto.RegisterType((*ImageChangeCause)(nil), "paas.ci.openshift.ImageChangeCause")
+	proto.RegisterType((*OsoBuildTriggerCause)(nil), "paas.ci.openshift.OsoBuildTriggerCause")
+	proto.RegisterType((*OsoBuildStatus)(nil), "paas.ci.openshift.OsoBuildStatus")
+	proto.RegisterType((*DockerBuildConfigRequestData)(nil), "paas.ci.openshift.DockerBuildConfigRequestData")
+	proto.RegisterType((*DockerBuildConfigResponseData)(nil), "paas.ci.openshift.DockerBuildConfigResponseData")
+	proto.RegisterType((*DockerBuildRequestData)(nil), "paas.ci.openshift.DockerBuildRequestData")
+	proto.RegisterType((*DockerBuildResponseData)(nil), "paas.ci.openshift.DockerBuildResponseData")
+	proto.RegisterType((*RawData)(nil), "paas.ci.openshift.RawData")
+	proto.RegisterEnum("paas.ci.openshift.BuildStrategy_OsoBuildStrategyType", BuildStrategy_OsoBuildStrategyType_name, BuildStrategy_OsoBuildStrategyType_value)
+	proto.RegisterEnum("paas.ci.openshift.BuildSource_OsoBuildSourceType", BuildSource_OsoBuildSourceType_name, BuildSource_OsoBuildSourceType_value)
+	proto.RegisterEnum("paas.ci.openshift.OsoBuildTriggerPolicy_OsoBuildTriggerType", OsoBuildTriggerPolicy_OsoBuildTriggerType_name, OsoBuildTriggerPolicy_OsoBuildTriggerType_value)
+	proto.RegisterEnum("paas.ci.openshift.OsoBuildStatus_OsoBuildPhase", OsoBuildStatus_OsoBuildPhase_name, OsoBuildStatus_OsoBuildPhase_value)
+	proto.RegisterEnum("paas.ci.openshift.DockerBuildConfigRequestData_OsoBuildRunPolicy", DockerBuildConfigRequestData_OsoBuildRunPolicy_name, DockerBuildConfigRequestData_OsoBuildRunPolicy_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -136,6 +1188,13 @@ type SimpleManageServiceClient interface {
 	CreateOriginProject(ctx context.Context, in *CreateOriginProjectRequest, opts ...grpc.CallOption) (*CreateOriginProjectResponse, error)
 	CreateOriginProjectArbitrary(ctx context.Context, in *CreateOriginProjectArbitraryRequest, opts ...grpc.CallOption) (*CreateOriginProjectArbitraryResponse, error)
 	FindProject(ctx context.Context, in *FindProjectRequest, opts ...grpc.CallOption) (*FindProjectResponse, error)
+	DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*DeleteProjectResponse, error)
+	NewOsoBuildConfig(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.BuildConfig, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.BuildConfig, error)
+	StartOsoBuild(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.Build, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.Build, error)
+	BuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error)
+	RebuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error)
+	CreateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error)
+	UpdateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error)
 }
 
 type simpleManageServiceClient struct {
@@ -173,12 +1232,82 @@ func (c *simpleManageServiceClient) FindProject(ctx context.Context, in *FindPro
 	return out, nil
 }
 
+func (c *simpleManageServiceClient) DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*DeleteProjectResponse, error) {
+	out := new(DeleteProjectResponse)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/DeleteProject", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleManageServiceClient) NewOsoBuildConfig(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.BuildConfig, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.BuildConfig, error) {
+	out := new(github_com_openshift_origin_pkg_build_api_v1.BuildConfig)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/NewOsoBuildConfig", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleManageServiceClient) StartOsoBuild(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.Build, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.Build, error) {
+	out := new(github_com_openshift_origin_pkg_build_api_v1.Build)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/StartOsoBuild", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleManageServiceClient) BuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error) {
+	out := new(RawData)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/BuildDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleManageServiceClient) RebuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error) {
+	out := new(RawData)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/RebuildDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleManageServiceClient) CreateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error) {
+	out := new(DockerBuildResponseData)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/CreateDockerImageBuild", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleManageServiceClient) UpdateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error) {
+	out := new(DockerBuildResponseData)
+	err := grpc.Invoke(ctx, "/paas.ci.openshift.SimpleManageService/UpdateDockerImageBuild", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for SimpleManageService service
 
 type SimpleManageServiceServer interface {
 	CreateOriginProject(context.Context, *CreateOriginProjectRequest) (*CreateOriginProjectResponse, error)
 	CreateOriginProjectArbitrary(context.Context, *CreateOriginProjectArbitraryRequest) (*CreateOriginProjectArbitraryResponse, error)
 	FindProject(context.Context, *FindProjectRequest) (*FindProjectResponse, error)
+	DeleteProject(context.Context, *DeleteProjectRequest) (*DeleteProjectResponse, error)
+	NewOsoBuildConfig(context.Context, *github_com_openshift_origin_pkg_build_api_v1.BuildConfig) (*github_com_openshift_origin_pkg_build_api_v1.BuildConfig, error)
+	StartOsoBuild(context.Context, *github_com_openshift_origin_pkg_build_api_v1.Build) (*github_com_openshift_origin_pkg_build_api_v1.Build, error)
+	BuildDockerImage(context.Context, *RawData) (*RawData, error)
+	RebuildDockerImage(context.Context, *RawData) (*RawData, error)
+	CreateDockerImageBuild(context.Context, *DockerBuildRequestData) (*DockerBuildResponseData, error)
+	UpdateDockerImageBuild(context.Context, *DockerBuildRequestData) (*DockerBuildResponseData, error)
 }
 
 func RegisterSimpleManageServiceServer(s *grpc.Server, srv SimpleManageServiceServer) {
@@ -221,6 +1350,90 @@ func _SimpleManageService_FindProject_Handler(srv interface{}, ctx context.Conte
 	return out, nil
 }
 
+func _SimpleManageService_DeleteProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(DeleteProjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).DeleteProject(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleManageService_NewOsoBuildConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(github_com_openshift_origin_pkg_build_api_v1.BuildConfig)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).NewOsoBuildConfig(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleManageService_StartOsoBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(github_com_openshift_origin_pkg_build_api_v1.Build)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).StartOsoBuild(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleManageService_BuildDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(RawData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).BuildDockerImage(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleManageService_RebuildDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(RawData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).RebuildDockerImage(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleManageService_CreateDockerImageBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(DockerBuildRequestData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).CreateDockerImageBuild(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleManageService_UpdateDockerImageBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(DockerBuildRequestData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleManageServiceServer).UpdateDockerImageBuild(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 var _SimpleManageService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "paas.ci.openshift.SimpleManageService",
 	HandlerType: (*SimpleManageServiceServer)(nil),
@@ -236,6 +1449,34 @@ var _SimpleManageService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindProject",
 			Handler:    _SimpleManageService_FindProject_Handler,
+		},
+		{
+			MethodName: "DeleteProject",
+			Handler:    _SimpleManageService_DeleteProject_Handler,
+		},
+		{
+			MethodName: "NewOsoBuildConfig",
+			Handler:    _SimpleManageService_NewOsoBuildConfig_Handler,
+		},
+		{
+			MethodName: "StartOsoBuild",
+			Handler:    _SimpleManageService_StartOsoBuild_Handler,
+		},
+		{
+			MethodName: "BuildDockerImage",
+			Handler:    _SimpleManageService_BuildDockerImage_Handler,
+		},
+		{
+			MethodName: "RebuildDockerImage",
+			Handler:    _SimpleManageService_RebuildDockerImage_Handler,
+		},
+		{
+			MethodName: "CreateDockerImageBuild",
+			Handler:    _SimpleManageService_CreateDockerImageBuild_Handler,
+		},
+		{
+			MethodName: "UpdateDockerImageBuild",
+			Handler:    _SimpleManageService_UpdateDockerImageBuild_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},
@@ -412,6 +1653,1667 @@ func (m *FindProjectResponse) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
+func (m *DeleteProjectRequest) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DeleteProjectRequest) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	return i, nil
+}
+
+func (m *DeleteProjectResponse) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DeleteProjectResponse) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Flag != 0 {
+		data[i] = 0x8
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Flag))
+	}
+	return i, nil
+}
+
+func (m *SourceControlUser) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SourceControlUser) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Email) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Email)))
+		i += copy(data[i:], m.Email)
+	}
+	return i, nil
+}
+
+func (m *GitSourceRevision) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *GitSourceRevision) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Commit) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Commit)))
+		i += copy(data[i:], m.Commit)
+	}
+	if m.Author != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Author.Size()))
+		n1, err := m.Author.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n1
+	}
+	if m.Committer != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Committer.Size()))
+		n2, err := m.Committer.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if len(m.Message) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Message)))
+		i += copy(data[i:], m.Message)
+	}
+	return i, nil
+}
+
+func (m *SourceRevision) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SourceRevision) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Type) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Type)))
+		i += copy(data[i:], m.Type)
+	}
+	if m.Git != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Git.Size()))
+		n3, err := m.Git.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	return i, nil
+}
+
+func (m *BuildPostCommitSpec) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *BuildPostCommitSpec) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Command) > 0 {
+		for _, s := range m.Command {
+			data[i] = 0xa
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if len(m.Args) > 0 {
+		for _, s := range m.Args {
+			data[i] = 0x12
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if len(m.Script) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Script)))
+		i += copy(data[i:], m.Script)
+	}
+	return i, nil
+}
+
+func (m *BuildOutput) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *BuildOutput) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.To != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.To.Size()))
+		n4, err := m.To.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	if m.PushSecret != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.PushSecret.Size()))
+		n5, err := m.PushSecret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+
+func (m *JenkinsPipelineBuildStrategy) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *JenkinsPipelineBuildStrategy) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.JenkinsfilePath) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.JenkinsfilePath)))
+		i += copy(data[i:], m.JenkinsfilePath)
+	}
+	if len(m.Jenkinsfile) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Jenkinsfile)))
+		i += copy(data[i:], m.Jenkinsfile)
+	}
+	return i, nil
+}
+
+func (m *SecretSpec) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SecretSpec) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.SecretSource != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.SecretSource.Size()))
+		n6, err := m.SecretSource.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	if len(m.MountPath) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.MountPath)))
+		i += copy(data[i:], m.MountPath)
+	}
+	return i, nil
+}
+
+func (m *CustomBuildStrategy) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *CustomBuildStrategy) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.From != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.From.Size()))
+		n7, err := m.From.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	if m.PullSecret != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.PullSecret.Size()))
+		n8, err := m.PullSecret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n8
+	}
+	if len(m.Env) > 0 {
+		for _, msg := range m.Env {
+			data[i] = 0x1a
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.ExposeDockerSocket {
+		data[i] = 0x20
+		i++
+		if m.ExposeDockerSocket {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if m.ForcePull {
+		data[i] = 0x28
+		i++
+		if m.ForcePull {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if len(m.Secrets) > 0 {
+		for _, msg := range m.Secrets {
+			data[i] = 0x32
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.BuildAPIVersion) > 0 {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.BuildAPIVersion)))
+		i += copy(data[i:], m.BuildAPIVersion)
+	}
+	return i, nil
+}
+
+func (m *SourceBuildStrategy) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SourceBuildStrategy) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.From != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.From.Size()))
+		n9, err := m.From.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n9
+	}
+	if m.PullSecret != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.PullSecret.Size()))
+		n10, err := m.PullSecret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n10
+	}
+	if len(m.Env) > 0 {
+		for _, msg := range m.Env {
+			data[i] = 0x1a
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.Scripts) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Scripts)))
+		i += copy(data[i:], m.Scripts)
+	}
+	if m.Incremental {
+		data[i] = 0x28
+		i++
+		if m.Incremental {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if m.ForcePull {
+		data[i] = 0x30
+		i++
+		if m.ForcePull {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
+func (m *DockerBuildStrategy) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DockerBuildStrategy) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.From != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.From.Size()))
+		n11, err := m.From.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n11
+	}
+	if m.PullSecret != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.PullSecret.Size()))
+		n12, err := m.PullSecret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n12
+	}
+	if m.NoCache {
+		data[i] = 0x18
+		i++
+		if m.NoCache {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if len(m.Env) > 0 {
+		for _, msg := range m.Env {
+			data[i] = 0x22
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.ForcePull {
+		data[i] = 0x28
+		i++
+		if m.ForcePull {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if len(m.DockerfilePath) > 0 {
+		data[i] = 0x32
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.DockerfilePath)))
+		i += copy(data[i:], m.DockerfilePath)
+	}
+	return i, nil
+}
+
+func (m *BuildStrategy) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *BuildStrategy) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Type) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Type)))
+		i += copy(data[i:], m.Type)
+	}
+	if m.DockerStrategy != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.DockerStrategy.Size()))
+		n13, err := m.DockerStrategy.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n13
+	}
+	if m.SourceStrategy != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.SourceStrategy.Size()))
+		n14, err := m.SourceStrategy.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n14
+	}
+	if m.CustomStrategy != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.CustomStrategy.Size()))
+		n15, err := m.CustomStrategy.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n15
+	}
+	if m.JenkinsPipelineStrategy != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.JenkinsPipelineStrategy.Size()))
+		n16, err := m.JenkinsPipelineStrategy.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n16
+	}
+	if m.OsoBuildStrategyType != 0 {
+		data[i] = 0x30
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.OsoBuildStrategyType))
+	}
+	return i, nil
+}
+
+func (m *SecretBuildSource) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SecretBuildSource) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Secret != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Secret.Size()))
+		n17, err := m.Secret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n17
+	}
+	if len(m.DestinationDir) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.DestinationDir)))
+		i += copy(data[i:], m.DestinationDir)
+	}
+	return i, nil
+}
+
+func (m *ImageSourcePath) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ImageSourcePath) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.SourcePath) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.SourcePath)))
+		i += copy(data[i:], m.SourcePath)
+	}
+	if len(m.DestinationDir) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.DestinationDir)))
+		i += copy(data[i:], m.DestinationDir)
+	}
+	return i, nil
+}
+
+func (m *ImageSource) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ImageSource) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.From != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.From.Size()))
+		n18, err := m.From.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n18
+	}
+	if len(m.Paths) > 0 {
+		for _, msg := range m.Paths {
+			data[i] = 0x12
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.PullSecret != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.PullSecret.Size()))
+		n19, err := m.PullSecret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n19
+	}
+	return i, nil
+}
+
+func (m *GitBuildSource) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *GitBuildSource) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Uri) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Uri)))
+		i += copy(data[i:], m.Uri)
+	}
+	if len(m.Ref) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Ref)))
+		i += copy(data[i:], m.Ref)
+	}
+	if len(m.HttpProxy) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.HttpProxy)))
+		i += copy(data[i:], m.HttpProxy)
+	}
+	if len(m.HttpsProxy) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.HttpsProxy)))
+		i += copy(data[i:], m.HttpsProxy)
+	}
+	return i, nil
+}
+
+func (m *BinaryBuildSource) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *BinaryBuildSource) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.AsFile) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.AsFile)))
+		i += copy(data[i:], m.AsFile)
+	}
+	return i, nil
+}
+
+func (m *BuildSource) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *BuildSource) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Type) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Type)))
+		i += copy(data[i:], m.Type)
+	}
+	if m.Binary != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Binary.Size()))
+		n20, err := m.Binary.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n20
+	}
+	if len(m.Dockerfile) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Dockerfile)))
+		i += copy(data[i:], m.Dockerfile)
+	}
+	if m.Git != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Git.Size()))
+		n21, err := m.Git.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n21
+	}
+	if len(m.Images) > 0 {
+		for _, msg := range m.Images {
+			data[i] = 0x2a
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.ContextDir) > 0 {
+		data[i] = 0x32
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.ContextDir)))
+		i += copy(data[i:], m.ContextDir)
+	}
+	if m.SourceSecret != nil {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.SourceSecret.Size()))
+		n22, err := m.SourceSecret.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n22
+	}
+	if len(m.Secrets) > 0 {
+		for _, msg := range m.Secrets {
+			data[i] = 0x42
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.OsoBuildSourceType != 0 {
+		data[i] = 0x48
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.OsoBuildSourceType))
+	}
+	return i, nil
+}
+
+func (m *OsoCommonSpec) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *OsoCommonSpec) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ServiceAccount) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.ServiceAccount)))
+		i += copy(data[i:], m.ServiceAccount)
+	}
+	if m.Source != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Source.Size()))
+		n23, err := m.Source.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n23
+	}
+	if m.Revision != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Revision.Size()))
+		n24, err := m.Revision.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n24
+	}
+	if m.Strategy != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Strategy.Size()))
+		n25, err := m.Strategy.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n25
+	}
+	if m.Output != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Output.Size()))
+		n26, err := m.Output.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n26
+	}
+	if m.Resources != nil {
+		data[i] = 0x32
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Resources.Size()))
+		n27, err := m.Resources.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n27
+	}
+	if m.PostCommit != nil {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.PostCommit.Size()))
+		n28, err := m.PostCommit.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n28
+	}
+	if m.CompletionDeadlineSeconds != 0 {
+		data[i] = 0x40
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.CompletionDeadlineSeconds))
+	}
+	return i, nil
+}
+
+func (m *WebHookTrigger) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *WebHookTrigger) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Secret) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Secret)))
+		i += copy(data[i:], m.Secret)
+	}
+	if m.AllowEnv {
+		data[i] = 0x10
+		i++
+		if m.AllowEnv {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
+func (m *ImageChangeTrigger) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ImageChangeTrigger) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.LastTriggeredImageID) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.LastTriggeredImageID)))
+		i += copy(data[i:], m.LastTriggeredImageID)
+	}
+	if m.From != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.From.Size()))
+		n29, err := m.From.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n29
+	}
+	return i, nil
+}
+
+func (m *OsoBuildTriggerPolicy) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *OsoBuildTriggerPolicy) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Type) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Type)))
+		i += copy(data[i:], m.Type)
+	}
+	if m.Github != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Github.Size()))
+		n30, err := m.Github.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n30
+	}
+	if m.Generic != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Generic.Size()))
+		n31, err := m.Generic.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n31
+	}
+	if m.ImageChange != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.ImageChange.Size()))
+		n32, err := m.ImageChange.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n32
+	}
+	if m.OsoBuildTriggerType != 0 {
+		data[i] = 0x28
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.OsoBuildTriggerType))
+	}
+	return i, nil
+}
+
+func (m *GenericWebHookCause) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *GenericWebHookCause) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Revision != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Revision.Size()))
+		n33, err := m.Revision.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n33
+	}
+	if len(m.Secret) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Secret)))
+		i += copy(data[i:], m.Secret)
+	}
+	return i, nil
+}
+
+func (m *GitHubWebHookCause) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *GitHubWebHookCause) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Revision != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Revision.Size()))
+		n34, err := m.Revision.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n34
+	}
+	if len(m.Secret) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Secret)))
+		i += copy(data[i:], m.Secret)
+	}
+	return i, nil
+}
+
+func (m *ImageChangeCause) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ImageChangeCause) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ImageID) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.ImageID)))
+		i += copy(data[i:], m.ImageID)
+	}
+	if m.FromRef != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.FromRef.Size()))
+		n35, err := m.FromRef.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n35
+	}
+	return i, nil
+}
+
+func (m *OsoBuildTriggerCause) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *OsoBuildTriggerCause) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Message) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Message)))
+		i += copy(data[i:], m.Message)
+	}
+	if m.GenericWebHook != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.GenericWebHook.Size()))
+		n36, err := m.GenericWebHook.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n36
+	}
+	if m.GithubWebHook != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.GithubWebHook.Size()))
+		n37, err := m.GithubWebHook.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n37
+	}
+	if m.ImageChangeBuild != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.ImageChangeBuild.Size()))
+		n38, err := m.ImageChangeBuild.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n38
+	}
+	return i, nil
+}
+
+func (m *OsoBuildStatus) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *OsoBuildStatus) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Phase) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Phase)))
+		i += copy(data[i:], m.Phase)
+	}
+	if m.Cancelled {
+		data[i] = 0x10
+		i++
+		if m.Cancelled {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if len(m.Reason) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Reason)))
+		i += copy(data[i:], m.Reason)
+	}
+	if len(m.Message) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Message)))
+		i += copy(data[i:], m.Message)
+	}
+	if m.StartTimestamp != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.StartTimestamp.Size()))
+		n39, err := m.StartTimestamp.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n39
+	}
+	if m.CompletionTimestamp != nil {
+		data[i] = 0x32
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.CompletionTimestamp.Size()))
+		n40, err := m.CompletionTimestamp.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n40
+	}
+	if m.Duration != 0 {
+		data[i] = 0x38
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Duration))
+	}
+	if len(m.OutputDockerImageReference) > 0 {
+		data[i] = 0x42
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.OutputDockerImageReference)))
+		i += copy(data[i:], m.OutputDockerImageReference)
+	}
+	if m.Config != nil {
+		data[i] = 0x4a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Config.Size()))
+		n41, err := m.Config.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n41
+	}
+	if m.OsoBuildPhase != 0 {
+		data[i] = 0x50
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.OsoBuildPhase))
+	}
+	return i, nil
+}
+
+func (m *DockerBuildConfigRequestData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DockerBuildConfigRequestData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.ProjectName) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.ProjectName)))
+		i += copy(data[i:], m.ProjectName)
+	}
+	if len(m.Triggers) > 0 {
+		for _, msg := range m.Triggers {
+			data[i] = 0x1a
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.RunPolicy) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.RunPolicy)))
+		i += copy(data[i:], m.RunPolicy)
+	}
+	if m.CommonSpec != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.CommonSpec.Size()))
+		n42, err := m.CommonSpec.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n42
+	}
+	if m.OsoBuildRunPolicy != 0 {
+		data[i] = 0x30
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.OsoBuildRunPolicy))
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
+			data[i] = 0x3a
+			i++
+			v := m.Labels[k]
+			mapSize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			i = encodeVarintManageService(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, _ := range m.Annotations {
+			data[i] = 0x42
+			i++
+			v := m.Annotations[k]
+			mapSize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			i = encodeVarintManageService(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	return i, nil
+}
+
+func (m *DockerBuildConfigResponseData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DockerBuildConfigResponseData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.State != 0 {
+		data[i] = 0x8
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.State))
+	}
+	if m.Metadata != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Metadata.Size()))
+		n43, err := m.Metadata.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n43
+	}
+	return i, nil
+}
+
+func (m *DockerBuildRequestData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DockerBuildRequestData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.ProjectName) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.ProjectName)))
+		i += copy(data[i:], m.ProjectName)
+	}
+	if m.ConfigSpec != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.ConfigSpec.Size()))
+		n44, err := m.ConfigSpec.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n44
+	}
+	if len(m.TriggeredBy) > 0 {
+		for _, msg := range m.TriggeredBy {
+			data[i] = 0x22
+			i++
+			i = encodeVarintManageService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
+			data[i] = 0x2a
+			i++
+			v := m.Labels[k]
+			mapSize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			i = encodeVarintManageService(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, _ := range m.Annotations {
+			data[i] = 0x32
+			i++
+			v := m.Annotations[k]
+			mapSize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			i = encodeVarintManageService(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	return i, nil
+}
+
+func (m *DockerBuildResponseData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DockerBuildResponseData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Result != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Result.Size()))
+		n45, err := m.Result.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n45
+	}
+	if m.ConfigResult != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.ConfigResult.Size()))
+		n46, err := m.ConfigResult.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n46
+	}
+	if m.Metadata != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintManageService(data, i, uint64(m.Metadata.Size()))
+		n47, err := m.Metadata.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n47
+	}
+	return i, nil
+}
+
+func (m *RawData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *RawData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ObjectName) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintManageService(data, i, uint64(len(m.ObjectName)))
+		i += copy(data[i:], m.ObjectName)
+	}
+	if m.ObjectBytes != nil {
+		if len(m.ObjectBytes) > 0 {
+			data[i] = 0x12
+			i++
+			i = encodeVarintManageService(data, i, uint64(len(m.ObjectBytes)))
+			i += copy(data[i:], m.ObjectBytes)
+		}
+	}
+	return i, nil
+}
+
 func encodeFixed64ManageService(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
@@ -508,6 +3410,719 @@ func (m *FindProjectResponse) Size() (n int) {
 	_ = l
 	if m.Odefv1RawData != nil {
 		l = len(m.Odefv1RawData)
+		if l > 0 {
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *DeleteProjectRequest) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *DeleteProjectResponse) Size() (n int) {
+	var l int
+	_ = l
+	if m.Flag != 0 {
+		n += 1 + sovManageService(uint64(m.Flag))
+	}
+	return n
+}
+
+func (m *SourceControlUser) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Email)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *GitSourceRevision) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Commit)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Author != nil {
+		l = m.Author.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Committer != nil {
+		l = m.Committer.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *SourceRevision) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Type)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Git != nil {
+		l = m.Git.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *BuildPostCommitSpec) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Command) > 0 {
+		for _, s := range m.Command {
+			l = len(s)
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	if len(m.Args) > 0 {
+		for _, s := range m.Args {
+			l = len(s)
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	l = len(m.Script)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *BuildOutput) Size() (n int) {
+	var l int
+	_ = l
+	if m.To != nil {
+		l = m.To.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.PushSecret != nil {
+		l = m.PushSecret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *JenkinsPipelineBuildStrategy) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.JenkinsfilePath)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Jenkinsfile)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *SecretSpec) Size() (n int) {
+	var l int
+	_ = l
+	if m.SecretSource != nil {
+		l = m.SecretSource.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.MountPath)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *CustomBuildStrategy) Size() (n int) {
+	var l int
+	_ = l
+	if m.From != nil {
+		l = m.From.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.PullSecret != nil {
+		l = m.PullSecret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for _, e := range m.Env {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	if m.ExposeDockerSocket {
+		n += 2
+	}
+	if m.ForcePull {
+		n += 2
+	}
+	if len(m.Secrets) > 0 {
+		for _, e := range m.Secrets {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	l = len(m.BuildAPIVersion)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *SourceBuildStrategy) Size() (n int) {
+	var l int
+	_ = l
+	if m.From != nil {
+		l = m.From.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.PullSecret != nil {
+		l = m.PullSecret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for _, e := range m.Env {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	l = len(m.Scripts)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Incremental {
+		n += 2
+	}
+	if m.ForcePull {
+		n += 2
+	}
+	return n
+}
+
+func (m *DockerBuildStrategy) Size() (n int) {
+	var l int
+	_ = l
+	if m.From != nil {
+		l = m.From.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.PullSecret != nil {
+		l = m.PullSecret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.NoCache {
+		n += 2
+	}
+	if len(m.Env) > 0 {
+		for _, e := range m.Env {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	if m.ForcePull {
+		n += 2
+	}
+	l = len(m.DockerfilePath)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *BuildStrategy) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Type)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.DockerStrategy != nil {
+		l = m.DockerStrategy.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.SourceStrategy != nil {
+		l = m.SourceStrategy.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.CustomStrategy != nil {
+		l = m.CustomStrategy.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.JenkinsPipelineStrategy != nil {
+		l = m.JenkinsPipelineStrategy.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.OsoBuildStrategyType != 0 {
+		n += 1 + sovManageService(uint64(m.OsoBuildStrategyType))
+	}
+	return n
+}
+
+func (m *SecretBuildSource) Size() (n int) {
+	var l int
+	_ = l
+	if m.Secret != nil {
+		l = m.Secret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.DestinationDir)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *ImageSourcePath) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.SourcePath)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.DestinationDir)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *ImageSource) Size() (n int) {
+	var l int
+	_ = l
+	if m.From != nil {
+		l = m.From.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.Paths) > 0 {
+		for _, e := range m.Paths {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	if m.PullSecret != nil {
+		l = m.PullSecret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *GitBuildSource) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Uri)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Ref)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.HttpProxy)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.HttpsProxy)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *BinaryBuildSource) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.AsFile)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *BuildSource) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Type)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Binary != nil {
+		l = m.Binary.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Dockerfile)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Git != nil {
+		l = m.Git.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.Images) > 0 {
+		for _, e := range m.Images {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	l = len(m.ContextDir)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.SourceSecret != nil {
+		l = m.SourceSecret.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.Secrets) > 0 {
+		for _, e := range m.Secrets {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	if m.OsoBuildSourceType != 0 {
+		n += 1 + sovManageService(uint64(m.OsoBuildSourceType))
+	}
+	return n
+}
+
+func (m *OsoCommonSpec) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ServiceAccount)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Source != nil {
+		l = m.Source.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Revision != nil {
+		l = m.Revision.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Strategy != nil {
+		l = m.Strategy.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Output != nil {
+		l = m.Output.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Resources != nil {
+		l = m.Resources.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.PostCommit != nil {
+		l = m.PostCommit.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.CompletionDeadlineSeconds != 0 {
+		n += 1 + sovManageService(uint64(m.CompletionDeadlineSeconds))
+	}
+	return n
+}
+
+func (m *WebHookTrigger) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Secret)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.AllowEnv {
+		n += 2
+	}
+	return n
+}
+
+func (m *ImageChangeTrigger) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.LastTriggeredImageID)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.From != nil {
+		l = m.From.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *OsoBuildTriggerPolicy) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Type)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Github != nil {
+		l = m.Github.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Generic != nil {
+		l = m.Generic.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.ImageChange != nil {
+		l = m.ImageChange.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.OsoBuildTriggerType != 0 {
+		n += 1 + sovManageService(uint64(m.OsoBuildTriggerType))
+	}
+	return n
+}
+
+func (m *GenericWebHookCause) Size() (n int) {
+	var l int
+	_ = l
+	if m.Revision != nil {
+		l = m.Revision.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Secret)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *GitHubWebHookCause) Size() (n int) {
+	var l int
+	_ = l
+	if m.Revision != nil {
+		l = m.Revision.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Secret)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *ImageChangeCause) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ImageID)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.FromRef != nil {
+		l = m.FromRef.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *OsoBuildTriggerCause) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.GenericWebHook != nil {
+		l = m.GenericWebHook.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.GithubWebHook != nil {
+		l = m.GithubWebHook.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.ImageChangeBuild != nil {
+		l = m.ImageChangeBuild.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *OsoBuildStatus) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Phase)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Cancelled {
+		n += 2
+	}
+	l = len(m.Reason)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.StartTimestamp != nil {
+		l = m.StartTimestamp.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.CompletionTimestamp != nil {
+		l = m.CompletionTimestamp.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Duration != 0 {
+		n += 1 + sovManageService(uint64(m.Duration))
+	}
+	l = len(m.OutputDockerImageReference)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Config != nil {
+		l = m.Config.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.OsoBuildPhase != 0 {
+		n += 1 + sovManageService(uint64(m.OsoBuildPhase))
+	}
+	return n
+}
+
+func (m *DockerBuildConfigRequestData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.ProjectName)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.Triggers) > 0 {
+		for _, e := range m.Triggers {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	l = len(m.RunPolicy)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.CommonSpec != nil {
+		l = m.CommonSpec.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.OsoBuildRunPolicy != 0 {
+		n += 1 + sovManageService(uint64(m.OsoBuildRunPolicy))
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			n += mapEntrySize + 1 + sovManageService(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, v := range m.Annotations {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			n += mapEntrySize + 1 + sovManageService(uint64(mapEntrySize))
+		}
+	}
+	return n
+}
+
+func (m *DockerBuildConfigResponseData) Size() (n int) {
+	var l int
+	_ = l
+	if m.State != 0 {
+		n += 1 + sovManageService(uint64(m.State))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *DockerBuildRequestData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	l = len(m.ProjectName)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.ConfigSpec != nil {
+		l = m.ConfigSpec.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if len(m.TriggeredBy) > 0 {
+		for _, e := range m.TriggeredBy {
+			l = e.Size()
+			n += 1 + l + sovManageService(uint64(l))
+		}
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			n += mapEntrySize + 1 + sovManageService(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, v := range m.Annotations {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovManageService(uint64(len(k))) + 1 + len(v) + sovManageService(uint64(len(v)))
+			n += mapEntrySize + 1 + sovManageService(uint64(mapEntrySize))
+		}
+	}
+	return n
+}
+
+func (m *DockerBuildResponseData) Size() (n int) {
+	var l int
+	_ = l
+	if m.Result != nil {
+		l = m.Result.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.ConfigResult != nil {
+		l = m.ConfigResult.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	return n
+}
+
+func (m *RawData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ObjectName)
+	if l > 0 {
+		n += 1 + l + sovManageService(uint64(l))
+	}
+	if m.ObjectBytes != nil {
+		l = len(m.ObjectBytes)
 		if l > 0 {
 			n += 1 + l + sovManageService(uint64(l))
 		}
@@ -1066,6 +4681,5597 @@ func (m *FindProjectResponse) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *DeleteProjectRequest) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteProjectRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteProjectRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeleteProjectResponse) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteProjectResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteProjectResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Flag", wireType)
+			}
+			m.Flag = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Flag |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SourceControlUser) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SourceControlUser: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SourceControlUser: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Email = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GitSourceRevision) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GitSourceRevision: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GitSourceRevision: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Commit", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Commit = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Author", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Author == nil {
+				m.Author = &SourceControlUser{}
+			}
+			if err := m.Author.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Committer", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Committer == nil {
+				m.Committer = &SourceControlUser{}
+			}
+			if err := m.Committer.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SourceRevision) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SourceRevision: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SourceRevision: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Type = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Git", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Git == nil {
+				m.Git = &GitSourceRevision{}
+			}
+			if err := m.Git.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuildPostCommitSpec) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuildPostCommitSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuildPostCommitSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Command", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Command = append(m.Command, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Args", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Args = append(m.Args, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Script", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Script = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuildOutput) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuildOutput: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuildOutput: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.To == nil {
+				m.To = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.To.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PushSecret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PushSecret == nil {
+				m.PushSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.PushSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JenkinsPipelineBuildStrategy) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JenkinsPipelineBuildStrategy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JenkinsPipelineBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JenkinsfilePath", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.JenkinsfilePath = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Jenkinsfile", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Jenkinsfile = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SecretSpec) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SecretSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SecretSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SecretSource", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SecretSource == nil {
+				m.SecretSource = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.SecretSource.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MountPath", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MountPath = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CustomBuildStrategy) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CustomBuildStrategy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CustomBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.From == nil {
+				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PullSecret == nil {
+				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Env = append(m.Env, &k8s_io_kubernetes_pkg_api_v1.EnvVar{})
+			if err := m.Env[len(m.Env)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExposeDockerSocket", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ExposeDockerSocket = bool(v != 0)
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ForcePull", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ForcePull = bool(v != 0)
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secrets", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secrets = append(m.Secrets, &SecretSpec{})
+			if err := m.Secrets[len(m.Secrets)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BuildAPIVersion", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BuildAPIVersion = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SourceBuildStrategy) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SourceBuildStrategy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SourceBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.From == nil {
+				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PullSecret == nil {
+				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Env = append(m.Env, &k8s_io_kubernetes_pkg_api_v1.EnvVar{})
+			if err := m.Env[len(m.Env)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Scripts", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Scripts = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Incremental", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Incremental = bool(v != 0)
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ForcePull", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ForcePull = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DockerBuildStrategy) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DockerBuildStrategy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DockerBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.From == nil {
+				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PullSecret == nil {
+				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NoCache", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.NoCache = bool(v != 0)
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Env = append(m.Env, &k8s_io_kubernetes_pkg_api_v1.EnvVar{})
+			if err := m.Env[len(m.Env)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ForcePull", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ForcePull = bool(v != 0)
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DockerfilePath", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DockerfilePath = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuildStrategy) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuildStrategy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Type = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DockerStrategy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.DockerStrategy == nil {
+				m.DockerStrategy = &DockerBuildStrategy{}
+			}
+			if err := m.DockerStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SourceStrategy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SourceStrategy == nil {
+				m.SourceStrategy = &SourceBuildStrategy{}
+			}
+			if err := m.SourceStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CustomStrategy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CustomStrategy == nil {
+				m.CustomStrategy = &CustomBuildStrategy{}
+			}
+			if err := m.CustomStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field JenkinsPipelineStrategy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.JenkinsPipelineStrategy == nil {
+				m.JenkinsPipelineStrategy = &JenkinsPipelineBuildStrategy{}
+			}
+			if err := m.JenkinsPipelineStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildStrategyType", wireType)
+			}
+			m.OsoBuildStrategyType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.OsoBuildStrategyType |= (BuildStrategy_OsoBuildStrategyType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SecretBuildSource) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SecretBuildSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SecretBuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Secret == nil {
+				m.Secret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.Secret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DestinationDir", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DestinationDir = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ImageSourcePath) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ImageSourcePath: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ImageSourcePath: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SourcePath", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SourcePath = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DestinationDir", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DestinationDir = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ImageSource) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ImageSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ImageSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.From == nil {
+				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Paths", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Paths = append(m.Paths, &ImageSourcePath{})
+			if err := m.Paths[len(m.Paths)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PullSecret == nil {
+				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GitBuildSource) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GitBuildSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GitBuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Uri = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ref", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Ref = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HttpProxy", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.HttpProxy = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HttpsProxy", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.HttpsProxy = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BinaryBuildSource) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BinaryBuildSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BinaryBuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AsFile", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AsFile = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BuildSource) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BuildSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Type = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Binary", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Binary == nil {
+				m.Binary = &BinaryBuildSource{}
+			}
+			if err := m.Binary.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dockerfile", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Dockerfile = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Git", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Git == nil {
+				m.Git = &GitBuildSource{}
+			}
+			if err := m.Git.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Images", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Images = append(m.Images, &ImageSource{})
+			if err := m.Images[len(m.Images)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ContextDir", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ContextDir = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SourceSecret", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SourceSecret == nil {
+				m.SourceSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
+			}
+			if err := m.SourceSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secrets", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secrets = append(m.Secrets, &SecretBuildSource{})
+			if err := m.Secrets[len(m.Secrets)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildSourceType", wireType)
+			}
+			m.OsoBuildSourceType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.OsoBuildSourceType |= (BuildSource_OsoBuildSourceType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *OsoCommonSpec) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OsoCommonSpec: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OsoCommonSpec: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceAccount", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceAccount = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Source", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Source == nil {
+				m.Source = &BuildSource{}
+			}
+			if err := m.Source.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Revision == nil {
+				m.Revision = &SourceRevision{}
+			}
+			if err := m.Revision.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Strategy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Strategy == nil {
+				m.Strategy = &BuildStrategy{}
+			}
+			if err := m.Strategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Output", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Output == nil {
+				m.Output = &BuildOutput{}
+			}
+			if err := m.Output.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Resources == nil {
+				m.Resources = &k8s_io_kubernetes_pkg_api_v1.ResourceRequirements{}
+			}
+			if err := m.Resources.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PostCommit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PostCommit == nil {
+				m.PostCommit = &BuildPostCommitSpec{}
+			}
+			if err := m.PostCommit.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CompletionDeadlineSeconds", wireType)
+			}
+			m.CompletionDeadlineSeconds = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.CompletionDeadlineSeconds |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WebHookTrigger) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WebHookTrigger: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WebHookTrigger: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secret = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AllowEnv", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AllowEnv = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ImageChangeTrigger) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ImageChangeTrigger: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ImageChangeTrigger: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastTriggeredImageID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LastTriggeredImageID = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.From == nil {
+				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *OsoBuildTriggerPolicy) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OsoBuildTriggerPolicy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OsoBuildTriggerPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Type = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Github", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Github == nil {
+				m.Github = &WebHookTrigger{}
+			}
+			if err := m.Github.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Generic", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Generic == nil {
+				m.Generic = &WebHookTrigger{}
+			}
+			if err := m.Generic.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ImageChange", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ImageChange == nil {
+				m.ImageChange = &ImageChangeTrigger{}
+			}
+			if err := m.ImageChange.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildTriggerType", wireType)
+			}
+			m.OsoBuildTriggerType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.OsoBuildTriggerType |= (OsoBuildTriggerPolicy_OsoBuildTriggerType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GenericWebHookCause) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GenericWebHookCause: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GenericWebHookCause: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Revision == nil {
+				m.Revision = &SourceRevision{}
+			}
+			if err := m.Revision.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secret = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GitHubWebHookCause) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GitHubWebHookCause: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GitHubWebHookCause: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Revision == nil {
+				m.Revision = &SourceRevision{}
+			}
+			if err := m.Revision.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Secret = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ImageChangeCause) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ImageChangeCause: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ImageChangeCause: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ImageID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ImageID = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FromRef", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.FromRef == nil {
+				m.FromRef = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.FromRef.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *OsoBuildTriggerCause) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OsoBuildTriggerCause: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OsoBuildTriggerCause: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GenericWebHook", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.GenericWebHook == nil {
+				m.GenericWebHook = &GenericWebHookCause{}
+			}
+			if err := m.GenericWebHook.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GithubWebHook", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.GithubWebHook == nil {
+				m.GithubWebHook = &GitHubWebHookCause{}
+			}
+			if err := m.GithubWebHook.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ImageChangeBuild", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ImageChangeBuild == nil {
+				m.ImageChangeBuild = &ImageChangeCause{}
+			}
+			if err := m.ImageChangeBuild.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *OsoBuildStatus) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: OsoBuildStatus: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: OsoBuildStatus: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Phase", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Phase = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cancelled", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Cancelled = bool(v != 0)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Reason = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.StartTimestamp == nil {
+				m.StartTimestamp = &k8s_io_kubernetes_pkg_api_unversioned.Time{}
+			}
+			if err := m.StartTimestamp.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CompletionTimestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CompletionTimestamp == nil {
+				m.CompletionTimestamp = &k8s_io_kubernetes_pkg_api_unversioned.Time{}
+			}
+			if err := m.CompletionTimestamp.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
+			}
+			m.Duration = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Duration |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OutputDockerImageReference", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OutputDockerImageReference = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Config == nil {
+				m.Config = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
+			}
+			if err := m.Config.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildPhase", wireType)
+			}
+			m.OsoBuildPhase = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.OsoBuildPhase |= (OsoBuildStatus_OsoBuildPhase(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DockerBuildConfigRequestData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DockerBuildConfigRequestData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DockerBuildConfigRequestData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProjectName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProjectName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Triggers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Triggers = append(m.Triggers, &OsoBuildTriggerPolicy{})
+			if err := m.Triggers[len(m.Triggers)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RunPolicy", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RunPolicy = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CommonSpec", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.CommonSpec == nil {
+				m.CommonSpec = &OsoCommonSpec{}
+			}
+			if err := m.CommonSpec.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildRunPolicy", wireType)
+			}
+			m.OsoBuildRunPolicy = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.OsoBuildRunPolicy |= (DockerBuildConfigRequestData_OsoBuildRunPolicy(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Labels == nil {
+				m.Labels = make(map[string]string)
+			}
+			m.Labels[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Annotations == nil {
+				m.Annotations = make(map[string]string)
+			}
+			m.Annotations[mapkey] = mapvalue
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DockerBuildConfigResponseData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DockerBuildConfigResponseData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DockerBuildConfigResponseData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.State |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &k8s_io_kubernetes_pkg_api_v1.ObjectMeta{}
+			}
+			if err := m.Metadata.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DockerBuildRequestData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DockerBuildRequestData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DockerBuildRequestData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProjectName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProjectName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConfigSpec", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ConfigSpec == nil {
+				m.ConfigSpec = &DockerBuildConfigRequestData{}
+			}
+			if err := m.ConfigSpec.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TriggeredBy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TriggeredBy = append(m.TriggeredBy, &OsoBuildTriggerCause{})
+			if err := m.TriggeredBy[len(m.TriggeredBy)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Labels == nil {
+				m.Labels = make(map[string]string)
+			}
+			m.Labels[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Annotations == nil {
+				m.Annotations = make(map[string]string)
+			}
+			m.Annotations[mapkey] = mapvalue
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DockerBuildResponseData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DockerBuildResponseData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DockerBuildResponseData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Result == nil {
+				m.Result = &OsoBuildStatus{}
+			}
+			if err := m.Result.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConfigResult", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ConfigResult == nil {
+				m.ConfigResult = &DockerBuildConfigResponseData{}
+			}
+			if err := m.ConfigResult.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &k8s_io_kubernetes_pkg_api_v1.ObjectMeta{}
+			}
+			if err := m.Metadata.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RawData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowManageService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RawData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RawData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ObjectName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ObjectBytes", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManageService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthManageService
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ObjectBytes = append(m.ObjectBytes[:0], data[iNdEx:postIndex]...)
+			if m.ObjectBytes == nil {
+				m.ObjectBytes = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipManageService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthManageService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipManageService(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -1172,28 +10378,185 @@ var (
 )
 
 var fileDescriptorManageService = []byte{
-	// 353 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0x52, 0x2b, 0x48, 0x4c, 0x2c,
-	0xd6, 0x4f, 0xce, 0xd4, 0xcf, 0x2f, 0x48, 0xcd, 0x2b, 0xce, 0xc8, 0x4c, 0x2b, 0xd1, 0xcf, 0x4d,
-	0xcc, 0x4b, 0x4c, 0x4f, 0x8d, 0x2f, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xd5, 0x2b, 0x28, 0xca,
-	0x2f, 0xc9, 0x17, 0x12, 0x04, 0xa9, 0xd3, 0x4b, 0xce, 0xd4, 0x83, 0xab, 0x53, 0x0a, 0xe0, 0x92,
-	0x72, 0x2e, 0x4a, 0x4d, 0x2c, 0x49, 0xf5, 0x2f, 0xca, 0x4c, 0xcf, 0xcc, 0x0b, 0x28, 0xca, 0xcf,
-	0x4a, 0x4d, 0x2e, 0x09, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x12, 0xe2, 0x62, 0xc9, 0x4b,
-	0xcc, 0x4d, 0x95, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3, 0x85, 0xe4, 0xb8, 0xb8, 0xd2,
-	0x32, 0xf3, 0x12, 0x73, 0x32, 0xab, 0x52, 0x8b, 0x8a, 0x25, 0x98, 0x14, 0x98, 0x81, 0x32, 0x48,
-	0x22, 0x4a, 0xce, 0x5c, 0xd2, 0x58, 0x4d, 0x2c, 0x2e, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0xe2, 0xe3,
-	0x62, 0xca, 0x4c, 0x81, 0x1a, 0x08, 0x64, 0x09, 0x89, 0x70, 0xb1, 0x16, 0x64, 0x24, 0x16, 0xa7,
-	0x02, 0x4d, 0x02, 0x09, 0x41, 0x38, 0x4a, 0xde, 0x5c, 0xca, 0x58, 0x0c, 0x71, 0x2c, 0x4a, 0xca,
-	0x2c, 0x29, 0x4a, 0x2c, 0xaa, 0x84, 0xb9, 0x4f, 0x85, 0x8b, 0x37, 0x3f, 0x25, 0x35, 0xad, 0xcc,
-	0x30, 0x28, 0xb1, 0xdc, 0x25, 0xb1, 0x24, 0x11, 0x6c, 0x2e, 0x4f, 0x10, 0xaa, 0xa0, 0x92, 0x0f,
-	0x97, 0x0a, 0x7e, 0xc3, 0xa0, 0x4e, 0x23, 0xce, 0x34, 0x0d, 0x2e, 0x21, 0xb7, 0xcc, 0xbc, 0x14,
-	0xc2, 0x21, 0xa5, 0x64, 0xcd, 0x25, 0x8c, 0xa2, 0x92, 0x14, 0x6b, 0x8c, 0x7e, 0x33, 0x71, 0x09,
-	0x07, 0x67, 0xe6, 0x16, 0xe4, 0xa4, 0xfa, 0x82, 0xa3, 0x32, 0x18, 0x12, 0x93, 0x42, 0x25, 0x5c,
-	0xc2, 0x58, 0x3c, 0x23, 0xa4, 0xab, 0x87, 0x11, 0xb7, 0x7a, 0xb8, 0x23, 0x56, 0x4a, 0x8f, 0x58,
-	0xe5, 0x50, 0x37, 0xf7, 0x33, 0x72, 0xc9, 0xe0, 0x0b, 0x43, 0x21, 0x33, 0xe2, 0x0c, 0x44, 0x8f,
-	0x41, 0x29, 0x73, 0x92, 0xf5, 0x41, 0x5d, 0x14, 0xc3, 0xc5, 0x8d, 0x14, 0xb8, 0x42, 0xaa, 0x58,
-	0xcc, 0xc1, 0x8c, 0x26, 0x29, 0x35, 0x42, 0xca, 0x20, 0xa6, 0x3b, 0x49, 0x9f, 0x78, 0x24, 0xc7,
-	0x78, 0x01, 0x88, 0x1f, 0x00, 0xf1, 0x8c, 0xc7, 0x72, 0x0c, 0x51, 0x9c, 0x70, 0x0d, 0x49, 0x6c,
-	0xe0, 0xdc, 0x64, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0xca, 0xd7, 0xf7, 0x75, 0x77, 0x03, 0x00,
-	0x00,
+	// 2877 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xdc, 0x5a, 0xdb, 0x6f, 0x1c, 0x57,
+	0x19, 0xef, 0x7a, 0xed, 0xb5, 0xfd, 0xad, 0xed, 0xac, 0x8f, 0x9d, 0xc4, 0xdd, 0x3a, 0xc1, 0x99,
+	0xa4, 0xa9, 0x49, 0xe8, 0x6e, 0xe3, 0x28, 0x6d, 0x6e, 0xad, 0x6a, 0xaf, 0x93, 0x34, 0xcd, 0xc5,
+	0xab, 0xe3, 0x24, 0x08, 0x28, 0xa0, 0xd9, 0xdd, 0xe3, 0xf5, 0xc4, 0xb3, 0x33, 0xdb, 0xb9, 0x38,
+	0x31, 0x11, 0x0f, 0x54, 0x48, 0x3c, 0xd0, 0x27, 0x10, 0xa2, 0xbc, 0x20, 0xfe, 0x01, 0xfe, 0x01,
+	0x90, 0x78, 0x42, 0xa2, 0x8f, 0x48, 0x3c, 0xf0, 0x86, 0x10, 0xf4, 0x0f, 0xe0, 0x0f, 0xe0, 0x81,
+	0xef, 0x5c, 0xe6, 0xba, 0xb3, 0xe3, 0x4b, 0xa3, 0x0a, 0x78, 0x48, 0x3c, 0xe7, 0xec, 0xf9, 0x7e,
+	0xdf, 0x77, 0xbe, 0xfb, 0x39, 0x33, 0x70, 0xbe, 0xaf, 0xeb, 0x6e, 0xbd, 0x6d, 0xd4, 0xed, 0x3e,
+	0xb3, 0xdc, 0x6d, 0x63, 0xcb, 0xab, 0xf7, 0x74, 0x4b, 0xef, 0xb2, 0xef, 0xbb, 0xcc, 0xd9, 0x35,
+	0xda, 0xac, 0xd6, 0x77, 0x6c, 0xcf, 0x26, 0xb3, 0x7c, 0x5d, 0xad, 0x6d, 0xd4, 0xc2, 0x75, 0xd5,
+	0xc5, 0xae, 0x6d, 0x77, 0x4d, 0x56, 0xd7, 0xfb, 0x46, 0x5d, 0xb7, 0x2c, 0xdb, 0xd3, 0x3d, 0xc3,
+	0xb6, 0x5c, 0x49, 0x50, 0xbd, 0xd9, 0x35, 0xbc, 0x6d, 0xbf, 0x55, 0x6b, 0xdb, 0xbd, 0x18, 0xb6,
+	0xed, 0x18, 0x5d, 0xc3, 0xaa, 0xf7, 0x77, 0xba, 0xf5, 0x96, 0x6f, 0x98, 0x1d, 0x41, 0xbc, 0x7b,
+	0xa9, 0xde, 0x65, 0x16, 0x73, 0x74, 0x8f, 0x75, 0x14, 0xf5, 0x95, 0x9d, 0xab, 0x6e, 0xcd, 0xb0,
+	0xeb, 0x3b, 0x7e, 0x8b, 0x39, 0x16, 0xf3, 0x98, 0x2b, 0x68, 0xf8, 0x6a, 0xdf, 0xda, 0x65, 0x8e,
+	0x8b, 0x9c, 0x58, 0x67, 0x80, 0xec, 0x1b, 0xc3, 0xc9, 0x06, 0x99, 0x68, 0x4d, 0xa8, 0x36, 0x1c,
+	0x86, 0x13, 0x1b, 0x42, 0xaa, 0xa6, 0x63, 0x3f, 0x65, 0x6d, 0x8f, 0xb2, 0x8f, 0x7d, 0xe6, 0x7a,
+	0x84, 0xc0, 0xa8, 0xa5, 0xf7, 0xd8, 0x42, 0x61, 0xa9, 0xb0, 0x3c, 0x49, 0xc5, 0x33, 0x39, 0x0d,
+	0xb0, 0x65, 0x58, 0xba, 0x69, 0xfc, 0x00, 0x45, 0x58, 0x18, 0x59, 0x2a, 0xe2, 0x2f, 0xb1, 0x19,
+	0xad, 0x01, 0xaf, 0x65, 0x22, 0xba, 0x7d, 0x54, 0x0c, 0x23, 0x33, 0x30, 0x62, 0x74, 0x14, 0x20,
+	0x3e, 0x91, 0x79, 0x18, 0xeb, 0x6f, 0xeb, 0x2e, 0x43, 0x24, 0x3e, 0x25, 0x07, 0xda, 0x3d, 0x38,
+	0x9b, 0x01, 0xb2, 0xea, 0xb4, 0x0c, 0xcf, 0xd1, 0x9d, 0xbd, 0x40, 0xbe, 0x73, 0x30, 0x6d, 0x77,
+	0xd8, 0xd6, 0xee, 0x25, 0xaa, 0x3f, 0x5b, 0xd7, 0x3d, 0x5d, 0xe0, 0x4e, 0xd1, 0xe4, 0xa4, 0x76,
+	0x1f, 0xce, 0xe5, 0x83, 0x29, 0xd1, 0x0e, 0x86, 0xb6, 0x0c, 0xe4, 0xb6, 0x61, 0x75, 0xf6, 0xd7,
+	0x94, 0x76, 0x03, 0xe6, 0x12, 0x2b, 0x0f, 0xc5, 0xe6, 0x02, 0xcc, 0xaf, 0x33, 0x13, 0xcd, 0x77,
+	0x00, 0x46, 0x17, 0xe1, 0x78, 0x6a, 0xad, 0x62, 0x85, 0x8b, 0xb7, 0x4c, 0xbd, 0x2b, 0x16, 0x17,
+	0xa9, 0x78, 0xd6, 0xde, 0x85, 0xd9, 0x4d, 0xdb, 0x77, 0xda, 0xac, 0x61, 0x5b, 0x9e, 0x63, 0x9b,
+	0x8f, 0xd1, 0xc9, 0x33, 0x0d, 0x8d, 0x96, 0x61, 0x3d, 0xdd, 0x30, 0x03, 0xcb, 0x88, 0x81, 0xf6,
+	0xa7, 0x02, 0xcc, 0xde, 0x31, 0x3c, 0x09, 0x41, 0xd9, 0xae, 0xc1, 0xdd, 0x90, 0x9c, 0x80, 0x12,
+	0x3a, 0x79, 0xcf, 0xf0, 0x14, 0x82, 0x1a, 0x91, 0x9b, 0x50, 0xd2, 0x7d, 0x6f, 0xdb, 0x76, 0x04,
+	0x48, 0x79, 0xe5, 0x5c, 0x6d, 0x20, 0x86, 0x6a, 0x03, 0xd2, 0x50, 0x45, 0x43, 0xd6, 0x60, 0x52,
+	0xe2, 0x78, 0xcc, 0x59, 0x28, 0x1e, 0x02, 0x20, 0x22, 0x23, 0x0b, 0x30, 0xde, 0x63, 0xae, 0x8b,
+	0xd1, 0xbc, 0x30, 0x2a, 0x44, 0x0b, 0x86, 0xda, 0x47, 0x30, 0x93, 0xda, 0x05, 0x6a, 0xc1, 0xdb,
+	0xeb, 0x87, 0x5a, 0xe0, 0xcf, 0xe4, 0x6d, 0x28, 0x62, 0x14, 0xe7, 0x88, 0x3f, 0xa0, 0x0c, 0xca,
+	0x09, 0xb4, 0xef, 0xc0, 0xdc, 0x1a, 0x8f, 0xee, 0xa6, 0xed, 0x7a, 0x0d, 0x21, 0xcd, 0x66, 0x9f,
+	0xb5, 0xb9, 0x38, 0x5c, 0x36, 0xdd, 0xe2, 0x31, 0xc0, 0x43, 0x27, 0x18, 0x72, 0xe6, 0xba, 0xd3,
+	0x0d, 0x22, 0x4a, 0x3c, 0x73, 0xb5, 0xba, 0x6d, 0xc7, 0xe8, 0x7b, 0x62, 0xf7, 0xa8, 0x56, 0x39,
+	0xd2, 0x7e, 0x53, 0x80, 0xb2, 0x40, 0xdf, 0xf0, 0xbd, 0xbe, 0xef, 0x91, 0x77, 0x61, 0xc4, 0xb3,
+	0x85, 0xd8, 0xe5, 0x95, 0x37, 0x6b, 0x32, 0x01, 0xd4, 0xa2, 0x04, 0x50, 0xc3, 0x04, 0x50, 0xc3,
+	0x04, 0x50, 0xdb, 0xbd, 0x54, 0xdb, 0x68, 0x49, 0x0f, 0xd9, 0x62, 0x0e, 0xb3, 0x50, 0x68, 0x24,
+	0x24, 0x14, 0xa0, 0xef, 0xbb, 0xdb, 0x9b, 0xac, 0xed, 0xb0, 0x60, 0xab, 0x2b, 0xf9, 0x30, 0xf7,
+	0xed, 0xb6, 0x6e, 0xa6, 0xb1, 0x62, 0x28, 0xda, 0x53, 0x58, 0xfc, 0x90, 0x59, 0x3b, 0x86, 0xe5,
+	0x36, 0x8d, 0x3e, 0x33, 0x0d, 0x8b, 0x09, 0x81, 0x37, 0x3d, 0x9e, 0x7d, 0xba, 0x7b, 0x64, 0x19,
+	0x8e, 0x3d, 0x95, 0xbf, 0x6f, 0x19, 0x26, 0x6b, 0xea, 0xde, 0xb6, 0x52, 0x7b, 0x7a, 0x9a, 0x2c,
+	0x41, 0x39, 0x36, 0xa5, 0xbc, 0x31, 0x3e, 0xa5, 0x7d, 0x52, 0x00, 0x90, 0x6c, 0x85, 0x8e, 0x9f,
+	0xc0, 0x94, 0x2b, 0x47, 0xc2, 0x2e, 0x4a, 0x2f, 0x47, 0xd9, 0x50, 0x02, 0x87, 0x2c, 0xc2, 0x64,
+	0xcf, 0xf6, 0x2d, 0x4f, 0x08, 0x2b, 0xc5, 0x88, 0x26, 0xb4, 0x5f, 0x14, 0x61, 0xae, 0xe1, 0xbb,
+	0x9e, 0xdd, 0x4b, 0x6e, 0x74, 0x15, 0x63, 0xd0, 0xb1, 0x7b, 0x47, 0xb3, 0x8e, 0x20, 0x95, 0xf6,
+	0x31, 0xcd, 0x97, 0x61, 0x9f, 0x00, 0x85, 0xfb, 0x35, 0xb3, 0x76, 0xd1, 0xaf, 0x8a, 0xc2, 0xaf,
+	0x73, 0xc1, 0x6e, 0x59, 0xbb, 0x4f, 0x74, 0x87, 0x72, 0x02, 0x52, 0x03, 0xc2, 0x9e, 0xf7, 0x6d,
+	0x97, 0xad, 0xdb, 0xed, 0x1d, 0xe6, 0x6c, 0xf2, 0xff, 0x3d, 0x11, 0x5a, 0x13, 0x34, 0xe3, 0x17,
+	0xae, 0xb4, 0x2d, 0x1b, 0xb5, 0xd7, 0x44, 0xd6, 0x0b, 0x63, 0x62, 0x59, 0x34, 0x41, 0xde, 0x81,
+	0x71, 0xa9, 0x62, 0x77, 0xa1, 0x24, 0x24, 0x39, 0x95, 0x15, 0xdf, 0xa1, 0x69, 0x69, 0xb0, 0x9a,
+	0xbb, 0x8f, 0x28, 0x9e, 0xab, 0xcd, 0xbb, 0x4f, 0x64, 0x29, 0x5c, 0x18, 0x97, 0xee, 0x93, 0x9a,
+	0xd6, 0xfe, 0x30, 0x02, 0x73, 0xd2, 0x80, 0xff, 0xd7, 0x76, 0xc1, 0xc4, 0x22, 0x93, 0x83, 0x1b,
+	0xe4, 0x39, 0x35, 0xe4, 0xf1, 0x63, 0x58, 0x88, 0xdd, 0x63, 0x96, 0xa7, 0x07, 0x36, 0x88, 0x4f,
+	0x25, 0x6d, 0x54, 0x4a, 0xd9, 0x48, 0xfb, 0x23, 0x2a, 0x50, 0x9a, 0xf4, 0x7f, 0x42, 0x81, 0xa8,
+	0x08, 0xcb, 0x6e, 0xe8, 0xed, 0x6d, 0x26, 0x92, 0xe6, 0x04, 0x0d, 0x86, 0x81, 0x6a, 0x47, 0x0f,
+	0xab, 0xda, 0x7c, 0x17, 0x3e, 0x0f, 0x33, 0x1d, 0xa1, 0x9d, 0x30, 0x8f, 0x95, 0x84, 0xfe, 0x53,
+	0xb3, 0xda, 0xef, 0x46, 0x61, 0x3a, 0xa9, 0xc0, 0xac, 0x72, 0xf3, 0x30, 0x40, 0x0b, 0x56, 0x29,
+	0xad, 0x9c, 0xcf, 0x88, 0x8b, 0x0c, 0xa3, 0xd0, 0x14, 0x35, 0xc7, 0x73, 0x85, 0xf3, 0x87, 0x78,
+	0xc5, 0xa1, 0x78, 0x19, 0x51, 0x42, 0x53, 0xd4, 0x1c, 0xaf, 0x2d, 0x92, 0x5c, 0x88, 0x37, 0x3a,
+	0x14, 0x2f, 0x23, 0x1b, 0xd2, 0x14, 0x35, 0x31, 0xe0, 0xe4, 0xd3, 0x64, 0x99, 0x08, 0x81, 0xc7,
+	0x04, 0x70, 0x3d, 0x03, 0x38, 0xaf, 0xb0, 0xd0, 0x61, 0x78, 0xc8, 0x6a, 0xde, 0x76, 0xed, 0xc4,
+	0xe2, 0x47, 0x5c, 0xfd, 0xdc, 0x5c, 0x33, 0x2b, 0x57, 0x32, 0xf8, 0x24, 0xd6, 0xd6, 0x36, 0x32,
+	0x88, 0x69, 0x26, 0xa4, 0xb6, 0x01, 0xf3, 0x59, 0xab, 0x09, 0x40, 0x49, 0x1a, 0xad, 0xf2, 0x0a,
+	0x7f, 0x96, 0x0a, 0xaf, 0x14, 0xf8, 0xb3, 0x54, 0x56, 0x65, 0x84, 0xcc, 0xc1, 0xb1, 0xd4, 0xfe,
+	0x2a, 0x45, 0xed, 0x27, 0xd8, 0x75, 0x49, 0xff, 0x96, 0xa0, 0xb2, 0x20, 0x7d, 0x88, 0xed, 0x81,
+	0x0c, 0x9d, 0xa3, 0x97, 0x38, 0x85, 0x20, 0xdc, 0x18, 0xfb, 0x4b, 0xec, 0xe3, 0xf9, 0x09, 0x66,
+	0xdd, 0x70, 0x54, 0x85, 0x4b, 0xcd, 0x6a, 0xdf, 0x82, 0x63, 0x77, 0x7b, 0xd8, 0x3e, 0x49, 0x11,
+	0x44, 0x81, 0xc6, 0x13, 0x81, 0x1b, 0x8e, 0x94, 0x37, 0xc7, 0x66, 0x0e, 0x0c, 0xfd, 0x37, 0xec,
+	0x6a, 0x62, 0xd8, 0x2f, 0x23, 0xc1, 0x5c, 0xc5, 0xd3, 0x05, 0x8a, 0x20, 0xbb, 0xaa, 0xf2, 0x8a,
+	0x96, 0x61, 0xe4, 0xd4, 0x6e, 0xa8, 0x24, 0x48, 0xa5, 0xa6, 0xe2, 0xcb, 0x48, 0x4d, 0x9a, 0x03,
+	0x33, 0xd8, 0x2d, 0xc6, 0x2d, 0x58, 0x81, 0xa2, 0xef, 0x18, 0x4a, 0x67, 0xfc, 0x91, 0xcf, 0x38,
+	0x6c, 0x4b, 0x69, 0x88, 0x3f, 0xf2, 0xf4, 0xb3, 0xed, 0x79, 0x7d, 0xec, 0xed, 0x9f, 0xef, 0xa9,
+	0x3e, 0x30, 0x9a, 0xe0, 0xca, 0xe7, 0x03, 0x57, 0xfe, 0x2c, 0x53, 0x7f, 0x6c, 0x06, 0xcf, 0x06,
+	0xb3, 0x6b, 0xa8, 0x63, 0x67, 0x2f, 0xce, 0x16, 0xfb, 0x4a, 0xdd, 0xbd, 0xcd, 0xbb, 0x29, 0xd5,
+	0xae, 0xcb, 0x91, 0xf6, 0xd7, 0x51, 0xd5, 0x57, 0xaa, 0x75, 0x59, 0x19, 0x0a, 0x5b, 0xfa, 0x96,
+	0x00, 0xcc, 0xe9, 0x89, 0x07, 0x38, 0x52, 0x45, 0xc3, 0xc5, 0x8d, 0xf2, 0xa2, 0xda, 0x4d, 0x6c,
+	0x86, 0x5c, 0x96, 0xed, 0xb6, 0x4c, 0x2a, 0x67, 0xb2, 0xdb, 0xed, 0x38, 0x2e, 0x5f, 0x8d, 0x89,
+	0xbd, 0x64, 0x70, 0x2b, 0xba, 0x98, 0x33, 0xb8, 0x99, 0x4f, 0xe7, 0x9b, 0x99, 0xaa, 0xd5, 0x5c,
+	0x98, 0x36, 0x9e, 0x1a, 0xd8, 0x73, 0x8f, 0x3b, 0xa5, 0x4c, 0xdb, 0xb1, 0x19, 0xd1, 0x48, 0xca,
+	0xf4, 0x27, 0xbd, 0x60, 0xfc, 0x4b, 0x34, 0x92, 0x31, 0x1c, 0xf2, 0x5e, 0xd4, 0xf5, 0x4c, 0xa8,
+	0x62, 0x34, 0xac, 0xeb, 0x89, 0xef, 0x35, 0x6c, 0x7e, 0x74, 0x20, 0x61, 0xda, 0x11, 0x3f, 0x89,
+	0x3c, 0x36, 0x29, 0xf2, 0xd8, 0xa5, 0xa1, 0x79, 0x4c, 0xac, 0x8c, 0xb2, 0x58, 0x48, 0x48, 0x33,
+	0xc0, 0xb4, 0x87, 0x40, 0x06, 0x57, 0x92, 0x71, 0x28, 0xa2, 0xfe, 0x31, 0x79, 0xcd, 0x00, 0xac,
+	0x87, 0x46, 0x93, 0x09, 0x4c, 0xda, 0x1c, 0x13, 0xd8, 0x24, 0x8c, 0x09, 0x65, 0x57, 0x8a, 0x64,
+	0x02, 0x46, 0x1f, 0xda, 0x98, 0xc0, 0x46, 0xb5, 0x7f, 0x17, 0x61, 0x1a, 0x01, 0xf9, 0x49, 0xc8,
+	0xb6, 0x44, 0x97, 0x8e, 0x59, 0x41, 0x5d, 0xaf, 0xac, 0xb6, 0xdb, 0xbc, 0x8b, 0x56, 0x5e, 0x96,
+	0x9a, 0xe5, 0xc6, 0x95, 0xca, 0x53, 0xfe, 0x76, 0x3a, 0x7f, 0x83, 0x54, 0xad, 0xc6, 0x33, 0xd1,
+	0x84, 0xa3, 0x4e, 0x64, 0x2a, 0x7c, 0xcf, 0x0c, 0xad, 0x79, 0xe1, 0xd1, 0x2d, 0x24, 0x41, 0x37,
+	0x9f, 0x70, 0x93, 0x25, 0x6e, 0x69, 0xbf, 0x0a, 0x41, 0x43, 0x0a, 0x2e, 0xb4, 0x2d, 0x8e, 0x66,
+	0xaa, 0x8a, 0x0d, 0x15, 0x5a, 0x1e, 0xe0, 0xa8, 0x5a, 0x4d, 0x9a, 0x30, 0xe9, 0x30, 0xb9, 0x01,
+	0x57, 0x38, 0xe4, 0xbe, 0xee, 0x46, 0xd5, 0x72, 0x7e, 0x3f, 0x60, 0xc8, 0x8e, 0xce, 0xa5, 0x11,
+	0x08, 0xb9, 0x8d, 0x79, 0x2c, 0x3c, 0x82, 0x2a, 0x0f, 0x3e, 0x3f, 0x4c, 0x9a, 0xe4, 0x61, 0x95,
+	0xc6, 0x28, 0x51, 0x1f, 0xaf, 0xe2, 0x49, 0xb5, 0x6f, 0x32, 0x91, 0xad, 0x99, 0xde, 0x11, 0xb5,
+	0x95, 0x61, 0xb4, 0x74, 0xb8, 0x17, 0xf3, 0xfb, 0x85, 0xe1, 0x0b, 0xb4, 0x75, 0x98, 0xf9, 0x26,
+	0x6b, 0x7d, 0x60, 0xdb, 0x3b, 0x8f, 0x1c, 0xa3, 0xdb, 0xc5, 0x73, 0xf9, 0x89, 0x44, 0xed, 0x9a,
+	0x0c, 0xeb, 0x50, 0x15, 0x26, 0x74, 0xd3, 0xb4, 0x9f, 0x61, 0x03, 0x26, 0x0c, 0x3e, 0x41, 0xc3,
+	0xb1, 0xf6, 0xd3, 0x02, 0x10, 0xe1, 0x5a, 0x8d, 0x6d, 0xdd, 0xea, 0xb2, 0x00, 0x6a, 0x05, 0xe6,
+	0x4d, 0xdd, 0xf5, 0xd4, 0x90, 0x75, 0xc4, 0x92, 0xbb, 0xeb, 0x0a, 0x38, 0xf3, 0xb7, 0xb0, 0xb6,
+	0x8c, 0x1c, 0xb9, 0xb6, 0x68, 0xbf, 0x2f, 0xc2, 0xf1, 0x20, 0x46, 0x14, 0x7e, 0xd3, 0x36, 0x8d,
+	0x76, 0x76, 0x63, 0x77, 0x0d, 0x4a, 0xf2, 0x36, 0x50, 0xb1, 0xcc, 0x72, 0xc6, 0xa4, 0x8a, 0xa8,
+	0x22, 0x20, 0x37, 0x60, 0x5c, 0x5c, 0xdb, 0x19, 0xed, 0x1c, 0x47, 0x4e, 0xd1, 0x06, 0x14, 0xe4,
+	0x0e, 0x76, 0xff, 0x91, 0xca, 0x94, 0x2b, 0xbf, 0x3e, 0x2c, 0x41, 0x26, 0x14, 0x4b, 0xe3, 0x94,
+	0xc4, 0x82, 0x39, 0x3b, 0xb9, 0x5b, 0x91, 0x75, 0xc6, 0x44, 0xd6, 0xb9, 0x99, 0x01, 0x98, 0xa9,
+	0x9b, 0xf4, 0xac, 0x48, 0x40, 0x59, 0xc0, 0xda, 0x77, 0x61, 0x2e, 0x63, 0x2d, 0xcf, 0x34, 0x98,
+	0x82, 0x3e, 0xf0, 0x5b, 0x98, 0x85, 0xca, 0x30, 0x7e, 0x47, 0x6e, 0x13, 0x53, 0xd0, 0x31, 0xd5,
+	0x3c, 0x48, 0x71, 0x31, 0x0f, 0x55, 0x60, 0xaa, 0x61, 0x5b, 0x5b, 0x46, 0x57, 0xcd, 0x14, 0x05,
+	0xad, 0x8d, 0xd4, 0x2e, 0x26, 0x24, 0x13, 0xe6, 0x14, 0xad, 0xd2, 0x5c, 0x43, 0xf7, 0xdd, 0x64,
+	0xd6, 0x28, 0x1c, 0x3e, 0x6b, 0x44, 0x5e, 0x3d, 0x12, 0xf7, 0x6a, 0x6d, 0x07, 0x88, 0x94, 0xfa,
+	0xab, 0x60, 0xe6, 0x43, 0x25, 0xa6, 0x09, 0xc9, 0x0a, 0x4f, 0x45, 0x46, 0x22, 0x2c, 0x82, 0x21,
+	0x3a, 0xc8, 0x38, 0x77, 0x67, 0xaa, 0x9a, 0x8e, 0x43, 0x07, 0x43, 0x40, 0xad, 0xfd, 0x7a, 0x24,
+	0xea, 0x7a, 0x95, 0xc5, 0x42, 0xde, 0xc1, 0x15, 0x5c, 0x21, 0x71, 0x05, 0xc7, 0x4f, 0x13, 0xdd,
+	0x84, 0x11, 0x72, 0x4e, 0x3b, 0x19, 0xd6, 0xa2, 0x29, 0x6a, 0x72, 0x0f, 0xa6, 0x65, 0xcc, 0x04,
+	0x70, 0xc5, 0xa1, 0xee, 0x3e, 0x68, 0x0e, 0x9a, 0xa4, 0x25, 0x1b, 0x50, 0x89, 0xf9, 0xbf, 0xd8,
+	0x96, 0x0a, 0x9f, 0xb3, 0xf9, 0xe1, 0x23, 0xd1, 0x06, 0x88, 0xb5, 0x4f, 0xc7, 0x60, 0x26, 0x3a,
+	0x16, 0xe8, 0x9e, 0xef, 0x46, 0xb7, 0xdf, 0x85, 0xd8, 0xed, 0x37, 0xef, 0xf8, 0xda, 0x3a, 0xea,
+	0xd6, 0x34, 0x59, 0x47, 0x25, 0xc1, 0x68, 0x82, 0x9b, 0xdd, 0x61, 0xba, 0xab, 0xca, 0x1a, 0x9a,
+	0x5d, 0x8e, 0x86, 0xdf, 0x74, 0x92, 0x4d, 0x2c, 0xb5, 0x9e, 0xee, 0x78, 0x8f, 0x0c, 0x9c, 0xf1,
+	0xf4, 0x5e, 0x5f, 0x55, 0xa5, 0x8b, 0x39, 0x96, 0x8e, 0xbd, 0x62, 0xa8, 0x71, 0x3a, 0x9a, 0x82,
+	0x20, 0x18, 0x9f, 0x51, 0xbe, 0x8f, 0x90, 0x4b, 0x87, 0x47, 0xce, 0xc2, 0xe1, 0x75, 0xa0, 0xe3,
+	0x3b, 0xe2, 0x6c, 0x20, 0xaa, 0x56, 0x91, 0x86, 0x63, 0xec, 0x9f, 0xaa, 0xb2, 0x5e, 0xca, 0x1e,
+	0x44, 0xa8, 0x3e, 0x74, 0x48, 0x51, 0x8c, 0x26, 0x69, 0xce, 0x0a, 0x72, 0x8b, 0xdf, 0x56, 0xf3,
+	0xcc, 0x20, 0x7a, 0xa6, 0x43, 0x7b, 0xbc, 0x22, 0x26, 0x8f, 0x61, 0x3a, 0x48, 0x5c, 0x4d, 0x61,
+	0x44, 0x10, 0xb9, 0xb0, 0x9e, 0x93, 0x0b, 0xa5, 0xd9, 0xc3, 0xa1, 0x20, 0xa3, 0x49, 0x14, 0x6d,
+	0x4b, 0x74, 0x4a, 0xd1, 0x04, 0xef, 0xba, 0x1e, 0xb2, 0x67, 0x32, 0xdf, 0x35, 0x99, 0xd5, 0x31,
+	0xac, 0x2e, 0xe6, 0x3b, 0x1c, 0x50, 0xdf, 0xb2, 0xf8, 0x60, 0x84, 0x4c, 0xc1, 0x44, 0x43, 0x2a,
+	0x51, 0xe5, 0xb9, 0xdb, 0x3a, 0x36, 0x66, 0x9d, 0xca, 0x28, 0xef, 0xc6, 0x6e, 0x39, 0x8e, 0xed,
+	0x54, 0xc6, 0xc8, 0x34, 0x4c, 0x36, 0x02, 0x2f, 0xaa, 0x94, 0xb4, 0x2f, 0xc6, 0x60, 0x31, 0x76,
+	0x85, 0x20, 0x73, 0xa5, 0x7a, 0xcd, 0xc0, 0x5f, 0x41, 0x64, 0xbe, 0x14, 0x58, 0x82, 0x72, 0x5f,
+	0xbe, 0x64, 0x78, 0xc8, 0x7f, 0x52, 0x97, 0xb1, 0xb1, 0x29, 0xb2, 0x0e, 0x13, 0x9e, 0x8c, 0x7e,
+	0x57, 0xdd, 0x62, 0x2d, 0x1f, 0xb4, 0x38, 0xd0, 0x90, 0x92, 0x87, 0x80, 0xe3, 0x5b, 0x72, 0x5a,
+	0xb9, 0x73, 0x34, 0x41, 0xde, 0xe7, 0x8d, 0x7b, 0xd0, 0x49, 0x2a, 0x67, 0x5e, 0xca, 0xe6, 0x12,
+	0x75, 0x9c, 0x34, 0x46, 0x43, 0x6c, 0x98, 0x0d, 0xb4, 0x4e, 0x43, 0x3e, 0xf2, 0x26, 0x60, 0x35,
+	0xff, 0xaa, 0x65, 0x40, 0x4f, 0xe1, 0x5e, 0x42, 0x20, 0x3a, 0x88, 0x8d, 0x31, 0x58, 0x32, 0xf5,
+	0x16, 0x33, 0x5d, 0xf4, 0x66, 0xae, 0x94, 0x1b, 0x87, 0xe5, 0x72, 0x5f, 0x50, 0xdf, 0xb2, 0x3c,
+	0x67, 0x8f, 0x2a, 0x28, 0xd2, 0x82, 0x72, 0xec, 0xad, 0xa3, 0x3a, 0x4c, 0xbc, 0x7f, 0x58, 0xe4,
+	0xd5, 0x08, 0x42, 0xc2, 0xc7, 0x41, 0xab, 0xd7, 0xa0, 0x1c, 0x63, 0xcd, 0xcf, 0xa7, 0x3b, 0x6c,
+	0x2f, 0x38, 0xb1, 0xe2, 0x23, 0xcf, 0x61, 0xbb, 0xba, 0xe9, 0x87, 0x6f, 0xf0, 0xc4, 0xe0, 0xfa,
+	0xc8, 0xd5, 0x42, 0xf5, 0x3d, 0xa8, 0xa4, 0xb1, 0x0f, 0x43, 0xaf, 0x35, 0x60, 0x76, 0x40, 0xb7,
+	0xdc, 0xd5, 0x9b, 0xba, 0x83, 0x3d, 0x21, 0x33, 0xd5, 0x2d, 0x0a, 0x56, 0x00, 0xdd, 0xc4, 0x88,
+	0x98, 0x87, 0x8a, 0x7c, 0xbe, 0x8f, 0x4d, 0xb8, 0xeb, 0x6d, 0x58, 0x26, 0x1e, 0x47, 0xb4, 0x17,
+	0x70, 0x2a, 0x63, 0xf7, 0xf2, 0x05, 0x99, 0x70, 0x73, 0xe4, 0x8f, 0x29, 0xc7, 0x63, 0xea, 0x2d,
+	0x99, 0x1c, 0x70, 0x37, 0xee, 0x31, 0x4f, 0xef, 0xf0, 0x17, 0x74, 0xb2, 0x28, 0x2d, 0x1f, 0x24,
+	0x4b, 0x3c, 0x40, 0x1a, 0x1a, 0x52, 0x6a, 0x3f, 0x1b, 0x85, 0x13, 0x31, 0xee, 0x5f, 0x3e, 0xba,
+	0x36, 0xc4, 0x91, 0x15, 0xb7, 0x20, 0x3c, 0xbf, 0x38, 0xf4, 0x8a, 0x2c, 0xcf, 0xe0, 0x34, 0x06,
+	0x41, 0xee, 0x42, 0xd9, 0x0b, 0x9a, 0xe3, 0xb5, 0x3d, 0x75, 0x39, 0xfa, 0xc6, 0xfe, 0x11, 0x2b,
+	0x8b, 0x5c, 0x9c, 0x96, 0x3c, 0x08, 0x5d, 0x5c, 0x1e, 0xc3, 0xaf, 0xe4, 0xcb, 0xb5, 0x9f, 0x73,
+	0x7f, 0x94, 0x74, 0x6e, 0xf9, 0x7e, 0xe0, 0xfa, 0xc1, 0x31, 0xff, 0x6b, 0xdd, 0xfa, 0x5f, 0x05,
+	0x38, 0x99, 0x90, 0x39, 0xe6, 0x8c, 0xd7, 0x78, 0x71, 0x77, 0x7d, 0xd3, 0xcb, 0x69, 0x08, 0x93,
+	0xc5, 0x84, 0x2a, 0x02, 0xf2, 0x08, 0xa6, 0xda, 0x81, 0x77, 0x73, 0x00, 0xe9, 0xb5, 0x6f, 0x1d,
+	0xcc, 0x39, 0x22, 0x11, 0x68, 0x02, 0x25, 0x11, 0x07, 0xc5, 0x23, 0xc7, 0xc1, 0x3d, 0x2c, 0x56,
+	0xf2, 0xc5, 0x36, 0xbf, 0x74, 0xb1, 0x5b, 0xa1, 0x8b, 0xab, 0xdb, 0xc2, 0x68, 0x86, 0xc7, 0x80,
+	0x1c, 0xad, 0xed, 0x21, 0xb2, 0xd8, 0xc5, 0x14, 0x8d, 0x4f, 0xad, 0x7c, 0x5e, 0x86, 0xb9, 0x4d,
+	0x83, 0x57, 0xbb, 0x07, 0xe2, 0x33, 0x8d, 0x4d, 0x79, 0x61, 0x40, 0x7e, 0x55, 0x80, 0xb9, 0x8c,
+	0x17, 0xfd, 0xe4, 0xcd, 0xac, 0xbb, 0xe9, 0xa1, 0x1f, 0x3d, 0x54, 0x6b, 0x07, 0x5d, 0x2e, 0x75,
+	0xa6, 0x9d, 0xfd, 0xe4, 0x2f, 0x5f, 0xfc, 0x7c, 0xe4, 0x54, 0x75, 0x81, 0x7f, 0x5f, 0x61, 0x77,
+	0x8c, 0x56, 0x5d, 0x05, 0xac, 0x5b, 0x7f, 0xc1, 0xa3, 0xfa, 0x87, 0xd7, 0x0b, 0x17, 0xc8, 0x6f,
+	0x0b, 0xb0, 0x98, 0xf7, 0x11, 0x02, 0x79, 0xfb, 0x60, 0x5c, 0xd3, 0x9f, 0x40, 0x54, 0xdf, 0x39,
+	0x34, 0x9d, 0x12, 0x7b, 0x51, 0x88, 0x7d, 0x42, 0x9b, 0x1d, 0x10, 0x9b, 0xcb, 0xfb, 0xa3, 0x02,
+	0x94, 0x63, 0x1f, 0x2f, 0x90, 0xac, 0x16, 0x7a, 0xf0, 0x33, 0x88, 0xea, 0xf9, 0xfd, 0x96, 0x25,
+	0x75, 0x46, 0x72, 0x75, 0xf6, 0xe3, 0x02, 0x4c, 0x27, 0xbe, 0x6b, 0x20, 0x59, 0x79, 0x29, 0xeb,
+	0x2b, 0x89, 0xea, 0xf2, 0xfe, 0x0b, 0x95, 0x24, 0x4b, 0x42, 0x92, 0xea, 0x70, 0x49, 0xb8, 0xe9,
+	0x66, 0xb1, 0xff, 0x0a, 0xa2, 0x4e, 0x46, 0x0c, 0xb9, 0x56, 0x8b, 0x3e, 0xee, 0x89, 0x31, 0x91,
+	0x1f, 0xf7, 0x88, 0x78, 0x10, 0x2f, 0x22, 0x83, 0xa8, 0x88, 0x91, 0x56, 0x8f, 0x4e, 0xaa, 0x69,
+	0x42, 0xda, 0x45, 0xed, 0xa4, 0x90, 0x16, 0x17, 0xe0, 0x1f, 0xb1, 0x58, 0xc6, 0xac, 0x30, 0xdd,
+	0x2f, 0x51, 0x6d, 0x9b, 0xbc, 0x57, 0x0f, 0x24, 0x26, 0x97, 0x8f, 0xc0, 0xb0, 0x7a, 0x14, 0xa2,
+	0x94, 0x53, 0xc5, 0xe4, 0x13, 0x92, 0xed, 0x40, 0x45, 0x2c, 0x8b, 0x35, 0xe5, 0xa4, 0x9a, 0x61,
+	0x29, 0x95, 0x2a, 0xaa, 0x39, 0xbf, 0x69, 0x5f, 0x13, 0x9c, 0x5e, 0xd5, 0xe6, 0x39, 0x27, 0x47,
+	0x7f, 0x56, 0x97, 0x97, 0xc8, 0x11, 0xb3, 0x3d, 0x20, 0x94, 0xb5, 0x5e, 0x16, 0xbb, 0x8b, 0x82,
+	0xdd, 0xeb, 0xd5, 0xa5, 0x2c, 0x76, 0xf5, 0x17, 0xe2, 0x6f, 0xe8, 0xb8, 0x9f, 0x16, 0xe0, 0x84,
+	0x8c, 0xc1, 0x18, 0x6b, 0x69, 0x8a, 0xaf, 0x1f, 0xb8, 0x7e, 0x55, 0x2f, 0xec, 0xb7, 0x34, 0xca,
+	0xd9, 0xda, 0x6b, 0x42, 0xbc, 0xe3, 0x5a, 0x85, 0x8b, 0x97, 0xd6, 0xc4, 0x67, 0x28, 0xce, 0xe3,
+	0x7e, 0xe7, 0x2b, 0x14, 0xe7, 0x0d, 0x21, 0xce, 0x99, 0xea, 0x62, 0x5a, 0x9c, 0x94, 0xa6, 0xd6,
+	0xbe, 0xf7, 0xf9, 0x3f, 0x4e, 0x17, 0xfe, 0x8c, 0xff, 0xfe, 0x8e, 0xff, 0x3e, 0xfb, 0xe7, 0xe9,
+	0x57, 0xe0, 0x2d, 0xee, 0x6e, 0x1f, 0xe3, 0xa9, 0x66, 0xcf, 0xd7, 0x2d, 0x1b, 0xf9, 0xd9, 0x0e,
+	0xab, 0xc9, 0xaf, 0xec, 0xc4, 0x17, 0x6b, 0x2d, 0x7f, 0x2b, 0x12, 0x00, 0x1d, 0xcc, 0x5d, 0x3b,
+	0x16, 0xa4, 0x38, 0xab, 0x23, 0x24, 0xf9, 0xf6, 0x64, 0xf8, 0x7b, 0xab, 0x24, 0x68, 0x2e, 0xff,
+	0x27, 0x00, 0x00, 0xff, 0xff, 0x8e, 0xce, 0xcc, 0x30, 0xe3, 0x27, 0x00, 0x00,
 }

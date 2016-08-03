@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/api/paas/ci/openshift"
-	_ "github.com/tangfeixiong/go-to-cloud-1/pkg/server"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	// "github.com/tangfeixiong/go-to-cloud-1/pkg/server"
 )
 
 var (

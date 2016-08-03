@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/tangfeixiong/go-to-cloud-1/pkg/examples/cmd"
+import "github.com/tangfeixiong/go-to-cloud-1/pkg/client/cmd"
 
 func main() {
 	cmd.Execute()
