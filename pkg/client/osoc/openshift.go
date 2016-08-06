@@ -8,12 +8,12 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 )
 
 type Builder interface {
 	CreateDockerBuild(ctx context.Context,
-		in *openshift.DockerBuildRequestData) (*openshift.DockerBuildResponseData, error)
+		in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error)
 }
 
 type builder struct {
@@ -34,7 +34,7 @@ func NewBuilder(server string) Builder {
 }
 
 func (bd *builder) CreateDockerBuild(ctx context.Context,
-	in *openshift.DockerBuildRequestData) (*openshift.DockerBuildResponseData, error) {
+	in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
 
 	conn, err := grpc.Dial(bd.server, grpc.WithInsecure())
 	if err != nil {
@@ -42,9 +42,9 @@ func (bd *builder) CreateDockerBuild(ctx context.Context,
 		return nil, err
 	}
 	defer conn.Close()
-	c := openshift.NewSimpleManageServiceClient(conn)
+	c := osopb3.NewSimpleServiceClient(conn)
 
-	sendProject := openshift.FindProjectRequest{Name: in.ProjectName}
+	sendProject := osopb3.FindProjectRequest{Name: in.ProjectName}
 	recvProject, err := c.FindProject(ctx, &sendProject)
 	if err != nil {
 		glog.Fatalf("could not request: %v", err)

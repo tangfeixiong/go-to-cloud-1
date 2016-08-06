@@ -1,0 +1,942 @@
+[root@ae717016d4b9 /]# java -jar server923_generic.jar 
+Unable to instantiate GUI, defaulting to console mode.
+Extracting 0%....................................................................................................100%
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Welcome:
+--------
+
+This installer will guide you through the installation of BEA Products. Type 
+"Next" or enter to proceed to the next prompt.  If you want to change data 
+entered previously, type "Previous".  You may quit the installer at any time by typing "Exit".
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+BEA Systems License Agreement:
+------------------------------
+
+BEA SYSTEMS, INC. SOFTWARE LICENSE AGREEMENT
+
+USE OF SOFTWARE ORDERED FROM BEA SYSTEMS, INC. ("BEA") IS PROVIDED ONLY UNDER 
+LICENSE FROM BEA. PLEASE READ THE FOLLOWING LICENSE AGREEMENT CAREFULLY, 
+INCLUDING ANY SUPPLEMENTAL TERMS AND CONDITIONS SET FORTH AT THE END OF THE 
+MAIN LICENSE AGREEMENT, AND INDICATE YOUR ACCEPTANCE BY CLICKING THE ACCEPTANCE BOX. CERTAIN CAPITALIZED TERMS ARE DEFINED IN SECTION  11. 
+       
+1.	LICENSE TERMS 
+
+a. 	Evaluation Use. The terms of this Section 1(a) are applicable to you if you have registered as an Evaluation customer. Subject to the terms of this 
+Agreement, BEA grants to you a non-exclusive, non-transferable, license to use 
+the Software solely for Evaluation Use. Third party software products or 
+modules supplied by BEA, if any, may be used solely with the Software, and may 
+be subject to your acceptance of terms and conditions provided by such third 
+parties. This license begins upon downloading and ends thirty (30) days 
+thereafter. When the license terminates you must stop using the Software.  All 
+rights not specifically granted to you herein are retained by BEA. 
+
+b.	Development Use. The terms of this Section 1(b) are applicable to you if you have registered as a Development Use customer. Subject to the terms of this 
+
+Use above value or select another option:
+    1 - Yes, I agree with the terms of the license
+    2 - No, I do not agree with the terms of the license
+
+
+
+
+Enter option number to select OR [Down][Exit][Previous]> 1
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose BEA Home Directory:
+--------------------------
+
+    "BEA Home" = [Enter new value or use default "/root/bea"]
+
+
+
+
+Enter new BEA Home OR [Exit][Previous][Next]> /bea
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose BEA Home Directory:
+--------------------------
+
+    "BEA Home" = [/bea]
+
+Use above value or select another option:
+    1 - Enter new BEA Home
+    2 - Change to default [/root/bea]
+
+
+
+
+Enter option number to select OR [Exit][Previous][Next]> 2
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose BEA Home Directory:
+--------------------------
+
+    "BEA Home" = [Enter new value or use default "/root/bea"]
+
+
+
+
+Enter new BEA Home OR [Exit][Previous][Next]> 
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose Install Type:
+--------------------
+
+Select the type of installation you wish to perform. 
+
+ ->1|Complete
+    |  Install the following software components and examples:
+    | - WebLogic Server
+    | - Workshop for WebLogic Platform
+
+   2|Custom
+    |  Choose software components to install and perform optional configuration.
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> 2
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose Components to install:
+-----------------------------
+
+    Release 9.2.3.0
+    |_____WebLogic Server [1] x
+    |    |_____Server [1.1] x
+    |    |_____Server Examples [1.2] x
+    |    |_____Web Server Plug-Ins [1.3] 
+    |_____Workshop for WebLogic Platform [2] x
+         |_____Workshop [2.1] x
+         |_____Workshop Examples [2.2] x
+
+
+
+
+Enter number exactly as it appears in brackets to toggle selection OR [Exit][Previous][Next]> 2
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose Components to install:
+-----------------------------
+
+    Release 9.2.3.0
+    |_____WebLogic Server [1] x
+    |    |_____Server [1.1] x
+    |    |_____Server Examples [1.2] x
+    |    |_____Web Server Plug-Ins [1.3] 
+    |_____Workshop for WebLogic Platform [2] 
+         |_____Workshop [2.1] 
+         |_____Workshop Examples [2.2] 
+
+
+
+
+Enter number exactly as it appears in brackets to toggle selection OR [Exit][Previous][Next]> 1.3
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose Components to install:
+-----------------------------
+
+    Release 9.2.3.0
+    |_____WebLogic Server [1] x
+    |    |_____Server [1.1] x
+    |    |_____Server Examples [1.2] x
+    |    |_____Web Server Plug-Ins [1.3] x
+    |_____Workshop for WebLogic Platform [2] 
+         |_____Workshop [2.1] 
+         |_____Workshop Examples [2.2] 
+
+
+
+
+Enter number exactly as it appears in brackets to toggle selection OR [Exit][Previous][Next]> 
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Choose Product Installation Directories:
+----------------------------------------
+
+BEA Home Directory: [/root/bea]
+
+Product Installation Directories:
+
+
+    "Default Product Home" = [Enter new value or use default 
+"/root/bea/weblogic92"]
+
+
+
+
+Enter new Default Product Home OR [Exit][Previous][Next]> 
+Aug 4, 2016 11:18:27 AM java.util.prefs.FileSystemPreferences$2 run
+INFO: Created user preferences directory.
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Installing files..
+
+0%          25%          50%          75%          100%
+[------------|------------|------------|------------]
+[***************************************************]
+
+
+Performing String Substitutions... 
+
+
+
+Creating Domains...
+
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Installation Complete
+
+
+Congratulations! BEA Products has been successfully installed to /root/bea/weblogic92.
+
+
+Press [Enter] to continue or type [Exit]> 
+
+
+
+
+<------------------------ BEA Installer - BEA Products ----------------------->
+
+Clean up process in progress ...
+
+
+
+
+[root@ae717016d4b9 bin]# ./setWLSEnv.sh 
+CLASSPATH=/root/bea/patch_weblogic923/profiles/default/sys_manifest_classpath/weblogic_patch.jar:/usr/java/jre1.5.0_22/lib/tools.jar:/root/bea/weblogic92/server/lib/weblogic_sp.jar:/root/bea/weblogic92/server/lib/weblogic.jar:/root/bea/weblogic92/server/lib/webservices.jar:
+
+PATH=/root/bea/weblogic92/server/bin:/usr/java/jre1.5.0_22/jre/bin:/usr/java/jre1.5.0_22/bin:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/java/jre1.5.0_22/bin:/usr/java/jre1.5.0_22/bin
+
+Your environment has been set.
+
+
+
+
+
+
+[root@ae717016d4b9 bin]# ./startWLS.sh 
+LD_LIBRARY_PATH=/root/bea/weblogic92/server/lib/linux/x86_64:/root/bea/weblogic92/server/lib/linux/x86_64/oci817_8
+***************************************************
+*  Warning:   This script is DEPRECATED.  Please  *
+*  don't start new Domains with this script. Use  *
+*  scripts generated by Domain Configuration      *
+*  Wizard instead.                                *
+***************************************************
+
+
+CLASSPATH=/usr/java/jre1.5.0_22/lib/tools.jar:/root/bea/weblogic92/server:/root/bea/weblogic92/server/lib/weblogic_sp.jar:/root/bea/weblogic92/server/lib/weblogic.jar:
+
+PATH=.:/root/bea/weblogic92/server/bin:/usr/java/jre1.5.0_22/jre/bin:/usr/java/jre1.5.0_22/bin:/root/bea/weblogic92/server/lib/linux:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/java/jre1.5.0_22/bin:/usr/java/jre1.5.0_22/bin
+
+***************************************************
+*  To start WebLogic Server, use a username and   *
+*  password assigned to an admin-level user.  For *
+*  server administration, use the WebLogic Server *
+*  console at http://<hostname>:<port>/console    *
+***************************************************
++ /usr/java/jre1.5.0_22/bin/java -Xms32m -Xmx200m -classpath /usr/java/jre1.5.0_22/lib/tools.jar:/root/bea/weblogic92/server:/root/bea/weblogic92/server/lib/weblogic_sp.jar:/root/bea/weblogic92/server/lib/weblogic.jar: -Dweblogic.Name= -Dbea.home=/root/bea -Dweblogic.management.username= -Dweblogic.management.password= -Dweblogic.ProductionModeEnabled= -Djava.security.policy=/root/bea/weblogic92/server/lib/weblogic.policy weblogic.Server
+<Aug 4, 2016 11:33:17 AM EDT> <Notice> <WebLogicServer> <BEA-000395> <Following extensions directory contents added to the end of the classpath:
+/root/bea/weblogic92/platform/lib/p13n/p13n-schemas.jar:/root/bea/weblogic92/platform/lib/p13n/p13n_common.jar:/root/bea/weblogic92/platform/lib/p13n/p13n_system.jar:/root/bea/weblogic92/platform/lib/wlp/netuix_common.jar:/root/bea/weblogic92/platform/lib/wlp/netuix_schemas.jar:/root/bea/weblogic92/platform/lib/wlp/netuix_system.jar:/root/bea/weblogic92/platform/lib/wlp/wsrp-common.jar> 
+<Aug 4, 2016 11:33:17 AM EDT> <Info> <WebLogicServer> <BEA-000377> <Starting WebLogic Server with Java HotSpot(TM) 64-Bit Server VM Version 1.5.0_22-b03 from Sun Microsystems Inc.> 
+
+/root/bea/weblogic92/server/bin/config/config.xml not found
+
+No config.xml was found.
+Would you like the server to create a default configuration and boot? (y/n): y
+<Aug 4, 2016 11:33:32 AM EDT> <Info> <Management> <BEA-140013> </root/bea/weblogic92/server/bin/config/config.xml not found> 
+<Aug 4, 2016 11:33:32 AM EDT> <Info> <Security> <BEA-090065> <Getting boot identity from user.> 
+Enter username to boot WebLogic server:root
+<Aug 4, 2016 11:33:39 AM EDT> <Error> <Security> <BEA-090782> <Server is Running in Production Mode and Native Library(terminalio) to read the password securely from commandline is not found.> 
+<Aug 4, 2016 11:33:39 AM EDT> <Notice> <WebLogicServer> <BEA-000388> <JVM called WLS shutdown hook. The server will force shutdown now> 
+<Aug 4, 2016 11:33:39 AM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to FORCE_SHUTTING_DOWN> 
++ '[' 255 = 0 -o 1 '!=' 1 ']'
++ true
++ '[' '' '!=' '' ']'
++ set -x
+
+
+
+
+
+
+
+
+
+
+
+
+[root@ae717016d4b9 weblogic92]# cd common/bin/
+[root@ae717016d4b9 bin]# ls
+commEnv.sh         config.sh  quickstart.sh            startPointBaseConsole.sh  stopPointBase.sh  upgrade.sh     wlsifconfig.sh
+config_builder.sh  pack.sh    startManagedWebLogic.sh  startPointBase.sh         unpack.sh         wlscontrol.sh  wlst.sh
+[root@ae717016d4b9 bin]# config.sh -mode=console
+bash: config.sh: command not found
+[root@ae717016d4b9 bin]# ./config.sh -mode=console
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Welcome:
+--------
+
+Choose between creating and extending a domain. Based on your selection, 
+the Configuration Wizard guides you through the steps to generate a new or 
+extend an existing domain.
+
+ ->1|Create a new WebLogic domain
+    |    Create a WebLogic domain in your projects directory.  
+
+   2|Extend an existing WebLogic domain
+    |    Extend an existing WebLogic domain.  Use this option to add 
+    |applications and services, or to override existing database access (JDBC) 
+    |and messaging (JMS) settings. You can also incorporate additional 
+    |functionality in your domain, for example, by including AquaLogic Service 
+    |Bus. 
+
+
+
+
+
+Enter index number to select OR [Exit][Next]> 1
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Select Domain Source:
+---------------------
+
+Select the source from which the domain will be created. You can create the 
+domain by selecting from the required components or by selecting from a 
+list of existing domain templates.
+
+ ->1|Choose Weblogic Platform components
+    |    You can choose the Weblogic component(s) that you want supported in 
+    |your domain. 
+
+   2|Choose custom template
+    |    Choose this option if you want to use an existing  template. This 
+    |could be a custom created template using the Template Builder. 
+
+
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> 1
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Application Template Selection:
+-------------------------------
+
+ 
+
+    Available Templates
+    |_____WebLogic Server (Required)x
+
+
+
+Enter number exactly as it appears in brackets to toggle selection OR [Exit][Previous][Next]> 
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Configure Administrator Username and Password:
+----------------------------------------------
+
+Create a user to be assigned to the Administrator role. This user is the 
+default administrator used to start development mode servers.
+
+    |          Name           |                  Value                  |
+   _|_________________________|_________________________________________|
+   1|       *User name:       |                weblogic                 |
+   2|     *User password:     |                                         |
+   3| *Confirm user password: |                                         |
+   4|      Description:       | This user is the default administrator. |
+
+Use above value or select another option:
+    1 - Modify "User name"
+    2 - Modify "User password"
+    3 - Modify "Confirm user password"
+    4 - Modify "Description"
+
+
+
+
+Enter option number to select OR [Exit][Previous][Next]> 2
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Configure Administrator Username and Password:
+----------------------------------------------
+
+Create a user to be assigned to the Administrator role. This user is the 
+default administrator used to start development mode servers.
+
+    "*User password:" = []
+
+
+
+
+Enter new *User password: OR [Exit][Reset][Accept]> weblogic
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Configure Administrator Username and Password:
+----------------------------------------------
+
+Create a user to be assigned to the Administrator role. This user is the 
+default administrator used to start development mode servers.
+
+    |          Name           |                  Value                  |
+   _|_________________________|_________________________________________|
+   1|       *User name:       |                weblogic                 |
+   2|     *User password:     |                ********                 |
+   3| *Confirm user password: |                                         |
+   4|      Description:       | This user is the default administrator. |
+
+Use above value or select another option:
+    1 - Modify "User name"
+    2 - Modify "User password"
+    3 - Modify "Confirm user password"
+    4 - Modify "Description"
+    5 - Discard Changes
+
+
+
+
+Enter option number to select OR [Exit][Previous][Next]> 3
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Configure Administrator Username and Password:
+----------------------------------------------
+
+Create a user to be assigned to the Administrator role. This user is the 
+default administrator used to start development mode servers.
+
+    "*Confirm user password:" = []
+
+
+
+
+Enter new *Confirm user password: OR [Exit][Reset][Accept]> weblogic
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Configure Administrator Username and Password:
+----------------------------------------------
+
+Create a user to be assigned to the Administrator role. This user is the 
+default administrator used to start development mode servers.
+
+    |          Name           |                  Value                  |
+   _|_________________________|_________________________________________|
+   1|       *User name:       |                weblogic                 |
+   2|     *User password:     |                ********                 |
+   3| *Confirm user password: |                ********                 |
+   4|      Description:       | This user is the default administrator. |
+
+Use above value or select another option:
+    1 - Modify "User name"
+    2 - Modify "User password"
+    3 - Modify "Confirm user password"
+    4 - Modify "Description"
+    5 - Discard Changes
+
+
+
+
+Enter option number to select OR [Exit][Previous][Next]> 
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Domain Mode Configuration:
+--------------------------
+
+Enable Development or Production Mode for this domain. 
+
+ ->1|Development Mode
+
+   2|Production Mode
+
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> 1
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Java SDK Selection:
+-------------------
+
+ ->1|Unknown SDK  @ /usr/java/jre1.5.0_22
+   2|Other Java SDK
+
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> Previous
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Domain Mode Configuration:
+--------------------------
+
+Enable Development or Production Mode for this domain. 
+
+ ->1|Development Mode
+
+   2|Production Mode
+
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> 2
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Java SDK Selection:
+-------------------
+
+ ->1|Unknown SDK  @ /usr/java/jre1.5.0_22
+   2|Other Java SDK
+
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> 1
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Choose Configuration Option:
+----------------------------
+
+    *Do you want to modify any of the preconfigured settings or defaults in 
+    *your template?
+    *
+    *To keep the default or template settings, and proceed directly to name and     *create your domain, leave No selected.
+
+   1|Yes
+
+ ->2|No
+
+
+
+
+
+Enter index number to select OR [Exit][Previous][Next]> 2
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Select the target domain directory for this domain:
+---------------------------------------------------
+
+    "Target Location" = [Enter new value or use default 
+"/root/bea/user_projects/domains"]
+
+
+
+
+Enter new Target Location OR [Exit][Previous][Next]>                      
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Edit Domain Information:
+------------------------
+
+    |  Name  |    Value    |
+   _|________|_____________|
+   1| *Name: | base_domain |
+
+
+
+
+Enter value for "Name" OR [Exit][Previous][Next]> 1
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Edit Domain Information:
+------------------------
+
+    |  Name  | Value |
+   _|________|_______|
+   1| *Name: |   1   |
+
+Use above value or select another option:
+    1 - Modify "Name"
+    2 - Discard Changes
+
+
+
+
+Enter option number to select OR [Exit][Previous][Next]> 1
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Edit Domain Information:
+------------------------
+
+    |  Name  | Value |
+   _|________|_______|
+   1| *Name: |   1   |
+
+
+
+
+Enter value for "Name" OR [Exit][Previous][Next]> tangfx
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Edit Domain Information:
+------------------------
+
+    |  Name  | Value  |
+   _|________|________|
+   1| *Name: | tangfx |
+
+Use above value or select another option:
+    1 - Modify "Name"
+    2 - Discard Changes
+
+
+
+
+Enter option number to select OR [Exit][Previous][Next]> 
+
+
+
+
+
+<--------------------- BEA WebLogic Configuration Wizard --------------------->
+
+Creating Domain...
+
+0%          25%          50%          75%          100%
+[------------|------------|------------|------------]
+[***************************************************]
+
+
+**** Domain Created Successfully! ****
+
+
+[root@ae717016d4b9 bin]# cd /root/bea/user_projects/domains/tangfx/
+[root@ae717016d4b9 tangfx]# ls
+autodeploy  bin  config  console-ext  fileRealm.properties  init-info  lib  security  startWebLogic.sh  user_staged_config
+[root@ae717016d4b9 tangfx]# ./startWebLogic.sh 
+.
+.
+JAVA Memory arguments: -Xms256m -Xmx512m
+.
+WLS Start Mode=Production
+.
+CLASSPATH=:/root/bea/patch_weblogic923/profiles/default/sys_manifest_classpath/weblogic_patch.jar:/usr/java/jre1.5.0_22/lib/tools.jar:/root/bea/weblogic92/server/lib/weblogic_sp.jar:/root/bea/weblogic92/server/lib/weblogic.jar:/root/bea/weblogic92/server/lib/webservices.jar::/root/bea/weblogic92/common/eval/pointbase/lib/pbclient51.jar:/root/bea/weblogic92/server/lib/xqrl.jar::
+.
+PATH=/root/bea/weblogic92/server/bin:/usr/java/jre1.5.0_22/jre/bin:/usr/java/jre1.5.0_22/bin:/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/java/jre1.5.0_22/bin
+.
+***************************************************
+*  To start WebLogic Server, use a username and   *
+*  password assigned to an admin-level user.  For *
+*  server administration, use the WebLogic Server *
+*  console at http://hostname:port/console        *
+***************************************************
+starting weblogic with Java version:
+java version "1.5.0_22"
+Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_22-b03)
+Java HotSpot(TM) 64-Bit Server VM (build 1.5.0_22-b03, mixed mode)
+Starting WLS with line:
+/usr/java/jre1.5.0_22/bin/java    -Xms256m -Xmx512m   -da -Dplatform.home=/root/bea/weblogic92 -Dwls.home=/root/bea/weblogic92/server -Dwli.home=/root/bea/weblogic92/integration  -Dweblogic.management.discover=true  -Dwlw.iterativeDev=false -Dwlw.testConsole=false -Dwlw.logErrorsToConsole= -Dweblogic.ext.dirs=/root/bea/patch_weblogic923/profiles/default/sysext_manifest_classpath -Dweblogic.Name=AdminServer -Djava.security.policy=/root/bea/weblogic92/server/lib/weblogic.policy   weblogic.Server
+<Aug 4, 2016 12:33:24 PM EDT> <Notice> <WebLogicServer> <BEA-000395> <Following extensions directory contents added to the end of the classpath:
+/root/bea/weblogic92/platform/lib/p13n/p13n-schemas.jar:/root/bea/weblogic92/platform/lib/p13n/p13n_common.jar:/root/bea/weblogic92/platform/lib/p13n/p13n_system.jar:/root/bea/weblogic92/platform/lib/wlp/netuix_common.jar:/root/bea/weblogic92/platform/lib/wlp/netuix_schemas.jar:/root/bea/weblogic92/platform/lib/wlp/netuix_system.jar:/root/bea/weblogic92/platform/lib/wlp/wsrp-common.jar> 
+<Aug 4, 2016 12:33:24 PM EDT> <Info> <WebLogicServer> <BEA-000377> <Starting WebLogic Server with Java HotSpot(TM) 64-Bit Server VM Version 1.5.0_22-b03 from Sun Microsystems Inc.> 
+<Aug 4, 2016 12:33:25 PM EDT> <Info> <Management> <BEA-141107> <Version: WebLogic Server 9.2 MP3  Mon Mar 10 08:28:41 EDT 2008 1096261 > 
+<Aug 4, 2016 12:36:04 PM EDT> <Info> <Security> <BEA-090065> <Getting boot identity from user.> 
+Enter username to boot WebLogic server:weblogic
+Enter password to boot WebLogic server:
+<Aug 4, 2016 12:36:45 PM EDT> <Info> <WebLogicServer> <BEA-000215> <Loaded License : /root/bea/license.bea> 
+<Aug 4, 2016 12:36:45 PM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to STARTING> 
+<Aug 4, 2016 12:36:45 PM EDT> <Info> <WorkManager> <BEA-002900> <Initializing self-tuning thread pool> 
+<Aug 4, 2016 12:36:46 PM EDT> <Notice> <Log Management> <BEA-170019> <The server log file /root/bea/user_projects/domains/tangfx/servers/AdminServer/logs/AdminServer.log is opened. All server side log events will be written to this file.> 
+<Aug 4, 2016 12:36:48 PM EDT> <Notice> <Security> <BEA-090082> <Security initializing using security realm myrealm.> 
+<Aug 4, 2016 12:36:50 PM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to STANDBY> 
+<Aug 4, 2016 12:36:50 PM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to STARTING> 
+<Aug 4, 2016 12:36:52 PM EDT> <Notice> <Log Management> <BEA-170027> <The server initialized the domain log broadcaster successfully. Log messages will now be broadcasted to the domain log.> 
+<Aug 4, 2016 12:36:52 PM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to ADMIN> 
+<Aug 4, 2016 12:36:53 PM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to RESUMING> 
+<Aug 4, 2016 12:36:53 PM EDT> <Notice> <Server> <BEA-002613> <Channel "Default[1]" is now listening on 127.0.0.1:7001 for protocols iiop, t3, ldap, http.> 
+<Aug 4, 2016 12:36:53 PM EDT> <Warning> <Server> <BEA-002611> <Hostname "ae717016d4b9", maps to multiple IP addresses: 172.17.0.8, 127.0.0.1> 
+<Aug 4, 2016 12:36:53 PM EDT> <Warning> <Server> <BEA-002611> <Hostname "localhost", maps to multiple IP addresses: 172.17.0.8, 127.0.0.1> 
+<Aug 4, 2016 12:36:53 PM EDT> <Notice> <Server> <BEA-002613> <Channel "Default" is now listening on 172.17.0.8:7001 for protocols iiop, t3, ldap, http.> 
+<Aug 4, 2016 12:36:53 PM EDT> <Notice> <WebLogicServer> <BEA-000329> <Started WebLogic Admin Server "AdminServer" for domain "tangfx" running in Production Mode> 
+<Aug 4, 2016 12:36:53 PM EDT> <Notice> <WebLogicServer> <BEA-000365> <Server state changed to RUNNING> 
+<Aug 4, 2016 12:36:53 PM EDT> <Notice> <WebLogicServer> <BEA-000360> <Server started in RUNNING mode> 
+<Aug 4, 2016 12:48:32 PM EDT> <Error> <Console> <BEA-240003> <Console encountered the following error java.lang.OutOfMemoryError: PermGen space
+	at weblogic.rmi.internal.ServerRequest.sendReceive(ServerRequest.java:205)
+	at weblogic.rmi.internal.BasicRemoteRef.invoke(BasicRemoteRef.java:223)
+	at weblogic.management.remote.iiop.IIOPServerImpl_923_WLStub.newClient(Unknown Source)
+	at javax.management.remote.rmi.RMIConnector.getConnection(Unknown Source)
+	at javax.management.remote.rmi.RMIConnector.connect(Unknown Source)
+	at javax.management.remote.JMXConnectorFactory.connect(Unknown Source)
+	at com.bea.console.utils.MBeanUtils.lookupMBeanServerConnection(MBeanUtils.java:2869)
+	at com.bea.console.utils.MBeanUtils.getDomainRuntimeMBeanServerConnection(MBeanUtils.java:1556)
+	at com.bea.console.utils.MBeanUtils.getDomainRuntimeServiceMBean(MBeanUtils.java:1632)
+	at com.bea.console.internal.ConsolePageFlowRequestProcessor.processActionPerform(ConsolePageFlowRequestProcessor.java:169)
+	at org.apache.struts.action.RequestProcessor.process(RequestProcessor.java:224)
+	at org.apache.beehive.netui.pageflow.PageFlowRequestProcessor.processInternal(PageFlowRequestProcessor.java:554)
+	at org.apache.beehive.netui.pageflow.PageFlowRequestProcessor.process(PageFlowRequestProcessor.java:851)
+	at org.apache.beehive.netui.pageflow.AutoRegisterActionServlet.process(AutoRegisterActionServlet.java:630)
+	at org.apache.beehive.netui.pageflow.PageFlowActionServlet.process(PageFlowActionServlet.java:157)
+	at com.bea.console.internal.ConsoleActionServlet.process(ConsoleActionServlet.java:241)
+	at org.apache.struts.action.ActionServlet.doGet(ActionServlet.java:414)
+	at com.bea.console.internal.ConsoleActionServlet.doGet(ConsoleActionServlet.java:130)
+	at org.apache.beehive.netui.pageflow.PageFlowUtils.strutsLookup(PageFlowUtils.java:1169)
+	at com.bea.portlet.adapter.scopedcontent.ScopedContentCommonSupport.executeAction(ScopedContentCommonSupport.java:688)
+	at com.bea.portlet.adapter.scopedcontent.ScopedContentCommonSupport.renderInternal(ScopedContentCommonSupport.java:268)
+	at com.bea.portlet.adapter.scopedcontent.StrutsStubImpl.render(StrutsStubImpl.java:107)
+	at com.bea.netuix.servlets.controls.content.NetuiContent.preRender(NetuiContent.java:288)
+	at com.bea.netuix.nf.ControlLifecycle$6.visit(ControlLifecycle.java:427)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:709)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walk(ControlTreeWalker.java:183)
+	at com.bea.netuix.nf.Lifecycle.processLifecycles(Lifecycle.java:361)
+	at com.bea.netuix.nf.Lifecycle.processLifecycles(Lifecycle.java:339)
+	at com.bea.netuix.nf.Lifecycle.runOutbound(Lifecycle.java:186)
+	at com.bea.netuix.nf.Lifecycle.run(Lifecycle.java:146)
+	at com.bea.netuix.servlets.manager.UIServlet.runLifecycle(UIServlet.java:419)
+	at com.bea.netuix.servlets.manager.UIServlet.doPost(UIServlet.java:267)
+	at com.bea.netuix.servlets.manager.UIServlet.doGet(UIServlet.java:209)
+	at com.bea.netuix.servlets.manager.UIServlet.service(UIServlet.java:194)
+	at com.bea.netuix.servlets.manager.SingleFileServlet.service(SingleFileServlet.java:237)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:856)
+	at weblogic.servlet.AsyncInitServlet.service(AsyncInitServlet.java:124)
+	at weblogic.servlet.internal.StubSecurityHelper$ServletServiceAction.run(StubSecurityHelper.java:227)
+	at weblogic.servlet.internal.StubSecurityHelper.invokeServlet(StubSecurityHelper.java:125)
+	at weblogic.servlet.internal.ServletStubImpl.execute(ServletStubImpl.java:283)
+	at weblogic.servlet.internal.TailFilter.doFilter(TailFilter.java:26)
+	at weblogic.servlet.internal.FilterChainImpl.doFilter(FilterChainImpl.java:42)
+	at weblogic.servlet.internal.RequestEventsFilter.doFilter(RequestEventsFilter.java:26)
+	at weblogic.servlet.internal.FilterChainImpl.doFilter(FilterChainImpl.java:42)
+	at weblogic.servlet.internal.WebAppServletContext$ServletInvocationAction.run(WebAppServletContext.java:3242)
+	at weblogic.security.acl.internal.AuthenticatedSubject.doAs(AuthenticatedSubject.java:321)
+	at weblogic.security.service.SecurityManager.runAs(SecurityManager.java:121)
+	at weblogic.servlet.internal.WebAppServletContext.securedExecute(WebAppServletContext.java:2010)
+	at weblogic.servlet.internal.WebAppServletContext.execute(WebAppServletContext.java:1916)
+	at weblogic.servlet.internal.ServletRequestImpl.run(ServletRequestImpl.java:1366)
+	at weblogic.work.ExecuteThread.execute(ExecuteThread.java:209)
+	at weblogic.work.ExecuteThread.run(ExecuteThread.java:181)
+> 
+<Aug 4, 2016 12:48:32 PM EDT> <Error> <Console> <BEA-240003> <Console encountered the following error com.bea.console.exceptions.ManagementException: java.lang.OutOfMemoryError: PermGen space
+	at com.bea.console.utils.MBeanUtils.getDomainRuntimeServiceMBean(MBeanUtils.java:1650)
+	at com.bea.console.internal.ConsolePageFlowRequestProcessor.processActionPerform(ConsolePageFlowRequestProcessor.java:169)
+	at org.apache.struts.action.RequestProcessor.process(RequestProcessor.java:224)
+	at org.apache.beehive.netui.pageflow.PageFlowRequestProcessor.processInternal(PageFlowRequestProcessor.java:554)
+	at org.apache.beehive.netui.pageflow.PageFlowRequestProcessor.process(PageFlowRequestProcessor.java:851)
+	at org.apache.beehive.netui.pageflow.AutoRegisterActionServlet.process(AutoRegisterActionServlet.java:630)
+	at org.apache.beehive.netui.pageflow.PageFlowActionServlet.process(PageFlowActionServlet.java:157)
+	at com.bea.console.internal.ConsoleActionServlet.process(ConsoleActionServlet.java:241)
+	at org.apache.struts.action.ActionServlet.doGet(ActionServlet.java:414)
+	at com.bea.console.internal.ConsoleActionServlet.doGet(ConsoleActionServlet.java:130)
+	at org.apache.beehive.netui.pageflow.PageFlowUtils.strutsLookup(PageFlowUtils.java:1169)
+	at com.bea.portlet.adapter.scopedcontent.ScopedContentCommonSupport.executeAction(ScopedContentCommonSupport.java:688)
+	at com.bea.portlet.adapter.scopedcontent.ScopedContentCommonSupport.renderInternal(ScopedContentCommonSupport.java:268)
+	at com.bea.portlet.adapter.scopedcontent.StrutsStubImpl.render(StrutsStubImpl.java:107)
+	at com.bea.netuix.servlets.controls.content.NetuiContent.preRender(NetuiContent.java:288)
+	at com.bea.netuix.nf.ControlLifecycle$6.visit(ControlLifecycle.java:427)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:709)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walkRecursivePreRender(ControlTreeWalker.java:721)
+	at com.bea.netuix.nf.ControlTreeWalker.walk(ControlTreeWalker.java:183)
+	at com.bea.netuix.nf.Lifecycle.processLifecycles(Lifecycle.java:361)
+	at com.bea.netuix.nf.Lifecycle.processLifecycles(Lifecycle.java:339)
+	at com.bea.netuix.nf.Lifecycle.runOutbound(Lifecycle.java:186)
+	at com.bea.netuix.nf.Lifecycle.run(Lifecycle.java:146)
+	at com.bea.netuix.servlets.manager.UIServlet.runLifecycle(UIServlet.java:419)
+	at com.bea.netuix.servlets.manager.UIServlet.doPost(UIServlet.java:267)
+	at com.bea.netuix.servlets.manager.UIServlet.doGet(UIServlet.java:209)
+	at com.bea.netuix.servlets.manager.UIServlet.service(UIServlet.java:194)
+	at com.bea.netuix.servlets.manager.SingleFileServlet.service(SingleFileServlet.java:237)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:856)
+	at weblogic.servlet.AsyncInitServlet.service(AsyncInitServlet.java:124)
+	at weblogic.servlet.internal.StubSecurityHelper$ServletServiceAction.run(StubSecurityHelper.java:227)
+	at weblogic.servlet.internal.StubSecurityHelper.invokeServlet(StubSecurityHelper.java:125)
+	at weblogic.servlet.internal.ServletStubImpl.execute(ServletStubImpl.java:283)
+	at weblogic.servlet.internal.TailFilter.doFilter(TailFilter.java:26)
+	at weblogic.servlet.internal.FilterChainImpl.doFilter(FilterChainImpl.java:42)
+	at weblogic.servlet.internal.RequestEventsFilter.doFilter(RequestEventsFilter.java:26)
+	at weblogic.servlet.internal.FilterChainImpl.doFilter(FilterChainImpl.java:42)
+	at weblogic.servlet.internal.WebAppServletContext$ServletInvocationAction.run(WebAppServletContext.java:3242)
+	at weblogic.security.acl.internal.AuthenticatedSubject.doAs(AuthenticatedSubject.java:321)
+	at weblogic.security.service.SecurityManager.runAs(SecurityManager.java:121)
+	at weblogic.servlet.internal.WebAppServletContext.securedExecute(WebAppServletContext.java:2010)
+	at weblogic.servlet.internal.WebAppServletContext.execute(WebAppServletContext.java:1916)
+	at weblogic.servlet.internal.ServletRequestImpl.run(ServletRequestImpl.java:1366)
+	at weblogic.work.ExecuteThread.execute(ExecuteThread.java:209)
+	at weblogic.work.ExecuteThread.run(ExecuteThread.java:181)
+Caused by: java.lang.OutOfMemoryError: PermGen space
+	at weblogic.rmi.internal.ServerRequest.sendReceive(ServerRequest.java:205)
+	at weblogic.rmi.internal.BasicRemoteRef.invoke(BasicRemoteRef.java:223)
+	at weblogic.management.remote.iiop.IIOPServerImpl_923_WLStub.newClient(Unknown Source)
+	at javax.management.remote.rmi.RMIConnector.getConnection(Unknown Source)
+	at javax.management.remote.rmi.RMIConnector.connect(Unknown Source)
+	at javax.management.remote.JMXConnectorFactory.connect(Unknown Source)
+	at com.bea.console.utils.MBeanUtils.lookupMBeanServerConnection(MBeanUtils.java:2869)
+	at com.bea.console.utils.MBeanUtils.getDomainRuntimeMBeanServerConnection(MBeanUtils.java:1556)
+	at com.bea.console.utils.MBeanUtils.getDomainRuntimeServiceMBean(MBeanUtils.java:1632)
+	... 58 more
+> 
+
+

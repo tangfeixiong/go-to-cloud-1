@@ -10,32 +10,36 @@ import (
 
 	"golang.org/x/net/context"
 
-	_ "google.golang.org/grpc"
-
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client"
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
 )
 
-func (u *UserResource) CreateOriginProject(context.Context, *openshift.CreateOriginProjectRequest) (*openshift.CreateOriginProjectResponse, error) {
+func (u *UserResource) CreateOriginProject(ctx context.Context,
+	req *osopb3.CreateOriginProjectRequest,
+	opts ...grpc.CallOption) (*osopb3.CreateOriginProjectResponse, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) CreateOriginProjectArbitrary(context.Context, *openshift.CreateOriginProjectArbitraryRequest) (*openshift.CreateOriginProjectArbitraryResponse, error) {
+func (u *UserResource) CreateOriginProjectArbitrary(ctx context.Context,
+	req *osopb3.CreateOriginProjectArbitraryRequest,
+	opts ...grpc.CallOption) (*osopb3.CreateOriginProjectArbitraryResponse, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) FindProject(ctx context.Context, req *openshift.FindProjectRequest) (*openshift.FindProjectResponse, error) {
+func (u *UserResource) FindProject(ctx context.Context,
+	req *osopb3.FindProjectRequest,
+	opts ...grpc.CallOption) (*osopb3.FindProjectResponse, error) {
 	if req.Name == "" {
 		return nil, errors.New("Unexpected")
 	}
-	raw, obj, err := client.RetrieveProject(req.Name)
+	raw, obj, err := origin.RetrieveProject(req.Name)
 	if err != nil {
 		return nil, err
 	}
 	if len(raw) == 0 || obj == nil {
 		return nil, errUnexpected
 	}
-	resp := &openshift.FindProjectResponse{
+	resp := &osopb3.FindProjectResponse{
 		Odefv1RawData: raw,
 		//Project: &google_protobuf.Any{
 		//	TypeUrl: "type.googleapis.com/github.com/openshift/origin/pkg/project/api/v1",
@@ -67,18 +71,26 @@ func (u *UserResource) createProject(request *restful.Request, response *restful
 	context.WithValue(ctx, 1, &u)
 }
 
-func (u *UserResource) CreateProject(context.Context, *openshift.CreateProjectRequest) (*openshift.CreateProjectResponse, error) {
+func (u *UserResource) CreateProject(ctx context.Context,
+	req *osopb3.CreateProjectRequest,
+	opts ...grpc.CallOption) (*osopb3.CreateProjectResponse, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) LookupProjects(context.Context, *openshift.LookupProjectsRequest) (*openshift.LookupProjectsResponse, error) {
+func (u *UserResource) LookupProjects(ctx context.Context,
+	req *osopb3.LookupProjectsRequest,
+	opts ...grpc.CallOption) (*osopb3.LookupProjectsResponse, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) OpenProject(context.Context, *openshift.OpenProjectRequest) (*openshift.OpenProjectResponse, error) {
+func (u *UserResource) OpenProject(ctx context.Context,
+	req *osopb3.OpenProjectRequest,
+	opts ...grpc.CallOption) (*osopb3.OpenProjectResponse, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) DeleteProject(ctx context.Context, in *openshift.DeleteProjectRequest) (*openshift.DeleteProjectResponse, error) {
+func (u *UserResource) DeleteProject(ctx context.Context,
+	req *osopb3.DeleteProjectRequest,
+	opts ...grpc.CallOption) (*osopb3.DeleteProjectResponse, error) {
 	return nil, errNotImplemented
 }

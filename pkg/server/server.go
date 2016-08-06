@@ -20,7 +20,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/service"
 )
 
@@ -46,8 +46,8 @@ func (s *APIContextServer) GRPCServer(server *grpc.Server) *APIContextServer {
 		log.Fatal(fmt.Errorf("gRPC server not found: %v", s))
 	}
 	s.grpcServer = server
-	openshift.RegisterSimpleServiceServer(server, service.Usrs)
-	openshift.RegisterSimpleManageServiceServer(server, service.Usrs)
+	osopb3.RegisterSimpleServiceServer(server, service.Usrs)
+	osopb3.RegisterSimpleManageServiceServer(server, service.Usrs)
 	return s
 }
 
@@ -86,11 +86,11 @@ func runGrpcServer() error {
 func newGateway(ctx context.Context, opts ...runtime.ServeMuxOption) (http.Handler, error) {
 	mux := runtime.NewServeMux(opts...)
 	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
-	err := openshift.RegisterSimpleManageServiceHandlerFromEndpoint(ctx, mux, "localhost:8086", dialOpts)
+	err := osopb3.RegisterSimpleManageServiceHandlerFromEndpoint(ctx, mux, "localhost:8086", dialOpts)
 	if err != nil {
 		return nil, err
 	}
-	//err = openshift.RegisterStreamServiceHandlerFromEndpoint(ctx, mux, *abeEndpoint, dialOpts)
+	//err = osopb3.RegisterStreamServiceHandlerFromEndpoint(ctx, mux, *abeEndpoint, dialOpts)
 	//if err != nil {
 	//	return nil, err
 	//}

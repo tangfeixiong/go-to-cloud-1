@@ -1,0 +1,140 @@
+github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client
+# github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api
+/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.pb.go:32: undefined: proto.ProtoPackageIsVersion2
+/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.pb.go:46: undefined: proto.RegisterFile
+/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/http.pb.go:338: undefined: proto.RegisterFile
+github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin
+# github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api".OwnerReference during import
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\"" } (in "github.com/helm/helm-classic/codec")
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\""; Controller *bool "json:\"controller,omitempty\"" } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api/unversioned".ObjectKind during import
+	interface { GroupVersionKind() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "github.com/helm/helm-classic/codec")
+	interface { GroupVersionKind() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.SetGroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api/resource".Scale during import
+	int (in "github.com/helm/helm-classic/codec")
+	int32 (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Scale."k8s.io/kubernetes/pkg/api/resource".infScale
+	method("k8s.io/kubernetes/pkg/api/resource".Scale) func() "k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Scale
+	method("k8s.io/kubernetes/pkg/api/resource".Scale) func() "k8s.io/kubernetes/vendor/gopkg.in/inf.v0".Scale
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api/resource".Quantity during import
+	struct { Amount *"k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Dec; "k8s.io/kubernetes/pkg/api/resource".Format } (in "github.com/helm/helm-classic/codec")
+	struct { i "k8s.io/kubernetes/pkg/api/resource".int64Amount; d "k8s.io/kubernetes/pkg/api/resource".infDecAmount; s string; "k8s.io/kubernetes/pkg/api/resource".Format } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Add
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Neg
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func()
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Sub
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tclogin/main.go:17: too many errors
+github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject
+# github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.SetGroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: inconsistent definition for type "k8s.io/kubernetes/pkg/api".OwnerReference during import
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\""; Controller *bool "json:\"controller,omitempty\"" } (in "k8s.io/kubernetes/pkg/api")
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\"" } (in "github.com/helm/helm-classic/codec")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: inconsistent definition for type resource.Scale during import
+	int32 (in "k8s.io/kubernetes/pkg/api")
+	int (in "github.com/helm/helm-classic/codec")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: method redeclared: resource.Scale.resource.infScale
+	method(resource.Scale) func() "k8s.io/kubernetes/vendor/gopkg.in/inf.v0".Scale
+	method(resource.Scale) func() "k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Scale
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: inconsistent definition for type resource.Quantity during import
+	struct { i resource.int64Amount; d resource.infDecAmount; s string; resource.Format } (in "k8s.io/kubernetes/pkg/api")
+	struct { Amount *"k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Dec; resource.Format } (in "github.com/helm/helm-classic/codec")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: method redeclared: resource.Quantity.Add
+	method(*resource.Quantity) func(resource.Quantity)
+	method(*resource.Quantity) func(resource.Quantity) error
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: method redeclared: resource.Quantity.Neg
+	method(*resource.Quantity) func()
+	method(*resource.Quantity) func(resource.Quantity) error
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: method redeclared: resource.Quantity.Sub
+	method(*resource.Quantity) func(resource.Quantity)
+	method(*resource.Quantity) func(resource.Quantity) error
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: inconsistent definition for type "k8s.io/kubernetes/pkg/api/unversioned".ObjectKind during import
+	interface { GroupVersionKind() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "k8s.io/kubernetes/pkg/api")
+	interface { GroupVersionKind() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "github.com/helm/helm-classic/codec")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcproject/main.go:8: too many errors
+github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest
+# github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api".OwnerReference during import
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\"" } (in "github.com/helm/helm-classic/codec")
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\""; Controller *bool "json:\"controller,omitempty\"" } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api/unversioned".ObjectKind during import
+	interface { GroupVersionKind() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "github.com/helm/helm-classic/codec")
+	interface { GroupVersionKind() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.SetGroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api/resource".Scale during import
+	int (in "github.com/helm/helm-classic/codec")
+	int32 (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Scale."k8s.io/kubernetes/pkg/api/resource".infScale
+	method("k8s.io/kubernetes/pkg/api/resource".Scale) func() "k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Scale
+	method("k8s.io/kubernetes/pkg/api/resource".Scale) func() "k8s.io/kubernetes/vendor/gopkg.in/inf.v0".Scale
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: inconsistent definition for type "k8s.io/kubernetes/pkg/api/resource".Quantity during import
+	struct { Amount *"k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Dec; "k8s.io/kubernetes/pkg/api/resource".Format } (in "github.com/helm/helm-classic/codec")
+	struct { i "k8s.io/kubernetes/pkg/api/resource".int64Amount; d "k8s.io/kubernetes/pkg/api/resource".infDecAmount; s string; "k8s.io/kubernetes/pkg/api/resource".Format } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Add
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Neg
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func()
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Sub
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/tcprojectrequest/main.go:17: too many errors
+github.com/gengo/grpc-gateway/runtime/internal
+# github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: inconsistent definition for type "k8s.io/kubernetes/pkg/api".OwnerReference during import
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\"" } (in "github.com/helm/helm-classic/codec")
+	struct { APIVersion string "json:\"apiVersion\""; Kind string "json:\"kind\""; Name string "json:\"name\""; UID "k8s.io/kubernetes/pkg/types".UID "json:\"uid\""; Controller *bool "json:\"controller,omitempty\"" } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: inconsistent definition for type "k8s.io/kubernetes/pkg/api/unversioned".ObjectKind during import
+	interface { GroupVersionKind() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "github.com/helm/helm-classic/codec")
+	interface { GroupVersionKind() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind; SetGroupVersionKind("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind) } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() *"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func() "k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: method redeclared: "k8s.io/kubernetes/pkg/api/unversioned".TypeMeta.SetGroupVersionKind
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func(*"k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+	method(*"k8s.io/kubernetes/pkg/api/unversioned".TypeMeta) func("k8s.io/kubernetes/pkg/api/unversioned".GroupVersionKind)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: inconsistent definition for type "k8s.io/kubernetes/pkg/api/resource".Scale during import
+	int (in "github.com/helm/helm-classic/codec")
+	int32 (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Scale."k8s.io/kubernetes/pkg/api/resource".infScale
+	method("k8s.io/kubernetes/pkg/api/resource".Scale) func() "k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Scale
+	method("k8s.io/kubernetes/pkg/api/resource".Scale) func() "k8s.io/kubernetes/vendor/gopkg.in/inf.v0".Scale
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: inconsistent definition for type "k8s.io/kubernetes/pkg/api/resource".Quantity during import
+	struct { Amount *"k8s.io/kubernetes/vendor/speter.net/go/exp/math/dec/inf".Dec; "k8s.io/kubernetes/pkg/api/resource".Format } (in "github.com/helm/helm-classic/codec")
+	struct { i "k8s.io/kubernetes/pkg/api/resource".int64Amount; d "k8s.io/kubernetes/pkg/api/resource".infDecAmount; s string; "k8s.io/kubernetes/pkg/api/resource".Format } (in "k8s.io/kubernetes/pkg/api")
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Add
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Neg
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func()
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: method redeclared: "k8s.io/kubernetes/pkg/api/resource".Quantity.Sub
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity) error
+	method(*"k8s.io/kubernetes/pkg/api/resource".Quantity) func("k8s.io/kubernetes/pkg/api/resource".Quantity)
+tangfeixiong/go-to-cloud-1/pkg/openshift/client/client.go:38: too many errors
+# github.com/gengo/grpc-gateway/runtime/internal
+/data/src/github.com/gengo/grpc-gateway/runtime/internal/stream_chunk.pb.go:29: undefined: proto.ProtoPackageIsVersion2
+/data/src/github.com/gengo/grpc-gateway/runtime/internal/stream_chunk.pb.go:49: undefined: proto.RegisterFile

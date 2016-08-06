@@ -74,24 +74,25 @@ func (s *apiServer) Run() {
 }
 
 var (
-	grpcServer *grpc.Server
+	_host        = "172.17.4.50:50051"
+	_grpc_server *grpc.Server
 )
 
 func startServerGRPC() {
 
-	lstn, err := net.Listen("tcp", ":8086")
+	lstn, err := net.Listen("tcp", _host)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
 		os.Exit(1)
 	}
 
-	grpcServer = grpc.NewServer()
-	openshift.RegisterSimpleServiceServer(grpcServer, Usrs)
-	openshift.RegisterSimpleManageServiceServer(grpcServer, Usrs)
+	_grpc_server = grpc.NewServer()
+	openshift.RegisterSimpleServiceServer(_grpc_server, Usrs)
+	openshift.RegisterSimpleManageServiceServer(_grpc_server, Usrs)
 
-	fmt.Printf("grpc server is running on %s\n", "")
+	fmt.Printf("grpc server is running on %s\n", _host)
 
-	if err := grpcServer.Serve(lstn); err != nil {
+	if err := _grpc_server.Serve(lstn); err != nil {
 		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
 		os.Exit(1)
 	}
@@ -101,13 +102,13 @@ func startServerGRPC() {
 }
 
 func stopServerGRPC() {
-	if grpcServer != nil {
+	if _grpc_server != nil {
 		time.Sleep(1000)
-		grpcServer.Stop()
+		_grpc_server.Stop()
 	}
 }
 
-func TestFindProjectGRPC(t *testing.T) {
+func TestGrpc_ProjectFind(t *testing.T) {
 	go startServerGRPC()
 	grpcFindProject()
 	time.Sleep(1200)

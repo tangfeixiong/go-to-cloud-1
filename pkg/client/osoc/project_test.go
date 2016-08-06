@@ -10,16 +10,15 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osobp3"
 )
 
 var (
-	_go2cloud1_server string = "localhost:50051"
-	_oso_project      string = "default"
+	_oso_project string = "tangfeixiong"
 )
 
-func TestFindProject(t *testing.T) {
-	r, err := findOpenshiftProject(Context.Background(), _oso_project)
+func TestProject_Find(t *testing.T) {
+	r, err := findOpenshiftProject(context.Background(), _oso_project)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,30 +28,32 @@ func TestFindProject(t *testing.T) {
 func findOpenshiftProject(context context.Context,
 	name string) (*projectapiv1.Project, error) {
 
-	conn, err := grpc.Dial(_go2cloud1_server, grpc.WithInsecure())
+	conn, err := grpc.Dial(_host, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 		return nil, err
 	}
 	defer conn.Close()
-	c := openshift.NewSimpleManageServiceClient(conn)
+	c := osobp3.NewSimpleManageServiceClient(conn)
 
-	in := openshift.FindProjectRequest{Name: name}
+	in := osobp3.FindProjectRequest{Name: name}
+
 	out, err := c.FindProject(context, &in)
 	if err != nil {
 		log.Fatalf("could not request: %v", err)
 		return nil, err
 	}
+	log.Println(string(out.Odefv1RawData))
 
 	o, err := codec.JSON.Decode(out.Odefv1RawData).One()
 	if err != nil {
-		log.Errorf("could not create decoder into object: %s", err)
+		log.Fatalf("could not create decoder into object: %s", err)
 		return nil, err
 	}
 
 	r := new(projectapiv1.Project)
 	if err := o.Object(r); err != nil {
-		log.Errorf("could not create decoder into object: %s", err)
+		log.Fatalf("could not create decoder into object: %s", err)
 		return nil, err
 	}
 	return r, nil
