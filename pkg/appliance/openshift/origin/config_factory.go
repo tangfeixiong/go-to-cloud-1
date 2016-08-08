@@ -96,7 +96,9 @@ func directKClientConfig() *kclientcmd.DirectClientConfig {
 	}
 	logger.Printf("cmd client config: %+v\n", conf)
 
-	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf, kubeconfigContext, &kclientcmd.ConfigOverrides{})
+	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
+		kubeconfigContext, &kclientcmd.ConfigOverrides{},
+		kclientcmd.NewDefaultClientConfigLoadingRules())
 	logger.Printf("rest kclient config: %+v\n", kClientConfig)
 	return kClientConfig.(*kclientcmd.DirectClientConfig)
 }
@@ -110,7 +112,10 @@ func directOClientConfig() kclientcmd.ClientConfig {
 	}
 	logger.Printf("openshift cmd api cmd client config: %+v\n", conf)
 
-	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf, oconfigContext, &kclientcmd.ConfigOverrides{})
+	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
+		oconfigContext,
+		&kclientcmd.ConfigOverrides{},
+		kclientcmd.NewDefaultClientConfigLoadingRules())
 
 	logger.Printf("rest oclient config: %+v\n", oClientConfig)
 	return oClientConfig
@@ -202,7 +207,10 @@ func withKClientConfig() kclientcmd.ClientConfig {
 	}
 	glog.Infof("cmd client config: %+v\n", conf)
 
-	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf, kubeconfigContext, &kclientcmd.ConfigOverrides{})
+	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
+		kubeconfigContext,
+		&kclientcmd.ConfigOverrides{},
+		kclientcmd.NewDefaultClientConfigLoadingRules())
 	glog.Infof("rest client config: %+v\n", kClientConfig)
 	return kClientConfig
 }
@@ -216,14 +224,24 @@ func withOClientConfig() kclientcmd.ClientConfig {
 	}
 	logger.Printf("openshift cmd api cmd client config: %+v\n", conf)
 
-	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf, oconfigContext, &kclientcmd.ConfigOverrides{})
+	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
+		oconfigContext,
+		&kclientcmd.ConfigOverrides{},
+		kclientcmd.NewDefaultClientConfigLoadingRules())
 	logger.Printf("rest client config: %+v\n", oClientConfig)
 	return oClientConfig
 }
 
 // openshift/origin/pkg/cmd/server/api/helpers.go
 func withAdminConfig() {
-	if kClient, kConfig, err := configapi.GetKubeClient(kubeconfigPath); err != nil {
+	var overrides *configapi.ClientConnectionOverrides = &configapi.ClientConnectionOverrides{
+		AcceptContentTypes: "application/json",
+		ContentType:        "application/json",
+		QPS:                2.0,
+		Burst:              10,
+	}
+	//configapi.SetProtobufClientDefaults(overrides)
+	if kClient, kConfig, err := configapi.GetKubeClient(kubeconfigPath, overrides); err != nil {
 		logger.Printf("Could not get kubernetes admin client: %+v\n", err)
 	} else if kClient == nil || kConfig == nil {
 		logger.Println("Could not find kubernetes admin client\n")
@@ -231,7 +249,7 @@ func withAdminConfig() {
 		logger.Printf("Kubernetes admin client %v with config %+v", kClient, kConfig)
 	}
 
-	if oClient, oConfig, err := configapi.GetOpenShiftClient(oconfigPath); err != nil {
+	if oClient, oConfig, err := configapi.GetOpenShiftClient(oconfigPath, overrides); err != nil {
 		logger.Printf("Could not get openshift admin client: %+v\n", err)
 	} else if oClient == nil || oConfig == nil {
 		logger.Println("Could not find openshift admin client\n")

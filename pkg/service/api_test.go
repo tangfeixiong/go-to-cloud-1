@@ -18,7 +18,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 )
 
 type apiServer struct {
@@ -87,8 +87,8 @@ func startServerGRPC() {
 	}
 
 	_grpc_server = grpc.NewServer()
-	openshift.RegisterSimpleServiceServer(_grpc_server, Usrs)
-	openshift.RegisterSimpleManageServiceServer(_grpc_server, Usrs)
+	osopb3.RegisterSimpleServiceServer(_grpc_server, Usrs)
+	osopb3.RegisterSimpleManageServiceServer(_grpc_server, Usrs)
 
 	fmt.Printf("grpc server is running on %s\n", _host)
 
@@ -121,10 +121,10 @@ func grpcFindProject() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := openshift.NewSimpleManageServiceClient(conn)
+	c := osopb3.NewSimpleManageServiceClient(conn)
 
 	// Contact the server and print out its response.
-	req := &openshift.FindProjectRequest{
+	req := &osopb3.FindProjectRequest{
 		Name: "tangfeixiong",
 	}
 

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osobp3"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 )
 
 var (
@@ -34,9 +34,9 @@ func findOpenshiftProject(context context.Context,
 		return nil, err
 	}
 	defer conn.Close()
-	c := osobp3.NewSimpleManageServiceClient(conn)
+	c := osopb3.NewSimpleManageServiceClient(conn)
 
-	in := osobp3.FindProjectRequest{Name: name}
+	in := osopb3.FindProjectRequest{Name: name}
 
 	out, err := c.FindProject(context, &in)
 	if err != nil {

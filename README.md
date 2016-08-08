@@ -44,7 +44,7 @@ Generate message and stub
 
 Latest
 
-    [vagrant@localhost _proto]$ protoc --proto_path=/usr/local/include --proto_path=/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --proto_path=/go/src --proto_path=/data/src --proto_path=/work/src/github.com/tangfeixiong/go-to-cloud-1/_proto --gofast_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:pkg/api/proto /work/src/github.com/tangfeixiong/go-to-cloud-1/_proto/paas/ci/osopb3/*.proto
+    [vagrant@localhost go-to-cloud-1]$ protoc --proto_path=/usr/local/include --proto_path=/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --proto_path=/go/src --proto_path=/data/src --proto_path=/work/src/github.com/tangfeixiong/go-to-cloud-1/_proto --gofast_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:pkg/api/proto /work/src/github.com/tangfeixiong/go-to-cloud-1/_proto/paas/ci/osopb3/*.proto
 
 Generate gateway
 
@@ -60,10 +60,15 @@ Generage message only
 
 ### Make
 
-Install
+Build with vendoring
 
-    [vagrant@localhost go-to-cloud-1]$ make install GOFLAGS=-v
-    go install -v github.com/tangfeixiong/go-to-cloud-1/cmd/ociacibuilds
+    [vagrant@localhost go-to-cloud-1]$ GOPATH=/work go build -a -v -o /data/bin/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
+
+
+Install without vendor
+
+    [vagrant@localhost go-to-cloud-1]$ mv vendor vendor-exclude && make install GOFLAGS=-v
+    go install -v github.com/tangfeixiong/go-to-cloud-1/cmd/apaas && mv vendor-exclude vendor
 
 ...
 

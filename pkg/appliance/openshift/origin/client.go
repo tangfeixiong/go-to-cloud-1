@@ -583,7 +583,7 @@ func RetrieveProject(name string) ([]byte, *projectapi.Project, error) {
 		//logger.Printf("Build: %+v\n", b.String())
 		kapi.Scheme.AddKnownTypes(projectapiv1.SchemeGroupVersion, &projectapiv1.Project{})
 		data, err := runtime.Encode(kapi.Codecs.LegacyCodec(projectapiv1.SchemeGroupVersion),
-			result, projectapiv1.SchemeGroupVersion)
+			result)
 		if err != nil {
 			glog.Errorf("Could not serialize runtime object: %+v", err)
 			return nil, result, err
@@ -667,79 +667,104 @@ func CreateBuild(name, projectName string, gitSecret map[string]string, gitURI, 
 			Labels:            map[string]string{buildapi.BuildConfigLabel: "tangfeixiong"},
 			Annotations:       map[string]string{buildapi.BuildNumberAnnotation: "1"},
 		},
-		Spec: buildapi.BuildSpec{
-			ServiceAccount: builderServiceAccount,
-			Source: buildapi.BuildSource{
-				//Binary : &buildapi.BinaryBuildSource {},
-				Dockerfile: &dockerfile,
-				Git: &buildapi.GitBuildSource{
-					URI: gitURI,
-					Ref: gitRef,
-					//HTTPProxy: nil,
-					//HTTPSProxy: nil,
-				},
-				/*Images : []buildapi.ImageSource {
-				    buildapi.ImageSource {
-				        From : kapi.ObjectReference {
-				            Kind : "DockerImage",
-				            Name : "alpine:edge",
-				        },
-				        Paths : []buildapi.ImageSourcePath {
-				           {
-				               SourcePath : "",
-				               DestinationDir : "",
-				           },
-				        },
-				        PullSecret : &kapi.LocalObjectReference {
-				        },
-				   },
-				},*/
-				ContextDir: contextDir,
-				//SourceSecret : &kapi.LocalObjectReference {
-				//    name : githubSecret,
-				//},
-				//Secrets : []buildapi.SecretBuildSource {
-				//    Secret : &kapi.LocalObjectReference {},
-				//    DestinationDir : "/root/.docker/config.json",
-				//},
-			},
-			//Revision: &buildapi.SourceRevision {},
-			Strategy: buildapi.BuildStrategy{
-				DockerStrategy: &buildapi.DockerBuildStrategy{
-					From: &kapi.ObjectReference{
-						Kind: "DockerImage",
-						Name: "alpine:edge",
+	}
+	obj.Spec = buildapi.BuildSpec{
+		TriggeredBy: []buildapi.BuildTriggerCause{
+			{
+				Message: "No message",
+				GenericWebHook: &buildapi.GenericWebHookCause{
+					Revision: &buildapi.SourceRevision{
+						Git: &buildapi.GitSourceRevision{
+							Commit: "master",
+							Author: buildapi.SourceControlUser{
+								Name:  "tangfeixiong",
+								Email: "tangfx128@gmail.com",
+							},
+							Committer: buildapi.SourceControlUser{
+								Name:  "tangfeixiong",
+								Email: "tangfx128@gmail.com",
+							},
+							Message: "example",
+						},
 					},
-					//PullSecret: &kapi.LocalObjectReference{
-					//	Name: dockerPullSecret,
-					//},
-					NoCache: false,
-					//Env : []kapi.EnvVar {},
-					ForcePull: false,
-					//DockerfilePath : ".",
+					Secret: "",
 				},
 			},
-			Output: buildapi.BuildOutput{
-				To: &kapi.ObjectReference{
-					Kind: "DockerImage",
-					Name: "docker.io/tangfeixiong/nc-http-dev:latest",
-				},
-				PushSecret: &kapi.LocalObjectReference{
-					Name: dockerPushSecret,
-				},
-			},
-			//Resources : kapi.ResourceRequirements {},
-			//PostCommit : buildapi.BuildPostCommitSpec {
-			//    Command : []string{},
-			//    Args : []string{},
-			//    Script: "",
-			//},
-			CompletionDeadlineSeconds: &timeout,
-		},
-		Status: buildapi.BuildStatus{
-			Phase: buildapi.BuildPhaseNew,
 		},
 	}
+	obj.Spec.CommonSpec = buildapi.CommonSpec{
+		ServiceAccount: builderServiceAccount,
+		Source: buildapi.BuildSource{
+			//Binary : &buildapi.BinaryBuildSource {},
+			Dockerfile: &dockerfile,
+			Git: &buildapi.GitBuildSource{
+				URI: gitURI,
+				Ref: gitRef,
+				//HTTPProxy: nil,
+				//HTTPSProxy: nil,
+			},
+			/*Images : []buildapi.ImageSource {
+			    buildapi.ImageSource {
+			        From : kapi.ObjectReference {
+			            Kind : "DockerImage",
+			            Name : "alpine:edge",
+			        },
+			        Paths : []buildapi.ImageSourcePath {
+			           {
+			               SourcePath : "",
+			               DestinationDir : "",
+			           },
+			        },
+			        PullSecret : &kapi.LocalObjectReference {
+			        },
+			   },
+			},*/
+			ContextDir: contextDir,
+			//SourceSecret : &kapi.LocalObjectReference {
+			//    name : githubSecret,
+			//},
+			//Secrets : []buildapi.SecretBuildSource {
+			//    Secret : &kapi.LocalObjectReference {},
+			//    DestinationDir : "/root/.docker/config.json",
+			//},
+		},
+		//Revision: &buildapi.SourceRevision {},
+		Strategy: buildapi.BuildStrategy{
+			DockerStrategy: &buildapi.DockerBuildStrategy{
+				From: &kapi.ObjectReference{
+					Kind: "DockerImage",
+					Name: "alpine:edge",
+				},
+				//PullSecret: &kapi.LocalObjectReference{
+				//	Name: dockerPullSecret,
+				//},
+				NoCache: false,
+				//Env : []kapi.EnvVar {},
+				ForcePull: false,
+				//DockerfilePath : ".",
+			},
+		},
+		Output: buildapi.BuildOutput{
+			To: &kapi.ObjectReference{
+				Kind: "DockerImage",
+				Name: "docker.io/tangfeixiong/nc-http-dev:latest",
+			},
+			PushSecret: &kapi.LocalObjectReference{
+				Name: dockerPushSecret,
+			},
+		},
+		//Resources : kapi.ResourceRequirements {},
+		//PostCommit : buildapi.BuildPostCommitSpec {
+		//    Command : []string{},
+		//    Args : []string{},
+		//    Script: "",
+		//},
+		CompletionDeadlineSeconds: &timeout,
+	}
+	obj.Status = buildapi.BuildStatus{
+		Phase: buildapi.BuildPhaseNew,
+	}
+
 	return CreateBuildWith(obj)
 }
 
@@ -796,7 +821,8 @@ func createBuild(data []byte, obj *buildapi.Build) ([]byte, *buildapi.Build, err
 		//}
 		//data = b.Bytes()
 		kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapi.Build{})
-		if data, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), obj, buildapiv1.SchemeGroupVersion); err != nil {
+		if data, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion),
+			obj); err != nil {
 			glog.Errorf("Could not serialize runtime object: %+v", err)
 			return nil, nil, err
 		}

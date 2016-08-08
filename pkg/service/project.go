@@ -9,26 +9,24 @@ import (
 	//google_protobuf "github.com/golang/protobuf/ptypes/any"
 
 	"golang.org/x/net/context"
+	//"google.golang.org/grpc"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
 )
 
 func (u *UserResource) CreateOriginProject(ctx context.Context,
-	req *osopb3.CreateOriginProjectRequest,
-	opts ...grpc.CallOption) (*osopb3.CreateOriginProjectResponse, error) {
+	req *osopb3.CreateOriginProjectRequest) (*osopb3.CreateOriginProjectResponse, error) {
 	return nil, errNotImplemented
 }
 
 func (u *UserResource) CreateOriginProjectArbitrary(ctx context.Context,
-	req *osopb3.CreateOriginProjectArbitraryRequest,
-	opts ...grpc.CallOption) (*osopb3.CreateOriginProjectArbitraryResponse, error) {
+	req *osopb3.CreateOriginProjectArbitraryRequest) (*osopb3.CreateOriginProjectArbitraryResponse, error) {
 	return nil, errNotImplemented
 }
 
 func (u *UserResource) FindProject(ctx context.Context,
-	req *osopb3.FindProjectRequest,
-	opts ...grpc.CallOption) (*osopb3.FindProjectResponse, error) {
+	req *osopb3.FindProjectRequest) (*osopb3.FindProjectResponse, error) {
 	if req.Name == "" {
 		return nil, errors.New("Unexpected")
 	}
@@ -72,25 +70,16 @@ func (u *UserResource) createProject(request *restful.Request, response *restful
 }
 
 func (u *UserResource) CreateProject(ctx context.Context,
-	req *osopb3.CreateProjectRequest,
-	opts ...grpc.CallOption) (*osopb3.CreateProjectResponse, error) {
-	return nil, errNotImplemented
-}
-
-func (u *UserResource) LookupProjects(ctx context.Context,
-	req *osopb3.LookupProjectsRequest,
-	opts ...grpc.CallOption) (*osopb3.LookupProjectsResponse, error) {
+	req *osopb3.CreateOriginProjectRequest) (*osopb3.CreateOriginProjectResponse, error) {
 	return nil, errNotImplemented
 }
 
 func (u *UserResource) OpenProject(ctx context.Context,
-	req *osopb3.OpenProjectRequest,
-	opts ...grpc.CallOption) (*osopb3.OpenProjectResponse, error) {
+	req *osopb3.FindProjectRequest) (*osopb3.FindProjectResponse, error) {
 	return nil, errNotImplemented
 }
 
 func (u *UserResource) DeleteProject(ctx context.Context,
-	req *osopb3.DeleteProjectRequest,
-	opts ...grpc.CallOption) (*osopb3.DeleteProjectResponse, error) {
+	req *osopb3.DeleteProjectRequest) (*osopb3.DeleteProjectResponse, error) {
 	return nil, errNotImplemented
 }

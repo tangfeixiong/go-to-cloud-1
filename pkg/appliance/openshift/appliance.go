@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/proto/paas/ci/openshift"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 	// "github.com/tangfeixiong/go-to-cloud-1/pkg/server"
 )
 
@@ -26,7 +26,8 @@ func init() {
 	//openshift.RegisterSimpleServiceServer(server.ApiServer.GrpcRootServer, oss)
 }
 
-func (oss *ossvc) EnterWorkspace(context.Context, *openshift.EnterWorkspaceRequest) (*openshift.EnterWorkspaceResponse, error) {
+func (oss *ossvc) EnterWorkspace(context.Context,
+    in *osopb3.EnterWorkspaceRequest) (*osopb3.EnterWorkspaceResponse, error) {
 	glog.Info("grpc request")
 	return nil, errNotImplemented
 }

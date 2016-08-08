@@ -1,0 +1,881 @@
+
+* Vendoring 
+
+[vagrant@localhost go-to-cloud-1]$ git clone --depth=1 https://github.com/openshift/origin _vendor/src/github.com/openshift/origin
+
+[vagrant@localhost go-to-cloud-1]$ ln -s _vendor/src vendor
+
+* Restore dependent projects
+
+[vagrant@localhost go-to-cloud-1]$ cd _vendor/src/github.com/openshift/origin
+
+[vagrant@localhost origin]$ GOPATH=/work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor godep restore -v
+
+* Pull Openshift forked repositories
+
+godep: Downloading dependency (if needed): github.com/RangelReale/osin
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/RangelReale/osin; git checkout 3464e46061256f6b3f23e14390b6e87a54eff386
+fatal: 引用不是一个树：3464e46061256f6b3f23e14390b6e87a54eff386
+godep: error downloading dep (github.com/RangelReale/osin): exit status 128
+
+
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/coreos/etcd; git checkout fbdb52decb4b74cbe93df01ce7f4728dae91511c
+fatal: 引用不是一个树：fbdb52decb4b74cbe93df01ce7f4728dae91511c
+godep: error downloading dep (github.com/coreos/etcd/alarm): exit status 128
+
+
+godep: Downloading dependency (if needed): github.com/docker/distribution
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/docker/distribution; git checkout 559433598c7be9d30d6cfc5cad5b5dfdb686725c
+fatal: 引用不是一个树：559433598c7be9d30d6cfc5cad5b5dfdb686725c
+godep: error downloading dep (github.com/docker/distribution): exit status 128
+
+
+godep: Downloading dependency (if needed): github.com/docker/docker/builder/command
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/docker/docker; git checkout 0f5c9d301b9b1cca66b3ea0f9dec3b5317d3686d
+error: The following untracked working tree files would be overwritten by checkout:
+	vendor/src/github.com/microsoft/hcsshim/LICENSE
+	vendor/src/github.com/microsoft/hcsshim/activatelayer.go
+	vendor/src/github.com/microsoft/hcsshim/createcomputesystem.go
+	vendor/src/github.com/microsoft/hcsshim/createlayer.go
+	vendor/src/github.com/microsoft/hcsshim/createprocess.go
+	vendor/src/github.com/microsoft/hcsshim/createsandboxlayer.go
+	vendor/src/github.com/microsoft/hcsshim/deactivatelayer.go
+	vendor/src/github.com/microsoft/hcsshim/destroylayer.go
+	vendor/src/github.com/microsoft/hcsshim/exportlayer.go
+	vendor/src/github.com/microsoft/hcsshim/getlayermountpath.go
+	vendor/src/github.com/microsoft/hcsshim/getsharedbaseimages.go
+	vendor/src/github.com/microsoft/hcsshim/guid.go
+	vendor/src/github.com/microsoft/hcsshim/hcsshim.go
+	vendor/src/github.com/microsoft/hcsshim/importlayer.go
+	vendor/src/github.com/microsoft/hcsshim/layerexists.go
+	vendor/src/github.com/microsoft/hcsshim/layerutils.go
+	vendor/src/github.com/microsoft/hcsshim/preparelayer.go
+	vendor/src/github.com/microsoft/hcsshim/resizeconsole.go
+	vendor/src/github.com/microsoft/hcsshim/startcomputesystem.go
+	vendor/src/github.com/microsoft/hcsshim/terminateprocess.go
+	vendor/src/github.com/microsoft/hcsshim/unpreparelayer.go
+	vendor/src/github.com/microsoft/hcsshim/waitprocess.go
+Please move or remove them before you can switch branches.
+Aborting
+godep: error downloading dep (github.com/docker/docker/builder/command): exit status 1
+
+
+godep: Downloading dependency (if needed): github.com/emicklei/go-restful
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/emicklei/go-restful; git checkout 152183b11abcd2b07ee814c8da82296340949747
+fatal: 引用不是一个树：152183b11abcd2b07ee814c8da82296340949747
+godep: error downloading dep (github.com/emicklei/go-restful): exit status 128
+
+
+godep: Downloading dependency (if needed): github.com/golang/glog
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/golang/glog; git checkout 335da9dda11408a34b64344f82e9c03779b71673
+fatal: 引用不是一个树：335da9dda11408a34b64344f82e9c03779b71673
+godep: error downloading dep (github.com/golang/glog): exit status 128
+
+
+godep: Downloading dependency (if needed): github.com/skynetservices/skydns/cache
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/skynetservices/skydns; git checkout 30763c4e568fe411f1663af553c063cec8879929
+fatal: 引用不是一个树：30763c4e568fe411f1663af553c063cec8879929
+godep: error downloading dep (github.com/skynetservices/skydns/cache): exit status 128
+
+
+godep: Downloading dependency (if needed): k8s.io/kubernetes/cmd/genutils
+# cd /work/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/k8s.io/kubernetes; git checkout 507d3a7b242634b131710cfdfd55e3a1531ffb1b
+fatal: 引用不是一个树：507d3a7b242634b131710cfdfd55e3a1531ffb1b
+godep: error downloading dep (k8s.io/kubernetes/cmd/genutils): exit status 128
+
+
+
+
+
+* Exclude duplicated vendoring directory
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/k8s.io vendor/github.com/openshift/origin/vendor/k8s.io-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/spf13 vendor/github.com/openshift/origin/vendor/github.com/spf13-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/spf13 vendor/k8s.io/kubernetes/vendor/github.com/spf13-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/coreos/etcd vendor/github.com/openshift/origin/vendor/github.com/coreos/etcd-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/coreos/etcd vendor/k8s.io/kubernetes/vendor/github.com/coreos/etcd-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/docker/engine-api vendor/github.com/openshift/origin/vendor/github.com/docker/engine-api-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/docker/engine-api vendor/k8s.io/kubernetes/vendor/github.com/docker/engine-api-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/emicklei/go-restful vendor/github.com/openshift/origin/vendor/github.com/emicklei/go-restful-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/emicklei/go-restful vendor/k8s.io/kubernetes/vendor/github.com/emicklei/go-restful-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/golang/glog vendor/github.com/openshift/origin/vendor/github.com/golang/glog-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/golang/glog vendor/k8s.io/kubernetes/vendor/github.com/golang/glog-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/docker/go-connections vendor/github.com/openshift/origin/vendor/github.com/docker/go-connections-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/docker/go-connections vendor/k8s.io/kubernetes/vendor/github.com/docker/go-connections-exclude
+
+[vagrant@localhost go-to-cloud-1]$ mv vendor/github.com/openshift/origin/vendor/github.com/docker/docker vendor/github.com/openshift/origin/vendor/github.com/docker/docker-exclude
+[vagrant@localhost go-to-cloud-1]$ mv vendor/k8s.io/kubernetes/vendor/github.com/docker/docker vendor/k8s.io/kubernetes/vendor/github.com/docker/docker-exclude
+
+panic: http: multiple registrations for /debug/requests
+
+/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/github.com/coreos/etcd/cmd/vendor/golang.org/x/net/trace/trace.go
+
+[vagrant@localhost go-to-cloud-1]$ mv _vendor/src/github.com/coreos/etcd/cmd/vendor/golang.org/x/net _vendor/src/github.com/coreos/etcd/cmd/vendor/golang.org/x/net-exclude
+
+/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/coreos/rkt/Godeps/_workspace/src/golang.org/x/net/trace/trace.go
+
+[vagrant@localhost go-to-cloud-1]$ mv _vendor/src/github.com/coreos/rkt/Godeps/_workspace/src/golang.org/x/net _vendor/src/github.com/coreos/rkt/Godeps/_workspace/src/golang.org/x/net-exclude
+
+/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/docker/distribution/vendor/golang.org/x/net/trace/trace.go
+
+[vagrant@localhost go-to-cloud-1]$ mv _vendor/src/github.com/docker/distribution/vendor/golang.org/x/net _vendor/src/github.com/docker/distribution/vendor/golang.org/x/net-exclude
+
+/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/google/cadvisor/Godeps/_workspace/src/golang.org/x/net/trace/trace.go
+
+[vagrant@localhost go-to-cloud-1]$ mv _vendor/src/github.com/google/cadvisor/Godeps/_workspace/src/golang.org/x/net _vendor/src/github.com/google/cadvisor/Godeps/_workspace/src/golang.org/x/net-exclude
+
+/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/github.com/openshift/origin/vendor/golang.org/x/net/trace/trace.go
+
+[vagrant@localhost go-to-cloud-1]$ mv _vendor/src/github.com/openshift/origin/vendor/golang.org/x/net _vendor/src/github.com/openshift/origin/vendor/golang.org/x/net-exclude
+
+/Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-cloud-1/_vendor/src/k8s.io/kubernetes/vendor/golang.org/x/net/trace/trace.go
+
+[vagrant@localhost go-to-cloud-1]$ mv _vendor/src/k8s.io/kubernetes/vendor/golang.org/x/net _vendor/src/k8s.io/kubernetes/vendor/golang.org/x/net-exclude
+
+
+
+
+
+
+* Modify Kubernetes code
+
+vendor/k8s.io/kubernetes/pkg/client/unversioned/client.go
+
+Line 47
+
+	Apps() AppsInterface
+
+vendor/k8s.io/kubernetes/pkg/client/unversioned/conditions.go
+
+Line 124-126
+
+// ErrContainerTerminated is returned by PodContainerRunning in the intermediate
+// state where the pod indicates it's still running, but its container is already terminated
+var ErrContainerTerminated = fmt.Errorf("container terminated")
+
+Line 224-226
+
+				if s.State.Terminated != nil {
+					return false, ErrContainerTerminated
+				}
+
+
+
+### Example
+
+[vagrant@localhost kubernetes]$ GOPATH=/work go build -v -o /data/bin/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/golang/glog
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/spf13/pflag
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/emicklei/go-restful/log
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/emicklei/go-restful
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/flagtypes
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/spf13/cobra
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/golang/protobuf/proto
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/gengo/grpc-gateway/utilities
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/context
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/internal/timeseries
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/trace
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/codes
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/credentials
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/grpclog
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/metadata
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/gengo/grpc-gateway/runtime/internal
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/golang/protobuf/jsonpb
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/naming
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/http2/hpack
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/peer
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/http2
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/golang/protobuf/protoc-gen-go/descriptor
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gogo/protobuf/proto
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc/transport
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/third_party/forked/reflect
+github.com/tangfeixiong/go-to-cloud-1/vendor/google.golang.org/grpc
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/conversion
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/gogo/protobuf/proto
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/gengo/grpc-gateway/runtime
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/types
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/meta/metatypes
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/google/gofuzz
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/sets
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/labels
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/conversion/queryparams
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/json
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/davecgh/go-spew/spew
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/gopkg.in/inf.v0
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/resource
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/auth/user
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/fields
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/gopkg.in/yaml.v2
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/extension
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/meta
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/ghodss/yaml
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/ugorji/go/codec
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/framer
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/yaml
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime/serializer/protobuf
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime/serializer/recognizer
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime/serializer/versioning
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/mount
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/docker/go-units
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/opencontainers/runc/libcontainer/configs
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/opencontainers/runc/libcontainer/cgroups
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/opencontainers/runc/libcontainer/system
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/opencontainers/runc/libcontainer/cgroups/fs
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/pborman/uuid
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/runtime
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/wait
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/intstr
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/rand
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/emicklei/go-restful/swagger
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/hash
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/net/sets
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/validation/field
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/unversioned/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/docker/distribution/digest
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/docker/distribution/reference
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/parsers
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime/serializer/streaming
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/net
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/watch
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/watch/versioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apimachinery
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apimachinery/registered
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/capabilities
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/dgrijalva/jwt-go
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/auth/authenticator
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/namer
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/blang/semver
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/digest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/Sirupsen/logrus
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime/serializer/json
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/uuid
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/runtime/serializer
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gorilla/context
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gorilla/mux
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/context
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/reference
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/manifest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/libtrust
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/manifest/schema1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/endpoints
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/pod
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/service
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/securitycontextconstraints/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/manifest/schema2
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/opts
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/Sirupsen/logrus
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/fileutils
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/go-units
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/system
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/idtools
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/golang.org/x/net/context
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/ioutils
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/pools
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/promise
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/archive
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/opencontainers/runc/libcontainer/user
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/homedir
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/docker/docker/pkg/stdcopy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient/external/github.com/hashicorp/go-cleanhttp
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsouza/go-dockerclient
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/image/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/autoscaling
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/batch
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/extensions
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/oauth/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/serviceaccount
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/route/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/sdn/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/security/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/template/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/latest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/beorn7/perks/quantile
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/golang/protobuf/proto
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/prometheus/common/model
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/prometheus/procfs
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/extensions/v1beta1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/prometheus/client_model/go
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/matttproud/golang_protobuf_extensions/pbutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/prometheus/common/expfmt
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/prometheus/client_golang/prometheus
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/version
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/beorn7/perks/quantile
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/golang/protobuf/proto
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/prometheus/common/model
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/prometheus/client_model/go
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/matttproud/golang_protobuf_extensions/pbutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/prometheus/procfs
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/prometheus/common/expfmt
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/transport
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/prometheus/client_golang/prometheus
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/crypto
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/juju/ratelimit
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/integer
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/flowcontrol
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/blang/semver
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/google/cadvisor/info/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/metrics
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/version
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/restclient
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/apps
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/apps/v1alpha1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/extensions/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/typed/discovery
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/apps/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/authentication
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/authorization
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/authentication/v1beta1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/authorization/v1beta1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/authorization/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/authentication/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/autoscaling/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/batch/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/autoscaling/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/batch/v2alpha1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/extensions/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/componentconfig
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/qos/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/batch/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/qos
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/master/ports
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/componentconfig/v1alpha1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/policy
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/policy/v1alpha1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/componentconfig/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/rbac
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/policy/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/rbac/v1alpha1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/golang.org/x/oauth2/internal
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/golang.org/x/oauth2
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/golang.org/x/oauth2/jws
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/rbac/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/golang.org/x/oauth2/jwt
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/context/ctxhttp
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/cloud/internal
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-oidc/jose
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/cloud/compute/metadata
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-systemd/journal
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/golang.org/x/oauth2/google
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/pkg/capnslog
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/plugin/pkg/client/auth/gcp
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-oidc/http
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/pkg/httputil
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-oidc/oauth2
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/pkg/health
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/pkg/timeutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/jonboulle/clockwork
+github.com/tangfeixiong/go-to-cloud-1/vendor/gopkg.in/yaml.v2
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-oidc/key
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-oidc/oidc
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/plugin/pkg/client/auth/oidc
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/ghodss/yaml
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/plugin/pkg/client/auth
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/helm/helm-classic/codec
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/pborman/uuid
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/RangelReale/osin
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/authenticator
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/oauth/handlers
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/client
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/rest
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/cache
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/storage
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/client
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/generic
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/registry/identity
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/registry/user
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/registry/useridentitymapping
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/userregistry/identitymapper
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/bitbucket.org/ww/goautoneg
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/httprequest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/server/errorpage
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gorilla/securecookie
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gorilla/sessions
+github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/server/session
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/server/csrf
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/server/login
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/server/selectprovider
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/policy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/clusterpolicy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/term
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/evanphx/json-patch
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/federation/apis/federation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/federation/client/clientset_generated/federation_internalclientset/typed/core/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/federation/apis/federation/v1beta1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/federation/client/clientset_generated/federation_internalclientset/typed/federation/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/authentication/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/autoscaling/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/federation/apis/federation/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/batch/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/federation/client/clientset_generated/federation_internalclientset
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/core/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset/typed/rbac/unversioned
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/imdario/mergo
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/auth
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/clientset_generated/internalclientset
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api/latest
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/homedir
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/clientcmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/adapters/internalclientset
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/golang/groupcache/lru
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/third_party/forked/json
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/strategicpatch
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/diff
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/record
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/controller/framework
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/annotations
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/blkiodev
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/strslice
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/go-connections/nat
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/controller
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/go-units
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/container
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/versions
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/filters
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/network
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/registry
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/credentialprovider
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/fieldpath
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/security/podsecuritypolicy/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/labels
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/pod
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/extensions/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/replicaset
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/deployment
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/thirdpartyresourcedata
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/third_party/golang/template
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/jsonpath
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/resource
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/slice
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/flag
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/interrupt
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/term
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/pem
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/client
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/etcd/pkg/pathutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/etcd/pkg/types
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/ugorji/go/codec
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/etcd/client
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/ugorji/go/codec
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-etcd/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/storage/etcd/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/flags
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/admission
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/storage/storagebackend
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/config
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/genericapiserver/options
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/api/errors/storage
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/storage/etcd/metrics
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/cache
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/storage/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/generic/registry
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/cmd/kube-apiserver/app/options
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/policybinding
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/clusterpolicybinding
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/coreos/go-etcd/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/role
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/interfaces
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/rulevalidation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/role/policybased
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/restoptions
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/clusterrole/proxy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/clusterpolicy/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/clusterpolicybinding/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/rolebinding
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/policy/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/rolebinding/policybased
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/policybinding/etcd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/authenticator/request/x509request
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/third_party/golang/netutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/config
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/registry/clusterrolebinding/proxy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/parsers
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/units
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph/encoding/dot
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/blas
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/blas/native/internal/math32
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/internal/asm
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph/internal
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/blas/native
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/lapack
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/MakeNowJust/heredoc
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph/traverse
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph/topo
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/dot
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/parallel
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/controller/framework/informers
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/blas/blas64
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/lapack/native
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/metrics
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/workqueue
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/controller/replication
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/lapack/lapack64
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/matrix/mat64
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/gopkg.in/yaml.v2
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph/concrete
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/gonum/graph/path
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/graph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/ghodss/yaml
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/kubegraph/nodes
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/image/graph/nodes
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/graph/nodes
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/graph/nodes
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/graph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/kubegraph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/graph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/image/graph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/route/graph/nodes
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/route/graph
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/kubegraph/analysis
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/graph/analysis
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/graph/graphview
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/graph/analysis
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/route/graph/analysis
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/api/latest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/describe
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/bootstrappolicy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/crypto
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/api/restmapper
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/reaper
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/reaper
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/cmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/generator
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/route/generator
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/reaper
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/variable
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/config/cmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/clientcmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/labelselector
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/registry/projectrequest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/registry/projectrequest/delegated
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/daviddengcn/go-colortext
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/log
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/diagnostics/options
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/types
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/templates
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/authenticator/redirector
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/gopkg.in/asn1-ber.v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/admin
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/client
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/policy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/gopkg.in/ldap.v2
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/cert
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/security/mcs
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/ldaputil/ldapclient
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/auth/ldaputil
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/security/uid
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/leaderelection
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/appc/spec/schema/common
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/cmd/kube-controller-manager/app/options
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-semver/semver
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/appc/spec/schema/types
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/go4.org/errorutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/godbus/dbus
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/appc/spec/schema
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-systemd/unit
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/codes
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/go-systemd/dbus
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/credentials
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/grpclog
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/metadata
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/naming
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/peer
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc/transport
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/kr/pty
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/util/format
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/cloudprovider
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/google.golang.org/grpc
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/chmod
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/chown
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/io
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/exec
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/mount
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/coreos/rkt/api/v1alpha
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/volume/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/third_party/golang/expansion
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/leaky
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/types
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/volume
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/util/ioutils
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/sysctl
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/network/hairpin
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/securitycontext
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/opencontainers/runc/libcontainer/selinux
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/selinux
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/strings
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/bitbucket.org/ww/goautoneg
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/websocket
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/container
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apiserver/metrics
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/auth/authorizer
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/abac
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/lifecycle
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/network
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/prober/results
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/abac/v0
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/rkt
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/abac/v1beta1
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/abac/latest
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/auth/authorizer/abac
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/auth/authorizer/union
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/httplog
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/probe
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/probe/http
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apis/rbac/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/clusterrole
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/cmd/kubelet/app/options
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/clusterrolebinding
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/role
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/rolebinding
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/flushwriter
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/httpstream
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/html/atom
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/html
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/host
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/proxy
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/wsstream
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/plugin/pkg/auth/authorizer/rbac
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/plugin/pkg/webhook
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/plugin/pkg/auth/authorizer/webhook
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/registry/clusterresourcequota
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/apiserver
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/namespace
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/client/cache
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/controller/shared
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/authorization/authorizer
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/cache
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/quota
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/controller/clusterquotamapping
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/miekg/dns
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/admission
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/service/admission
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/cluster
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/pod
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/diagnostics/systemd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync/interfaces
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/diagnostics
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync/groupdetector
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync/ad
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync/syncerror
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync/rfc2307
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups/sync/cli
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/migrate
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/groups
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/migrate/images
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/migrate/storage
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/network
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/node
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/project
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/prune
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/deploy/prune
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/docker/distribution/registry/api/errcode
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/image/prune
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/builder/command
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/builder/parser
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/dockerregistry
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/prune
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/dockerfile
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/util/glog
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/util/user
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/scm/git
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/git
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/source
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/template/generator
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/stringreplace
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/template
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/docker/dockerfile
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/security/scc
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/app
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/file
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/top
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/go-systemd/journal
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/pkg/capnslog
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/registry
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin/router
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/etcd/pkg/fileutil
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/coreos/etcd/version
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/image/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/webhook
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/rest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/api/validation
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/create
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/registry/build
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/registry/buildconfig
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/prefixwriter
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/timeutils
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/jsonmessage
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/Sirupsen/logrus
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/distribution/digest
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/distribution/reference
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/docker/pkg/stdcopy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/opencontainers/runc/libcontainer/user
+github.com/tangfeixiong/go-to-cloud-1/vendor/golang.org/x/net/proxy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/reference
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/types/time
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/go-connections/sockets
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/go-connections/tlsconfig
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/custommetrics
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/client/transport
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/metrics
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/client/transport/cancellable
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/util/cache
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/docker/engine-api/client
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/oom
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/procfs
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/tokencmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/app/cmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/dockertools
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/serviceaccounts/util
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/source-to-image/pkg/tar
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/daviddengcn/go-colortext
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/server/portforward
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/portforward
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/util/docker
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/docker/spdystream/spdy
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd/config
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/vendor/github.com/docker/spdystream
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/httpstream/spdy
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd/rollout
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubelet/server/remotecommand
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/client/unversioned/remotecommand
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd/set
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd/util/editor
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd/util/jsonmerge
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/crlf
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/controller
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/kubectl/cmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/endpoint
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/util/node
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/node
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/persistentvolume
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/persistentvolumeclaim
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/pod
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/resourcequota
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/secret
+github.com/tangfeixiong/go-to-cloud-1/vendor/k8s.io/kubernetes/pkg/registry/serviceaccount
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/experimental/buildchain
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/ipfailover
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/ipfailover/keepalived
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/experimental/ipfailover
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/imagebuilder/imageprogress
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/errors
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/dockerhelper
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/localcmd
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/dockermachine
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/run
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/host
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/exec
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/admin
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/admission/defaults/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/admission/defaults/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/admission/defaults/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/admission/overrides/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/admission/overrides/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/admission/overrides/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/admission/requestlimit/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/admission/requestlimit/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/admission/requestlimit/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/admission/clusterresourceoverride/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/admission/clusterresourceoverride/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/admission/clusterresourceoverride/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/admission/runonceduration/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/admission/runonceduration/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/scheduler/admission/podnodeconstraints/api
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/quota/admission/runonceduration/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/scheduler/admission/podnodeconstraints/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/scheduler/admission/podnodeconstraints/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/imagebuilder/signal
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/imagebuilder/strslice
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/imagebuilder
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/server/api/install
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/openshift/imagebuilder/dockerclient
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker/openshift
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/dockerbuild
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/appjson
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/flynn/go-shlex
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/third_party/github.com/docker/libcompose/project
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/generate/dockercompose
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/importer
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/bootstrap/docker
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/rollout
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/cluster
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/vendor/github.com/fsnotify/fsnotify
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/util/fsnotification
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/rsync
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/cmd/set
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/policy
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/serviceaccounts
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/build/builder/cmd/scmauth
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/sa
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli/secrets
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/project/api/v1
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/cmd/cli
+github.com/tangfeixiong/go-to-cloud-1/vendor/github.com/openshift/origin/pkg/user/api/v1
+github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/api
+github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin
+github.com/tangfeixiong/go-to-cloud-1/pkg/service
+github.com/tangfeixiong/go-to-cloud-1/pkg/server
+github.com/tangfeixiong/go-to-cloud-1/cmd/apaas/app
+github.com/tangfeixiong/go-to-cloud-1/cmd/apaas

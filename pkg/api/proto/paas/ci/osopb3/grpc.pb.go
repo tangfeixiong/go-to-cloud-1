@@ -7,16 +7,43 @@
 
 	It is generated from these files:
 		paas/ci/osopb3/grpc.proto
+		paas/ci/osopb3/model.proto
 
 	It has these top-level messages:
+		ProjectResponseDataArbitrary
+		ProjectCreationRequestData
+		ProjectCreationResponseData
+		ProjectRetrieveRequestData
+		ProjectRetrieveResponseData
+		ProjectUpdationRequestData
+		ProjectDeletionRequestData
+		ProjectDeletionResponseData
 		CreateOriginProjectRequest
 		CreateOriginProjectResponse
-		CreateOriginProjectArbitraryRequest
-		CreateOriginProjectArbitraryResponse
 		FindProjectRequest
 		FindProjectResponse
 		DeleteProjectRequest
 		DeleteProjectResponse
+		DockerBuildConfigRequestData
+		DockerBuildConfigResponseData
+		DockerBuildRequestData
+		DockerBuildResponseData
+		RawData
+		K8STypeMeta
+		K8SListMeta
+		K8SUnversionedTime
+		K8SResourceQuantity
+		OwnerReference
+		K8SObjectMeta
+		K8SObjectReference
+		K8SLocalObjectReference
+		K8SResourceRequirements
+		SecretKeySelector
+		ConfigMapKeySelector
+		ResourceFieldSelector
+		ObjectFieldSelector
+		EnvVarSource
+		K8SEnvVar
 		SourceControlUser
 		GitSourceRevision
 		SourceRevision
@@ -43,11 +70,6 @@
 		ImageChangeCause
 		OsoBuildTriggerCause
 		OsoBuildStatus
-		DockerBuildConfigRequestData
-		DockerBuildConfigResponseData
-		DockerBuildRequestData
-		DockerBuildResponseData
-		RawData
 */
 package osopb3
 
@@ -55,9 +77,6 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api"
-import github_com_openshift_origin_pkg_build_api_v1 "github.com/openshift/origin/pkg/build/api/v1"
-import k8s_io_kubernetes_pkg_api_unversioned "k8s.io/kubernetes/pkg/api/unversioned"
-import k8s_io_kubernetes_pkg_api_v1 "k8s.io/kubernetes/pkg/api/v1"
 
 import (
 	context "golang.org/x/net/context"
@@ -74,137 +93,6 @@ var _ = math.Inf
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
 const _ = proto.ProtoPackageIsVersion1
-
-type BuildStrategy_OsoBuildStrategyType int32
-
-const (
-	BuildStrategy_Docker          BuildStrategy_OsoBuildStrategyType = 0
-	BuildStrategy_Source          BuildStrategy_OsoBuildStrategyType = 1
-	BuildStrategy_Custom          BuildStrategy_OsoBuildStrategyType = 2
-	BuildStrategy_JenkinsPipeline BuildStrategy_OsoBuildStrategyType = 3
-)
-
-var BuildStrategy_OsoBuildStrategyType_name = map[int32]string{
-	0: "Docker",
-	1: "Source",
-	2: "Custom",
-	3: "JenkinsPipeline",
-}
-var BuildStrategy_OsoBuildStrategyType_value = map[string]int32{
-	"Docker":          0,
-	"Source":          1,
-	"Custom":          2,
-	"JenkinsPipeline": 3,
-}
-
-func (x BuildStrategy_OsoBuildStrategyType) String() string {
-	return proto.EnumName(BuildStrategy_OsoBuildStrategyType_name, int32(x))
-}
-func (BuildStrategy_OsoBuildStrategyType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{18, 0}
-}
-
-type BuildSource_OsoBuildSourceType int32
-
-const (
-	BuildSource_Git        BuildSource_OsoBuildSourceType = 0
-	BuildSource_Dockerfile BuildSource_OsoBuildSourceType = 1
-	BuildSource_Binary     BuildSource_OsoBuildSourceType = 2
-	BuildSource_Image      BuildSource_OsoBuildSourceType = 3
-	BuildSource_None       BuildSource_OsoBuildSourceType = 4
-)
-
-var BuildSource_OsoBuildSourceType_name = map[int32]string{
-	0: "Git",
-	1: "Dockerfile",
-	2: "Binary",
-	3: "Image",
-	4: "None",
-}
-var BuildSource_OsoBuildSourceType_value = map[string]int32{
-	"Git":        0,
-	"Dockerfile": 1,
-	"Binary":     2,
-	"Image":      3,
-	"None":       4,
-}
-
-func (x BuildSource_OsoBuildSourceType) String() string {
-	return proto.EnumName(BuildSource_OsoBuildSourceType_name, int32(x))
-}
-func (BuildSource_OsoBuildSourceType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{24, 0}
-}
-
-type OsoBuildTriggerPolicy_OsoBuildTriggerType int32
-
-const (
-	OsoBuildTriggerPolicy_GitHub       OsoBuildTriggerPolicy_OsoBuildTriggerType = 0
-	OsoBuildTriggerPolicy_Generic      OsoBuildTriggerPolicy_OsoBuildTriggerType = 1
-	OsoBuildTriggerPolicy_ImageChange  OsoBuildTriggerPolicy_OsoBuildTriggerType = 2
-	OsoBuildTriggerPolicy_ConfigChange OsoBuildTriggerPolicy_OsoBuildTriggerType = 3
-	OsoBuildTriggerPolicy_GoGits       OsoBuildTriggerPolicy_OsoBuildTriggerType = 4
-)
-
-var OsoBuildTriggerPolicy_OsoBuildTriggerType_name = map[int32]string{
-	0: "GitHub",
-	1: "Generic",
-	2: "ImageChange",
-	3: "ConfigChange",
-	4: "GoGits",
-}
-var OsoBuildTriggerPolicy_OsoBuildTriggerType_value = map[string]int32{
-	"GitHub":       0,
-	"Generic":      1,
-	"ImageChange":  2,
-	"ConfigChange": 3,
-	"GoGits":       4,
-}
-
-func (x OsoBuildTriggerPolicy_OsoBuildTriggerType) String() string {
-	return proto.EnumName(OsoBuildTriggerPolicy_OsoBuildTriggerType_name, int32(x))
-}
-func (OsoBuildTriggerPolicy_OsoBuildTriggerType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{28, 0}
-}
-
-type OsoBuildStatus_OsoBuildPhase int32
-
-const (
-	OsoBuildStatus_New       OsoBuildStatus_OsoBuildPhase = 0
-	OsoBuildStatus_Pending   OsoBuildStatus_OsoBuildPhase = 1
-	OsoBuildStatus_Running   OsoBuildStatus_OsoBuildPhase = 2
-	OsoBuildStatus_Complete  OsoBuildStatus_OsoBuildPhase = 3
-	OsoBuildStatus_Failed    OsoBuildStatus_OsoBuildPhase = 4
-	OsoBuildStatus_Error     OsoBuildStatus_OsoBuildPhase = 5
-	OsoBuildStatus_Cancelled OsoBuildStatus_OsoBuildPhase = 6
-)
-
-var OsoBuildStatus_OsoBuildPhase_name = map[int32]string{
-	0: "New",
-	1: "Pending",
-	2: "Running",
-	3: "Complete",
-	4: "Failed",
-	5: "Error",
-	6: "Cancelled",
-}
-var OsoBuildStatus_OsoBuildPhase_value = map[string]int32{
-	"New":       0,
-	"Pending":   1,
-	"Running":   2,
-	"Complete":  3,
-	"Failed":    4,
-	"Error":     5,
-	"Cancelled": 6,
-}
-
-func (x OsoBuildStatus_OsoBuildPhase) String() string {
-	return proto.EnumName(OsoBuildStatus_OsoBuildPhase_name, int32(x))
-}
-func (OsoBuildStatus_OsoBuildPhase) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{33, 0}
-}
 
 type DockerBuildConfigRequestData_OsoBuildRunPolicy int32
 
@@ -229,7 +117,175 @@ func (x DockerBuildConfigRequestData_OsoBuildRunPolicy) String() string {
 	return proto.EnumName(DockerBuildConfigRequestData_OsoBuildRunPolicy_name, int32(x))
 }
 func (DockerBuildConfigRequestData_OsoBuildRunPolicy) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{34, 0}
+	return fileDescriptorGrpc, []int{14, 0}
+}
+
+//
+// Project
+//
+type ProjectResponseDataArbitrary struct {
+	Name          string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Result        string            `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
+	Finalizers    []string          `protobuf:"bytes,3,rep,name=finalizers" json:"finalizers,omitempty"`
+	Datatype      *K8STypeMeta      `protobuf:"bytes,4,opt,name=datatype" json:"datatype,omitempty"`
+	Metadata      *K8SObjectMeta    `protobuf:"bytes,5,opt,name=metadata" json:"metadata,omitempty"`
+	ResultingCode K8SNamespacePhase `protobuf:"varint,6,opt,name=resultingCode,proto3,enum=paas.ci.osopb3.K8SNamespacePhase" json:"resultingCode,omitempty"`
+	Raw           *RawData          `protobuf:"bytes,7,opt,name=raw" json:"raw,omitempty"`
+}
+
+func (m *ProjectResponseDataArbitrary) Reset()                    { *m = ProjectResponseDataArbitrary{} }
+func (m *ProjectResponseDataArbitrary) String() string            { return proto.CompactTextString(m) }
+func (*ProjectResponseDataArbitrary) ProtoMessage()               {}
+func (*ProjectResponseDataArbitrary) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{0} }
+
+func (m *ProjectResponseDataArbitrary) GetDatatype() *K8STypeMeta {
+	if m != nil {
+		return m.Datatype
+	}
+	return nil
+}
+
+func (m *ProjectResponseDataArbitrary) GetMetadata() *K8SObjectMeta {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+func (m *ProjectResponseDataArbitrary) GetRaw() *RawData {
+	if m != nil {
+		return m.Raw
+	}
+	return nil
+}
+
+type ProjectCreationRequestData struct {
+	Name        string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Labels      map[string]string `protobuf:"bytes,2,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Annotations map[string]string `protobuf:"bytes,3,rep,name=annotations" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Finalizers  []string          `protobuf:"bytes,4,rep,name=finalizers" json:"finalizers,omitempty"`
+}
+
+func (m *ProjectCreationRequestData) Reset()                    { *m = ProjectCreationRequestData{} }
+func (m *ProjectCreationRequestData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectCreationRequestData) ProtoMessage()               {}
+func (*ProjectCreationRequestData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{1} }
+
+func (m *ProjectCreationRequestData) GetLabels() map[string]string {
+	if m != nil {
+		return m.Labels
+	}
+	return nil
+}
+
+func (m *ProjectCreationRequestData) GetAnnotations() map[string]string {
+	if m != nil {
+		return m.Annotations
+	}
+	return nil
+}
+
+type ProjectCreationResponseData struct {
+	Name       string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status     string            `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Finalizers []string          `protobuf:"bytes,3,rep,name=finalizers" json:"finalizers,omitempty"`
+	Phase      K8SNamespacePhase `protobuf:"varint,4,opt,name=phase,proto3,enum=paas.ci.osopb3.K8SNamespacePhase" json:"phase,omitempty"`
+	Raw        *RawData          `protobuf:"bytes,5,opt,name=raw" json:"raw,omitempty"`
+}
+
+func (m *ProjectCreationResponseData) Reset()                    { *m = ProjectCreationResponseData{} }
+func (m *ProjectCreationResponseData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectCreationResponseData) ProtoMessage()               {}
+func (*ProjectCreationResponseData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{2} }
+
+func (m *ProjectCreationResponseData) GetRaw() *RawData {
+	if m != nil {
+		return m.Raw
+	}
+	return nil
+}
+
+type ProjectRetrieveRequestData struct {
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *ProjectRetrieveRequestData) Reset()                    { *m = ProjectRetrieveRequestData{} }
+func (m *ProjectRetrieveRequestData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectRetrieveRequestData) ProtoMessage()               {}
+func (*ProjectRetrieveRequestData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{3} }
+
+type ProjectRetrieveResponseData struct {
+	Name       string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status     string            `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Finalizers []string          `protobuf:"bytes,3,rep,name=finalizers" json:"finalizers,omitempty"`
+	Phase      K8SNamespacePhase `protobuf:"varint,4,opt,name=phase,proto3,enum=paas.ci.osopb3.K8SNamespacePhase" json:"phase,omitempty"`
+	Raw        *RawData          `protobuf:"bytes,5,opt,name=raw" json:"raw,omitempty"`
+}
+
+func (m *ProjectRetrieveResponseData) Reset()                    { *m = ProjectRetrieveResponseData{} }
+func (m *ProjectRetrieveResponseData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectRetrieveResponseData) ProtoMessage()               {}
+func (*ProjectRetrieveResponseData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{4} }
+
+func (m *ProjectRetrieveResponseData) GetRaw() *RawData {
+	if m != nil {
+		return m.Raw
+	}
+	return nil
+}
+
+type ProjectUpdationRequestData struct {
+	Name        string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Labels      map[string]string `protobuf:"bytes,2,rep,name=labels" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Annotations map[string]string `protobuf:"bytes,3,rep,name=annotations" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (m *ProjectUpdationRequestData) Reset()                    { *m = ProjectUpdationRequestData{} }
+func (m *ProjectUpdationRequestData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectUpdationRequestData) ProtoMessage()               {}
+func (*ProjectUpdationRequestData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{5} }
+
+func (m *ProjectUpdationRequestData) GetLabels() map[string]string {
+	if m != nil {
+		return m.Labels
+	}
+	return nil
+}
+
+func (m *ProjectUpdationRequestData) GetAnnotations() map[string]string {
+	if m != nil {
+		return m.Annotations
+	}
+	return nil
+}
+
+type ProjectDeletionRequestData struct {
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *ProjectDeletionRequestData) Reset()                    { *m = ProjectDeletionRequestData{} }
+func (m *ProjectDeletionRequestData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectDeletionRequestData) ProtoMessage()               {}
+func (*ProjectDeletionRequestData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{6} }
+
+type ProjectDeletionResponseData struct {
+	Name       string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status     string            `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Finalizers []string          `protobuf:"bytes,3,rep,name=finalizers" json:"finalizers,omitempty"`
+	Phase      K8SNamespacePhase `protobuf:"varint,4,opt,name=phase,proto3,enum=paas.ci.osopb3.K8SNamespacePhase" json:"phase,omitempty"`
+	Raw        *RawData          `protobuf:"bytes,5,opt,name=raw" json:"raw,omitempty"`
+}
+
+func (m *ProjectDeletionResponseData) Reset()                    { *m = ProjectDeletionResponseData{} }
+func (m *ProjectDeletionResponseData) String() string            { return proto.CompactTextString(m) }
+func (*ProjectDeletionResponseData) ProtoMessage()               {}
+func (*ProjectDeletionResponseData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{7} }
+
+func (m *ProjectDeletionResponseData) GetRaw() *RawData {
+	if m != nil {
+		return m.Raw
+	}
+	return nil
 }
 
 type CreateOriginProjectRequest struct {
@@ -240,7 +296,7 @@ type CreateOriginProjectRequest struct {
 func (m *CreateOriginProjectRequest) Reset()                    { *m = CreateOriginProjectRequest{} }
 func (m *CreateOriginProjectRequest) String() string            { return proto.CompactTextString(m) }
 func (*CreateOriginProjectRequest) ProtoMessage()               {}
-func (*CreateOriginProjectRequest) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{0} }
+func (*CreateOriginProjectRequest) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{8} }
 
 type CreateOriginProjectResponse struct {
 	Id    string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -250,29 +306,7 @@ type CreateOriginProjectResponse struct {
 func (m *CreateOriginProjectResponse) Reset()                    { *m = CreateOriginProjectResponse{} }
 func (m *CreateOriginProjectResponse) String() string            { return proto.CompactTextString(m) }
 func (*CreateOriginProjectResponse) ProtoMessage()               {}
-func (*CreateOriginProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{1} }
-
-type CreateOriginProjectArbitraryRequest struct {
-	Odefv1RawData []byte `protobuf:"bytes,1,opt,name=odefv1RawData,proto3" json:"odefv1RawData,omitempty"`
-}
-
-func (m *CreateOriginProjectArbitraryRequest) Reset()         { *m = CreateOriginProjectArbitraryRequest{} }
-func (m *CreateOriginProjectArbitraryRequest) String() string { return proto.CompactTextString(m) }
-func (*CreateOriginProjectArbitraryRequest) ProtoMessage()    {}
-func (*CreateOriginProjectArbitraryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{2}
-}
-
-type CreateOriginProjectArbitraryResponse struct {
-	Odefv1RawData []byte `protobuf:"bytes,1,opt,name=odefv1RawData,proto3" json:"odefv1RawData,omitempty"`
-}
-
-func (m *CreateOriginProjectArbitraryResponse) Reset()         { *m = CreateOriginProjectArbitraryResponse{} }
-func (m *CreateOriginProjectArbitraryResponse) String() string { return proto.CompactTextString(m) }
-func (*CreateOriginProjectArbitraryResponse) ProtoMessage()    {}
-func (*CreateOriginProjectArbitraryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{3}
-}
+func (*CreateOriginProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{9} }
 
 type FindProjectRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -281,7 +315,7 @@ type FindProjectRequest struct {
 func (m *FindProjectRequest) Reset()                    { *m = FindProjectRequest{} }
 func (m *FindProjectRequest) String() string            { return proto.CompactTextString(m) }
 func (*FindProjectRequest) ProtoMessage()               {}
-func (*FindProjectRequest) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{4} }
+func (*FindProjectRequest) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{10} }
 
 type FindProjectResponse struct {
 	Odefv1RawData []byte `protobuf:"bytes,1,opt,name=odefv1RawData,proto3" json:"odefv1RawData,omitempty"`
@@ -290,7 +324,7 @@ type FindProjectResponse struct {
 func (m *FindProjectResponse) Reset()                    { *m = FindProjectResponse{} }
 func (m *FindProjectResponse) String() string            { return proto.CompactTextString(m) }
 func (*FindProjectResponse) ProtoMessage()               {}
-func (*FindProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{5} }
+func (*FindProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{11} }
 
 type DeleteProjectRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -299,7 +333,7 @@ type DeleteProjectRequest struct {
 func (m *DeleteProjectRequest) Reset()                    { *m = DeleteProjectRequest{} }
 func (m *DeleteProjectRequest) String() string            { return proto.CompactTextString(m) }
 func (*DeleteProjectRequest) ProtoMessage()               {}
-func (*DeleteProjectRequest) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{6} }
+func (*DeleteProjectRequest) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{12} }
 
 type DeleteProjectResponse struct {
 	Flag int64 `protobuf:"varint,1,opt,name=flag,proto3" json:"flag,omitempty"`
@@ -308,654 +342,11 @@ type DeleteProjectResponse struct {
 func (m *DeleteProjectResponse) Reset()                    { *m = DeleteProjectResponse{} }
 func (m *DeleteProjectResponse) String() string            { return proto.CompactTextString(m) }
 func (*DeleteProjectResponse) ProtoMessage()               {}
-func (*DeleteProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{7} }
-
-type SourceControlUser struct {
-	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-}
-
-func (m *SourceControlUser) Reset()                    { *m = SourceControlUser{} }
-func (m *SourceControlUser) String() string            { return proto.CompactTextString(m) }
-func (*SourceControlUser) ProtoMessage()               {}
-func (*SourceControlUser) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{8} }
-
-type GitSourceRevision struct {
-	Commit    string             `protobuf:"bytes,1,opt,name=commit,proto3" json:"commit,omitempty"`
-	Author    *SourceControlUser `protobuf:"bytes,2,opt,name=author" json:"author,omitempty"`
-	Committer *SourceControlUser `protobuf:"bytes,3,opt,name=committer" json:"committer,omitempty"`
-	Message   string             `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (m *GitSourceRevision) Reset()                    { *m = GitSourceRevision{} }
-func (m *GitSourceRevision) String() string            { return proto.CompactTextString(m) }
-func (*GitSourceRevision) ProtoMessage()               {}
-func (*GitSourceRevision) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{9} }
-
-func (m *GitSourceRevision) GetAuthor() *SourceControlUser {
-	if m != nil {
-		return m.Author
-	}
-	return nil
-}
-
-func (m *GitSourceRevision) GetCommitter() *SourceControlUser {
-	if m != nil {
-		return m.Committer
-	}
-	return nil
-}
-
-type SourceRevision struct {
-	Type string             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Git  *GitSourceRevision `protobuf:"bytes,2,opt,name=git" json:"git,omitempty"`
-}
-
-func (m *SourceRevision) Reset()                    { *m = SourceRevision{} }
-func (m *SourceRevision) String() string            { return proto.CompactTextString(m) }
-func (*SourceRevision) ProtoMessage()               {}
-func (*SourceRevision) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{10} }
-
-func (m *SourceRevision) GetGit() *GitSourceRevision {
-	if m != nil {
-		return m.Git
-	}
-	return nil
-}
-
-type BuildPostCommitSpec struct {
-	Command []string `protobuf:"bytes,1,rep,name=command" json:"command,omitempty"`
-	Args    []string `protobuf:"bytes,2,rep,name=args" json:"args,omitempty"`
-	Script  string   `protobuf:"bytes,3,opt,name=script,proto3" json:"script,omitempty"`
-}
-
-func (m *BuildPostCommitSpec) Reset()                    { *m = BuildPostCommitSpec{} }
-func (m *BuildPostCommitSpec) String() string            { return proto.CompactTextString(m) }
-func (*BuildPostCommitSpec) ProtoMessage()               {}
-func (*BuildPostCommitSpec) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{11} }
-
-type BuildOutput struct {
-	To         *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=to" json:"to,omitempty"`
-	PushSecret *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pushSecret" json:"pushSecret,omitempty"`
-}
-
-func (m *BuildOutput) Reset()                    { *m = BuildOutput{} }
-func (m *BuildOutput) String() string            { return proto.CompactTextString(m) }
-func (*BuildOutput) ProtoMessage()               {}
-func (*BuildOutput) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{12} }
-
-func (m *BuildOutput) GetTo() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.To
-	}
-	return nil
-}
-
-func (m *BuildOutput) GetPushSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.PushSecret
-	}
-	return nil
-}
-
-type JenkinsPipelineBuildStrategy struct {
-	JenkinsfilePath string `protobuf:"bytes,1,opt,name=jenkinsfilePath,proto3" json:"jenkinsfilePath,omitempty"`
-	Jenkinsfile     string `protobuf:"bytes,2,opt,name=jenkinsfile,proto3" json:"jenkinsfile,omitempty"`
-}
-
-func (m *JenkinsPipelineBuildStrategy) Reset()         { *m = JenkinsPipelineBuildStrategy{} }
-func (m *JenkinsPipelineBuildStrategy) String() string { return proto.CompactTextString(m) }
-func (*JenkinsPipelineBuildStrategy) ProtoMessage()    {}
-func (*JenkinsPipelineBuildStrategy) Descriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{13}
-}
-
-type SecretSpec struct {
-	SecretSource *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,1,opt,name=secretSource" json:"secretSource,omitempty"`
-	MountPath    string                                             `protobuf:"bytes,2,opt,name=mountPath,proto3" json:"mountPath,omitempty"`
-}
-
-func (m *SecretSpec) Reset()                    { *m = SecretSpec{} }
-func (m *SecretSpec) String() string            { return proto.CompactTextString(m) }
-func (*SecretSpec) ProtoMessage()               {}
-func (*SecretSpec) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{14} }
-
-func (m *SecretSpec) GetSecretSource() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.SecretSource
-	}
-	return nil
-}
-
-type CustomBuildStrategy struct {
-	From               *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
-	PullSecret         *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pullSecret" json:"pullSecret,omitempty"`
-	Env                []*k8s_io_kubernetes_pkg_api_v1.EnvVar             `protobuf:"bytes,3,rep,name=env" json:"env,omitempty"`
-	ExposeDockerSocket bool                                               `protobuf:"varint,4,opt,name=exposeDockerSocket,proto3" json:"exposeDockerSocket,omitempty"`
-	ForcePull          bool                                               `protobuf:"varint,5,opt,name=forcePull,proto3" json:"forcePull,omitempty"`
-	Secrets            []*SecretSpec                                      `protobuf:"bytes,6,rep,name=secrets" json:"secrets,omitempty"`
-	BuildAPIVersion    string                                             `protobuf:"bytes,7,opt,name=buildAPIVersion,proto3" json:"buildAPIVersion,omitempty"`
-}
-
-func (m *CustomBuildStrategy) Reset()                    { *m = CustomBuildStrategy{} }
-func (m *CustomBuildStrategy) String() string            { return proto.CompactTextString(m) }
-func (*CustomBuildStrategy) ProtoMessage()               {}
-func (*CustomBuildStrategy) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{15} }
-
-func (m *CustomBuildStrategy) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.From
-	}
-	return nil
-}
-
-func (m *CustomBuildStrategy) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.PullSecret
-	}
-	return nil
-}
-
-func (m *CustomBuildStrategy) GetEnv() []*k8s_io_kubernetes_pkg_api_v1.EnvVar {
-	if m != nil {
-		return m.Env
-	}
-	return nil
-}
-
-func (m *CustomBuildStrategy) GetSecrets() []*SecretSpec {
-	if m != nil {
-		return m.Secrets
-	}
-	return nil
-}
-
-type SourceBuildStrategy struct {
-	From        *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
-	PullSecret  *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pullSecret" json:"pullSecret,omitempty"`
-	Env         []*k8s_io_kubernetes_pkg_api_v1.EnvVar             `protobuf:"bytes,3,rep,name=env" json:"env,omitempty"`
-	Scripts     string                                             `protobuf:"bytes,4,opt,name=scripts,proto3" json:"scripts,omitempty"`
-	Incremental bool                                               `protobuf:"varint,5,opt,name=incremental,proto3" json:"incremental,omitempty"`
-	ForcePull   bool                                               `protobuf:"varint,6,opt,name=forcePull,proto3" json:"forcePull,omitempty"`
-}
-
-func (m *SourceBuildStrategy) Reset()                    { *m = SourceBuildStrategy{} }
-func (m *SourceBuildStrategy) String() string            { return proto.CompactTextString(m) }
-func (*SourceBuildStrategy) ProtoMessage()               {}
-func (*SourceBuildStrategy) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{16} }
-
-func (m *SourceBuildStrategy) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.From
-	}
-	return nil
-}
-
-func (m *SourceBuildStrategy) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.PullSecret
-	}
-	return nil
-}
-
-func (m *SourceBuildStrategy) GetEnv() []*k8s_io_kubernetes_pkg_api_v1.EnvVar {
-	if m != nil {
-		return m.Env
-	}
-	return nil
-}
-
-type DockerBuildStrategy struct {
-	From           *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
-	PullSecret     *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,2,opt,name=pullSecret" json:"pullSecret,omitempty"`
-	NoCache        bool                                               `protobuf:"varint,3,opt,name=noCache,proto3" json:"noCache,omitempty"`
-	Env            []*k8s_io_kubernetes_pkg_api_v1.EnvVar             `protobuf:"bytes,4,rep,name=env" json:"env,omitempty"`
-	ForcePull      bool                                               `protobuf:"varint,5,opt,name=forcePull,proto3" json:"forcePull,omitempty"`
-	DockerfilePath string                                             `protobuf:"bytes,6,opt,name=dockerfilePath,proto3" json:"dockerfilePath,omitempty"`
-}
-
-func (m *DockerBuildStrategy) Reset()                    { *m = DockerBuildStrategy{} }
-func (m *DockerBuildStrategy) String() string            { return proto.CompactTextString(m) }
-func (*DockerBuildStrategy) ProtoMessage()               {}
-func (*DockerBuildStrategy) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{17} }
-
-func (m *DockerBuildStrategy) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.From
-	}
-	return nil
-}
-
-func (m *DockerBuildStrategy) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.PullSecret
-	}
-	return nil
-}
-
-func (m *DockerBuildStrategy) GetEnv() []*k8s_io_kubernetes_pkg_api_v1.EnvVar {
-	if m != nil {
-		return m.Env
-	}
-	return nil
-}
-
-type BuildStrategy struct {
-	Type                    string                             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	DockerStrategy          *DockerBuildStrategy               `protobuf:"bytes,2,opt,name=dockerStrategy" json:"dockerStrategy,omitempty"`
-	SourceStrategy          *SourceBuildStrategy               `protobuf:"bytes,3,opt,name=sourceStrategy" json:"sourceStrategy,omitempty"`
-	CustomStrategy          *CustomBuildStrategy               `protobuf:"bytes,4,opt,name=customStrategy" json:"customStrategy,omitempty"`
-	JenkinsPipelineStrategy *JenkinsPipelineBuildStrategy      `protobuf:"bytes,5,opt,name=jenkinsPipelineStrategy" json:"jenkinsPipelineStrategy,omitempty"`
-	OsoBuildStrategyType    BuildStrategy_OsoBuildStrategyType `protobuf:"varint,6,opt,name=osoBuildStrategyType,proto3,enum=paas.ci.osopb3.BuildStrategy_OsoBuildStrategyType" json:"osoBuildStrategyType,omitempty"`
-}
-
-func (m *BuildStrategy) Reset()                    { *m = BuildStrategy{} }
-func (m *BuildStrategy) String() string            { return proto.CompactTextString(m) }
-func (*BuildStrategy) ProtoMessage()               {}
-func (*BuildStrategy) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{18} }
-
-func (m *BuildStrategy) GetDockerStrategy() *DockerBuildStrategy {
-	if m != nil {
-		return m.DockerStrategy
-	}
-	return nil
-}
-
-func (m *BuildStrategy) GetSourceStrategy() *SourceBuildStrategy {
-	if m != nil {
-		return m.SourceStrategy
-	}
-	return nil
-}
-
-func (m *BuildStrategy) GetCustomStrategy() *CustomBuildStrategy {
-	if m != nil {
-		return m.CustomStrategy
-	}
-	return nil
-}
-
-func (m *BuildStrategy) GetJenkinsPipelineStrategy() *JenkinsPipelineBuildStrategy {
-	if m != nil {
-		return m.JenkinsPipelineStrategy
-	}
-	return nil
-}
-
-type SecretBuildSource struct {
-	Secret         *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,1,opt,name=secret" json:"secret,omitempty"`
-	DestinationDir string                                             `protobuf:"bytes,2,opt,name=destinationDir,proto3" json:"destinationDir,omitempty"`
-}
-
-func (m *SecretBuildSource) Reset()                    { *m = SecretBuildSource{} }
-func (m *SecretBuildSource) String() string            { return proto.CompactTextString(m) }
-func (*SecretBuildSource) ProtoMessage()               {}
-func (*SecretBuildSource) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{19} }
-
-func (m *SecretBuildSource) GetSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.Secret
-	}
-	return nil
-}
-
-type ImageSourcePath struct {
-	SourcePath     string `protobuf:"bytes,1,opt,name=sourcePath,proto3" json:"sourcePath,omitempty"`
-	DestinationDir string `protobuf:"bytes,2,opt,name=destinationDir,proto3" json:"destinationDir,omitempty"`
-}
-
-func (m *ImageSourcePath) Reset()                    { *m = ImageSourcePath{} }
-func (m *ImageSourcePath) String() string            { return proto.CompactTextString(m) }
-func (*ImageSourcePath) ProtoMessage()               {}
-func (*ImageSourcePath) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{20} }
-
-type ImageSource struct {
-	From       *k8s_io_kubernetes_pkg_api_v1.ObjectReference      `protobuf:"bytes,1,opt,name=from" json:"from,omitempty"`
-	Paths      []*ImageSourcePath                                 `protobuf:"bytes,2,rep,name=paths" json:"paths,omitempty"`
-	PullSecret *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,3,opt,name=pullSecret" json:"pullSecret,omitempty"`
-}
-
-func (m *ImageSource) Reset()                    { *m = ImageSource{} }
-func (m *ImageSource) String() string            { return proto.CompactTextString(m) }
-func (*ImageSource) ProtoMessage()               {}
-func (*ImageSource) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{21} }
-
-func (m *ImageSource) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.From
-	}
-	return nil
-}
-
-func (m *ImageSource) GetPaths() []*ImageSourcePath {
-	if m != nil {
-		return m.Paths
-	}
-	return nil
-}
-
-func (m *ImageSource) GetPullSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.PullSecret
-	}
-	return nil
-}
-
-type GitBuildSource struct {
-	Uri        string `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
-	Ref        string `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
-	HttpProxy  string `protobuf:"bytes,3,opt,name=httpProxy,proto3" json:"httpProxy,omitempty"`
-	HttpsProxy string `protobuf:"bytes,4,opt,name=httpsProxy,proto3" json:"httpsProxy,omitempty"`
-}
-
-func (m *GitBuildSource) Reset()                    { *m = GitBuildSource{} }
-func (m *GitBuildSource) String() string            { return proto.CompactTextString(m) }
-func (*GitBuildSource) ProtoMessage()               {}
-func (*GitBuildSource) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{22} }
-
-type BinaryBuildSource struct {
-	AsFile string `protobuf:"bytes,1,opt,name=asFile,proto3" json:"asFile,omitempty"`
-}
-
-func (m *BinaryBuildSource) Reset()                    { *m = BinaryBuildSource{} }
-func (m *BinaryBuildSource) String() string            { return proto.CompactTextString(m) }
-func (*BinaryBuildSource) ProtoMessage()               {}
-func (*BinaryBuildSource) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{23} }
-
-type BuildSource struct {
-	Type               string                                             `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Binary             *BinaryBuildSource                                 `protobuf:"bytes,2,opt,name=binary" json:"binary,omitempty"`
-	Dockerfile         string                                             `protobuf:"bytes,3,opt,name=dockerfile,proto3" json:"dockerfile,omitempty"`
-	Git                *GitBuildSource                                    `protobuf:"bytes,4,opt,name=git" json:"git,omitempty"`
-	Images             []*ImageSource                                     `protobuf:"bytes,5,rep,name=images" json:"images,omitempty"`
-	ContextDir         string                                             `protobuf:"bytes,6,opt,name=contextDir,proto3" json:"contextDir,omitempty"`
-	SourceSecret       *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference `protobuf:"bytes,7,opt,name=sourceSecret" json:"sourceSecret,omitempty"`
-	Secrets            []*SecretBuildSource                               `protobuf:"bytes,8,rep,name=secrets" json:"secrets,omitempty"`
-	OsoBuildSourceType BuildSource_OsoBuildSourceType                     `protobuf:"varint,9,opt,name=osoBuildSourceType,proto3,enum=paas.ci.osopb3.BuildSource_OsoBuildSourceType" json:"osoBuildSourceType,omitempty"`
-}
-
-func (m *BuildSource) Reset()                    { *m = BuildSource{} }
-func (m *BuildSource) String() string            { return proto.CompactTextString(m) }
-func (*BuildSource) ProtoMessage()               {}
-func (*BuildSource) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{24} }
-
-func (m *BuildSource) GetBinary() *BinaryBuildSource {
-	if m != nil {
-		return m.Binary
-	}
-	return nil
-}
-
-func (m *BuildSource) GetGit() *GitBuildSource {
-	if m != nil {
-		return m.Git
-	}
-	return nil
-}
-
-func (m *BuildSource) GetImages() []*ImageSource {
-	if m != nil {
-		return m.Images
-	}
-	return nil
-}
-
-func (m *BuildSource) GetSourceSecret() *k8s_io_kubernetes_pkg_api_v1.LocalObjectReference {
-	if m != nil {
-		return m.SourceSecret
-	}
-	return nil
-}
-
-func (m *BuildSource) GetSecrets() []*SecretBuildSource {
-	if m != nil {
-		return m.Secrets
-	}
-	return nil
-}
-
-type OsoCommonSpec struct {
-	ServiceAccount            string                                             `protobuf:"bytes,1,opt,name=serviceAccount,proto3" json:"serviceAccount,omitempty"`
-	Source                    *BuildSource                                       `protobuf:"bytes,2,opt,name=source" json:"source,omitempty"`
-	Revision                  *SourceRevision                                    `protobuf:"bytes,3,opt,name=revision" json:"revision,omitempty"`
-	Strategy                  *BuildStrategy                                     `protobuf:"bytes,4,opt,name=strategy" json:"strategy,omitempty"`
-	Output                    *BuildOutput                                       `protobuf:"bytes,5,opt,name=output" json:"output,omitempty"`
-	Resources                 *k8s_io_kubernetes_pkg_api_v1.ResourceRequirements `protobuf:"bytes,6,opt,name=resources" json:"resources,omitempty"`
-	PostCommit                *BuildPostCommitSpec                               `protobuf:"bytes,7,opt,name=postCommit" json:"postCommit,omitempty"`
-	CompletionDeadlineSeconds int64                                              `protobuf:"varint,8,opt,name=completionDeadlineSeconds,proto3" json:"completionDeadlineSeconds,omitempty"`
-}
-
-func (m *OsoCommonSpec) Reset()                    { *m = OsoCommonSpec{} }
-func (m *OsoCommonSpec) String() string            { return proto.CompactTextString(m) }
-func (*OsoCommonSpec) ProtoMessage()               {}
-func (*OsoCommonSpec) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{25} }
-
-func (m *OsoCommonSpec) GetSource() *BuildSource {
-	if m != nil {
-		return m.Source
-	}
-	return nil
-}
-
-func (m *OsoCommonSpec) GetRevision() *SourceRevision {
-	if m != nil {
-		return m.Revision
-	}
-	return nil
-}
-
-func (m *OsoCommonSpec) GetStrategy() *BuildStrategy {
-	if m != nil {
-		return m.Strategy
-	}
-	return nil
-}
-
-func (m *OsoCommonSpec) GetOutput() *BuildOutput {
-	if m != nil {
-		return m.Output
-	}
-	return nil
-}
-
-func (m *OsoCommonSpec) GetResources() *k8s_io_kubernetes_pkg_api_v1.ResourceRequirements {
-	if m != nil {
-		return m.Resources
-	}
-	return nil
-}
-
-func (m *OsoCommonSpec) GetPostCommit() *BuildPostCommitSpec {
-	if m != nil {
-		return m.PostCommit
-	}
-	return nil
-}
-
-type WebHookTrigger struct {
-	Secret   string `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
-	AllowEnv bool   `protobuf:"varint,2,opt,name=allowEnv,proto3" json:"allowEnv,omitempty"`
-}
-
-func (m *WebHookTrigger) Reset()                    { *m = WebHookTrigger{} }
-func (m *WebHookTrigger) String() string            { return proto.CompactTextString(m) }
-func (*WebHookTrigger) ProtoMessage()               {}
-func (*WebHookTrigger) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{26} }
-
-type ImageChangeTrigger struct {
-	LastTriggeredImageID string                                        `protobuf:"bytes,1,opt,name=lastTriggeredImageID,proto3" json:"lastTriggeredImageID,omitempty"`
-	From                 *k8s_io_kubernetes_pkg_api_v1.ObjectReference `protobuf:"bytes,2,opt,name=from" json:"from,omitempty"`
-}
-
-func (m *ImageChangeTrigger) Reset()                    { *m = ImageChangeTrigger{} }
-func (m *ImageChangeTrigger) String() string            { return proto.CompactTextString(m) }
-func (*ImageChangeTrigger) ProtoMessage()               {}
-func (*ImageChangeTrigger) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{27} }
-
-func (m *ImageChangeTrigger) GetFrom() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.From
-	}
-	return nil
-}
-
-type OsoBuildTriggerPolicy struct {
-	Type                string                                    `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Github              *WebHookTrigger                           `protobuf:"bytes,2,opt,name=github" json:"github,omitempty"`
-	Generic             *WebHookTrigger                           `protobuf:"bytes,3,opt,name=generic" json:"generic,omitempty"`
-	ImageChange         *ImageChangeTrigger                       `protobuf:"bytes,4,opt,name=imageChange" json:"imageChange,omitempty"`
-	OsoBuildTriggerType OsoBuildTriggerPolicy_OsoBuildTriggerType `protobuf:"varint,5,opt,name=osoBuildTriggerType,proto3,enum=paas.ci.osopb3.OsoBuildTriggerPolicy_OsoBuildTriggerType" json:"osoBuildTriggerType,omitempty"`
-}
-
-func (m *OsoBuildTriggerPolicy) Reset()                    { *m = OsoBuildTriggerPolicy{} }
-func (m *OsoBuildTriggerPolicy) String() string            { return proto.CompactTextString(m) }
-func (*OsoBuildTriggerPolicy) ProtoMessage()               {}
-func (*OsoBuildTriggerPolicy) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{28} }
-
-func (m *OsoBuildTriggerPolicy) GetGithub() *WebHookTrigger {
-	if m != nil {
-		return m.Github
-	}
-	return nil
-}
-
-func (m *OsoBuildTriggerPolicy) GetGeneric() *WebHookTrigger {
-	if m != nil {
-		return m.Generic
-	}
-	return nil
-}
-
-func (m *OsoBuildTriggerPolicy) GetImageChange() *ImageChangeTrigger {
-	if m != nil {
-		return m.ImageChange
-	}
-	return nil
-}
-
-type GenericWebHookCause struct {
-	Revision *SourceRevision `protobuf:"bytes,1,opt,name=revision" json:"revision,omitempty"`
-	Secret   string          `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-}
-
-func (m *GenericWebHookCause) Reset()                    { *m = GenericWebHookCause{} }
-func (m *GenericWebHookCause) String() string            { return proto.CompactTextString(m) }
-func (*GenericWebHookCause) ProtoMessage()               {}
-func (*GenericWebHookCause) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{29} }
-
-func (m *GenericWebHookCause) GetRevision() *SourceRevision {
-	if m != nil {
-		return m.Revision
-	}
-	return nil
-}
-
-type GitHubWebHookCause struct {
-	Revision *SourceRevision `protobuf:"bytes,1,opt,name=revision" json:"revision,omitempty"`
-	Secret   string          `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-}
-
-func (m *GitHubWebHookCause) Reset()                    { *m = GitHubWebHookCause{} }
-func (m *GitHubWebHookCause) String() string            { return proto.CompactTextString(m) }
-func (*GitHubWebHookCause) ProtoMessage()               {}
-func (*GitHubWebHookCause) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{30} }
-
-func (m *GitHubWebHookCause) GetRevision() *SourceRevision {
-	if m != nil {
-		return m.Revision
-	}
-	return nil
-}
-
-type ImageChangeCause struct {
-	ImageID string                                        `protobuf:"bytes,1,opt,name=imageID,proto3" json:"imageID,omitempty"`
-	FromRef *k8s_io_kubernetes_pkg_api_v1.ObjectReference `protobuf:"bytes,2,opt,name=fromRef" json:"fromRef,omitempty"`
-}
-
-func (m *ImageChangeCause) Reset()                    { *m = ImageChangeCause{} }
-func (m *ImageChangeCause) String() string            { return proto.CompactTextString(m) }
-func (*ImageChangeCause) ProtoMessage()               {}
-func (*ImageChangeCause) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{31} }
-
-func (m *ImageChangeCause) GetFromRef() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.FromRef
-	}
-	return nil
-}
-
-type OsoBuildTriggerCause struct {
-	Message          string               `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	GenericWebHook   *GenericWebHookCause `protobuf:"bytes,2,opt,name=genericWebHook" json:"genericWebHook,omitempty"`
-	GithubWebHook    *GitHubWebHookCause  `protobuf:"bytes,3,opt,name=githubWebHook" json:"githubWebHook,omitempty"`
-	ImageChangeBuild *ImageChangeCause    `protobuf:"bytes,4,opt,name=imageChangeBuild" json:"imageChangeBuild,omitempty"`
-}
-
-func (m *OsoBuildTriggerCause) Reset()                    { *m = OsoBuildTriggerCause{} }
-func (m *OsoBuildTriggerCause) String() string            { return proto.CompactTextString(m) }
-func (*OsoBuildTriggerCause) ProtoMessage()               {}
-func (*OsoBuildTriggerCause) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{32} }
-
-func (m *OsoBuildTriggerCause) GetGenericWebHook() *GenericWebHookCause {
-	if m != nil {
-		return m.GenericWebHook
-	}
-	return nil
-}
-
-func (m *OsoBuildTriggerCause) GetGithubWebHook() *GitHubWebHookCause {
-	if m != nil {
-		return m.GithubWebHook
-	}
-	return nil
-}
-
-func (m *OsoBuildTriggerCause) GetImageChangeBuild() *ImageChangeCause {
-	if m != nil {
-		return m.ImageChangeBuild
-	}
-	return nil
-}
-
-type OsoBuildStatus struct {
-	Phase                      string                                        `protobuf:"bytes,1,opt,name=phase,proto3" json:"phase,omitempty"`
-	Cancelled                  bool                                          `protobuf:"varint,2,opt,name=cancelled,proto3" json:"cancelled,omitempty"`
-	Reason                     string                                        `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
-	Message                    string                                        `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-	StartTimestamp             *k8s_io_kubernetes_pkg_api_unversioned.Time   `protobuf:"bytes,5,opt,name=startTimestamp" json:"startTimestamp,omitempty"`
-	CompletionTimestamp        *k8s_io_kubernetes_pkg_api_unversioned.Time   `protobuf:"bytes,6,opt,name=completionTimestamp" json:"completionTimestamp,omitempty"`
-	Duration                   int64                                         `protobuf:"varint,7,opt,name=duration,proto3" json:"duration,omitempty"`
-	OutputDockerImageReference string                                        `protobuf:"bytes,8,opt,name=outputDockerImageReference,proto3" json:"outputDockerImageReference,omitempty"`
-	Config                     *k8s_io_kubernetes_pkg_api_v1.ObjectReference `protobuf:"bytes,9,opt,name=config" json:"config,omitempty"`
-	OsoBuildPhase              OsoBuildStatus_OsoBuildPhase                  `protobuf:"varint,10,opt,name=osoBuildPhase,proto3,enum=paas.ci.osopb3.OsoBuildStatus_OsoBuildPhase" json:"osoBuildPhase,omitempty"`
-}
-
-func (m *OsoBuildStatus) Reset()                    { *m = OsoBuildStatus{} }
-func (m *OsoBuildStatus) String() string            { return proto.CompactTextString(m) }
-func (*OsoBuildStatus) ProtoMessage()               {}
-func (*OsoBuildStatus) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{33} }
-
-func (m *OsoBuildStatus) GetStartTimestamp() *k8s_io_kubernetes_pkg_api_unversioned.Time {
-	if m != nil {
-		return m.StartTimestamp
-	}
-	return nil
-}
-
-func (m *OsoBuildStatus) GetCompletionTimestamp() *k8s_io_kubernetes_pkg_api_unversioned.Time {
-	if m != nil {
-		return m.CompletionTimestamp
-	}
-	return nil
-}
-
-func (m *OsoBuildStatus) GetConfig() *k8s_io_kubernetes_pkg_api_v1.ObjectReference {
-	if m != nil {
-		return m.Config
-	}
-	return nil
-}
-
+func (*DeleteProjectResponse) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{13} }
+
+//
+// Docker Build
+//
 type DockerBuildConfigRequestData struct {
 	Name              string                                         `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	ProjectName       string                                         `protobuf:"bytes,2,opt,name=projectName,proto3" json:"projectName,omitempty"`
@@ -971,7 +362,7 @@ func (m *DockerBuildConfigRequestData) Reset()         { *m = DockerBuildConfigR
 func (m *DockerBuildConfigRequestData) String() string { return proto.CompactTextString(m) }
 func (*DockerBuildConfigRequestData) ProtoMessage()    {}
 func (*DockerBuildConfigRequestData) Descriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{34}
+	return fileDescriptorGrpc, []int{14}
 }
 
 func (m *DockerBuildConfigRequestData) GetTriggers() []*OsoBuildTriggerPolicy {
@@ -1003,18 +394,18 @@ func (m *DockerBuildConfigRequestData) GetAnnotations() map[string]string {
 }
 
 type DockerBuildConfigResponseData struct {
-	State    int64                                    `protobuf:"varint,1,opt,name=state,proto3" json:"state,omitempty"`
-	Metadata *k8s_io_kubernetes_pkg_api_v1.ObjectMeta `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
+	State    int64          `protobuf:"varint,1,opt,name=state,proto3" json:"state,omitempty"`
+	Metadata *K8SObjectMeta `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
 }
 
 func (m *DockerBuildConfigResponseData) Reset()         { *m = DockerBuildConfigResponseData{} }
 func (m *DockerBuildConfigResponseData) String() string { return proto.CompactTextString(m) }
 func (*DockerBuildConfigResponseData) ProtoMessage()    {}
 func (*DockerBuildConfigResponseData) Descriptor() ([]byte, []int) {
-	return fileDescriptorGrpc, []int{35}
+	return fileDescriptorGrpc, []int{15}
 }
 
-func (m *DockerBuildConfigResponseData) GetMetadata() *k8s_io_kubernetes_pkg_api_v1.ObjectMeta {
+func (m *DockerBuildConfigResponseData) GetMetadata() *K8SObjectMeta {
 	if m != nil {
 		return m.Metadata
 	}
@@ -1033,7 +424,7 @@ type DockerBuildRequestData struct {
 func (m *DockerBuildRequestData) Reset()                    { *m = DockerBuildRequestData{} }
 func (m *DockerBuildRequestData) String() string            { return proto.CompactTextString(m) }
 func (*DockerBuildRequestData) ProtoMessage()               {}
-func (*DockerBuildRequestData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{36} }
+func (*DockerBuildRequestData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{16} }
 
 func (m *DockerBuildRequestData) GetConfigSpec() *DockerBuildConfigRequestData {
 	if m != nil {
@@ -1064,15 +455,15 @@ func (m *DockerBuildRequestData) GetAnnotations() map[string]string {
 }
 
 type DockerBuildResponseData struct {
-	Result       *OsoBuildStatus                          `protobuf:"bytes,1,opt,name=result" json:"result,omitempty"`
-	ConfigResult *DockerBuildConfigResponseData           `protobuf:"bytes,2,opt,name=configResult" json:"configResult,omitempty"`
-	Metadata     *k8s_io_kubernetes_pkg_api_v1.ObjectMeta `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
+	Result       *OsoBuildStatus                `protobuf:"bytes,1,opt,name=result" json:"result,omitempty"`
+	ConfigResult *DockerBuildConfigResponseData `protobuf:"bytes,2,opt,name=configResult" json:"configResult,omitempty"`
+	Metadata     *K8SObjectMeta                 `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
 }
 
 func (m *DockerBuildResponseData) Reset()                    { *m = DockerBuildResponseData{} }
 func (m *DockerBuildResponseData) String() string            { return proto.CompactTextString(m) }
 func (*DockerBuildResponseData) ProtoMessage()               {}
-func (*DockerBuildResponseData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{37} }
+func (*DockerBuildResponseData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{17} }
 
 func (m *DockerBuildResponseData) GetResult() *OsoBuildStatus {
 	if m != nil {
@@ -1088,7 +479,7 @@ func (m *DockerBuildResponseData) GetConfigResult() *DockerBuildConfigResponseDa
 	return nil
 }
 
-func (m *DockerBuildResponseData) GetMetadata() *k8s_io_kubernetes_pkg_api_v1.ObjectMeta {
+func (m *DockerBuildResponseData) GetMetadata() *K8SObjectMeta {
 	if m != nil {
 		return m.Metadata
 	}
@@ -1103,52 +494,28 @@ type RawData struct {
 func (m *RawData) Reset()                    { *m = RawData{} }
 func (m *RawData) String() string            { return proto.CompactTextString(m) }
 func (*RawData) ProtoMessage()               {}
-func (*RawData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{38} }
+func (*RawData) Descriptor() ([]byte, []int) { return fileDescriptorGrpc, []int{18} }
 
 func init() {
+	proto.RegisterType((*ProjectResponseDataArbitrary)(nil), "paas.ci.osopb3.ProjectResponseDataArbitrary")
+	proto.RegisterType((*ProjectCreationRequestData)(nil), "paas.ci.osopb3.ProjectCreationRequestData")
+	proto.RegisterType((*ProjectCreationResponseData)(nil), "paas.ci.osopb3.ProjectCreationResponseData")
+	proto.RegisterType((*ProjectRetrieveRequestData)(nil), "paas.ci.osopb3.ProjectRetrieveRequestData")
+	proto.RegisterType((*ProjectRetrieveResponseData)(nil), "paas.ci.osopb3.ProjectRetrieveResponseData")
+	proto.RegisterType((*ProjectUpdationRequestData)(nil), "paas.ci.osopb3.ProjectUpdationRequestData")
+	proto.RegisterType((*ProjectDeletionRequestData)(nil), "paas.ci.osopb3.ProjectDeletionRequestData")
+	proto.RegisterType((*ProjectDeletionResponseData)(nil), "paas.ci.osopb3.ProjectDeletionResponseData")
 	proto.RegisterType((*CreateOriginProjectRequest)(nil), "paas.ci.osopb3.CreateOriginProjectRequest")
 	proto.RegisterType((*CreateOriginProjectResponse)(nil), "paas.ci.osopb3.CreateOriginProjectResponse")
-	proto.RegisterType((*CreateOriginProjectArbitraryRequest)(nil), "paas.ci.osopb3.CreateOriginProjectArbitraryRequest")
-	proto.RegisterType((*CreateOriginProjectArbitraryResponse)(nil), "paas.ci.osopb3.CreateOriginProjectArbitraryResponse")
 	proto.RegisterType((*FindProjectRequest)(nil), "paas.ci.osopb3.FindProjectRequest")
 	proto.RegisterType((*FindProjectResponse)(nil), "paas.ci.osopb3.FindProjectResponse")
 	proto.RegisterType((*DeleteProjectRequest)(nil), "paas.ci.osopb3.DeleteProjectRequest")
 	proto.RegisterType((*DeleteProjectResponse)(nil), "paas.ci.osopb3.DeleteProjectResponse")
-	proto.RegisterType((*SourceControlUser)(nil), "paas.ci.osopb3.SourceControlUser")
-	proto.RegisterType((*GitSourceRevision)(nil), "paas.ci.osopb3.GitSourceRevision")
-	proto.RegisterType((*SourceRevision)(nil), "paas.ci.osopb3.SourceRevision")
-	proto.RegisterType((*BuildPostCommitSpec)(nil), "paas.ci.osopb3.BuildPostCommitSpec")
-	proto.RegisterType((*BuildOutput)(nil), "paas.ci.osopb3.BuildOutput")
-	proto.RegisterType((*JenkinsPipelineBuildStrategy)(nil), "paas.ci.osopb3.JenkinsPipelineBuildStrategy")
-	proto.RegisterType((*SecretSpec)(nil), "paas.ci.osopb3.SecretSpec")
-	proto.RegisterType((*CustomBuildStrategy)(nil), "paas.ci.osopb3.CustomBuildStrategy")
-	proto.RegisterType((*SourceBuildStrategy)(nil), "paas.ci.osopb3.SourceBuildStrategy")
-	proto.RegisterType((*DockerBuildStrategy)(nil), "paas.ci.osopb3.DockerBuildStrategy")
-	proto.RegisterType((*BuildStrategy)(nil), "paas.ci.osopb3.BuildStrategy")
-	proto.RegisterType((*SecretBuildSource)(nil), "paas.ci.osopb3.SecretBuildSource")
-	proto.RegisterType((*ImageSourcePath)(nil), "paas.ci.osopb3.ImageSourcePath")
-	proto.RegisterType((*ImageSource)(nil), "paas.ci.osopb3.ImageSource")
-	proto.RegisterType((*GitBuildSource)(nil), "paas.ci.osopb3.GitBuildSource")
-	proto.RegisterType((*BinaryBuildSource)(nil), "paas.ci.osopb3.BinaryBuildSource")
-	proto.RegisterType((*BuildSource)(nil), "paas.ci.osopb3.BuildSource")
-	proto.RegisterType((*OsoCommonSpec)(nil), "paas.ci.osopb3.OsoCommonSpec")
-	proto.RegisterType((*WebHookTrigger)(nil), "paas.ci.osopb3.WebHookTrigger")
-	proto.RegisterType((*ImageChangeTrigger)(nil), "paas.ci.osopb3.ImageChangeTrigger")
-	proto.RegisterType((*OsoBuildTriggerPolicy)(nil), "paas.ci.osopb3.OsoBuildTriggerPolicy")
-	proto.RegisterType((*GenericWebHookCause)(nil), "paas.ci.osopb3.GenericWebHookCause")
-	proto.RegisterType((*GitHubWebHookCause)(nil), "paas.ci.osopb3.GitHubWebHookCause")
-	proto.RegisterType((*ImageChangeCause)(nil), "paas.ci.osopb3.ImageChangeCause")
-	proto.RegisterType((*OsoBuildTriggerCause)(nil), "paas.ci.osopb3.OsoBuildTriggerCause")
-	proto.RegisterType((*OsoBuildStatus)(nil), "paas.ci.osopb3.OsoBuildStatus")
 	proto.RegisterType((*DockerBuildConfigRequestData)(nil), "paas.ci.osopb3.DockerBuildConfigRequestData")
 	proto.RegisterType((*DockerBuildConfigResponseData)(nil), "paas.ci.osopb3.DockerBuildConfigResponseData")
 	proto.RegisterType((*DockerBuildRequestData)(nil), "paas.ci.osopb3.DockerBuildRequestData")
 	proto.RegisterType((*DockerBuildResponseData)(nil), "paas.ci.osopb3.DockerBuildResponseData")
 	proto.RegisterType((*RawData)(nil), "paas.ci.osopb3.RawData")
-	proto.RegisterEnum("paas.ci.osopb3.BuildStrategy_OsoBuildStrategyType", BuildStrategy_OsoBuildStrategyType_name, BuildStrategy_OsoBuildStrategyType_value)
-	proto.RegisterEnum("paas.ci.osopb3.BuildSource_OsoBuildSourceType", BuildSource_OsoBuildSourceType_name, BuildSource_OsoBuildSourceType_value)
-	proto.RegisterEnum("paas.ci.osopb3.OsoBuildTriggerPolicy_OsoBuildTriggerType", OsoBuildTriggerPolicy_OsoBuildTriggerType_name, OsoBuildTriggerPolicy_OsoBuildTriggerType_value)
-	proto.RegisterEnum("paas.ci.osopb3.OsoBuildStatus_OsoBuildPhase", OsoBuildStatus_OsoBuildPhase_name, OsoBuildStatus_OsoBuildPhase_value)
 	proto.RegisterEnum("paas.ci.osopb3.DockerBuildConfigRequestData_OsoBuildRunPolicy", DockerBuildConfigRequestData_OsoBuildRunPolicy_name, DockerBuildConfigRequestData_OsoBuildRunPolicy_value)
 }
 
@@ -1159,16 +526,17 @@ var _ grpc.ClientConn
 // Client API for SimpleService service
 
 type SimpleServiceClient interface {
+	CreateProjectIntoArbitrary(ctx context.Context, in *ProjectCreationRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error)
+	RetrieveProjectIntoArbitrary(ctx context.Context, in *ProjectRetrieveRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error)
+	UpdateProjectIntoArbitrary(ctx context.Context, in *ProjectUpdationRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error)
+	DeleteProjectIntoArbitrary(ctx context.Context, in *ProjectDeletionRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error)
 	CreateOriginProject(ctx context.Context, in *CreateOriginProjectRequest, opts ...grpc.CallOption) (*CreateOriginProjectResponse, error)
-	CreateOriginProjectArbitrary(ctx context.Context, in *CreateOriginProjectArbitraryRequest, opts ...grpc.CallOption) (*CreateOriginProjectArbitraryResponse, error)
 	FindProject(ctx context.Context, in *FindProjectRequest, opts ...grpc.CallOption) (*FindProjectResponse, error)
 	DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*DeleteProjectResponse, error)
-	NewOsoBuildConfig(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.BuildConfig, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.BuildConfig, error)
-	StartOsoBuild(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.Build, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.Build, error)
 	BuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error)
 	RebuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error)
-	CreateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error)
-	UpdateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error)
+	CreateIntoBuildDockerImage(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error)
+	UpdateIntoBuildDockerImage(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error)
 }
 
 type simpleServiceClient struct {
@@ -1179,18 +547,45 @@ func NewSimpleServiceClient(cc *grpc.ClientConn) SimpleServiceClient {
 	return &simpleServiceClient{cc}
 }
 
-func (c *simpleServiceClient) CreateOriginProject(ctx context.Context, in *CreateOriginProjectRequest, opts ...grpc.CallOption) (*CreateOriginProjectResponse, error) {
-	out := new(CreateOriginProjectResponse)
-	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/CreateOriginProject", in, out, c.cc, opts...)
+func (c *simpleServiceClient) CreateProjectIntoArbitrary(ctx context.Context, in *ProjectCreationRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error) {
+	out := new(ProjectResponseDataArbitrary)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/CreateProjectIntoArbitrary", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simpleServiceClient) CreateOriginProjectArbitrary(ctx context.Context, in *CreateOriginProjectArbitraryRequest, opts ...grpc.CallOption) (*CreateOriginProjectArbitraryResponse, error) {
-	out := new(CreateOriginProjectArbitraryResponse)
-	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/CreateOriginProjectArbitrary", in, out, c.cc, opts...)
+func (c *simpleServiceClient) RetrieveProjectIntoArbitrary(ctx context.Context, in *ProjectRetrieveRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error) {
+	out := new(ProjectResponseDataArbitrary)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/RetrieveProjectIntoArbitrary", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) UpdateProjectIntoArbitrary(ctx context.Context, in *ProjectUpdationRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error) {
+	out := new(ProjectResponseDataArbitrary)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/UpdateProjectIntoArbitrary", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) DeleteProjectIntoArbitrary(ctx context.Context, in *ProjectDeletionRequestData, opts ...grpc.CallOption) (*ProjectResponseDataArbitrary, error) {
+	out := new(ProjectResponseDataArbitrary)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/DeleteProjectIntoArbitrary", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) CreateOriginProject(ctx context.Context, in *CreateOriginProjectRequest, opts ...grpc.CallOption) (*CreateOriginProjectResponse, error) {
+	out := new(CreateOriginProjectResponse)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/CreateOriginProject", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1215,24 +610,6 @@ func (c *simpleServiceClient) DeleteProject(ctx context.Context, in *DeleteProje
 	return out, nil
 }
 
-func (c *simpleServiceClient) NewOsoBuildConfig(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.BuildConfig, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.BuildConfig, error) {
-	out := new(github_com_openshift_origin_pkg_build_api_v1.BuildConfig)
-	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/NewOsoBuildConfig", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *simpleServiceClient) StartOsoBuild(ctx context.Context, in *github_com_openshift_origin_pkg_build_api_v1.Build, opts ...grpc.CallOption) (*github_com_openshift_origin_pkg_build_api_v1.Build, error) {
-	out := new(github_com_openshift_origin_pkg_build_api_v1.Build)
-	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/StartOsoBuild", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *simpleServiceClient) BuildDockerImage(ctx context.Context, in *RawData, opts ...grpc.CallOption) (*RawData, error) {
 	out := new(RawData)
 	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/BuildDockerImage", in, out, c.cc, opts...)
@@ -1251,18 +628,18 @@ func (c *simpleServiceClient) RebuildDockerImage(ctx context.Context, in *RawDat
 	return out, nil
 }
 
-func (c *simpleServiceClient) CreateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error) {
+func (c *simpleServiceClient) CreateIntoBuildDockerImage(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error) {
 	out := new(DockerBuildResponseData)
-	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/CreateDockerImageBuild", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/CreateIntoBuildDockerImage", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simpleServiceClient) UpdateDockerImageBuild(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error) {
+func (c *simpleServiceClient) UpdateIntoBuildDockerImage(ctx context.Context, in *DockerBuildRequestData, opts ...grpc.CallOption) (*DockerBuildResponseData, error) {
 	out := new(DockerBuildResponseData)
-	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/UpdateDockerImageBuild", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/paas.ci.osopb3.SimpleService/UpdateIntoBuildDockerImage", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1272,20 +649,69 @@ func (c *simpleServiceClient) UpdateDockerImageBuild(ctx context.Context, in *Do
 // Server API for SimpleService service
 
 type SimpleServiceServer interface {
+	CreateProjectIntoArbitrary(context.Context, *ProjectCreationRequestData) (*ProjectResponseDataArbitrary, error)
+	RetrieveProjectIntoArbitrary(context.Context, *ProjectRetrieveRequestData) (*ProjectResponseDataArbitrary, error)
+	UpdateProjectIntoArbitrary(context.Context, *ProjectUpdationRequestData) (*ProjectResponseDataArbitrary, error)
+	DeleteProjectIntoArbitrary(context.Context, *ProjectDeletionRequestData) (*ProjectResponseDataArbitrary, error)
 	CreateOriginProject(context.Context, *CreateOriginProjectRequest) (*CreateOriginProjectResponse, error)
-	CreateOriginProjectArbitrary(context.Context, *CreateOriginProjectArbitraryRequest) (*CreateOriginProjectArbitraryResponse, error)
 	FindProject(context.Context, *FindProjectRequest) (*FindProjectResponse, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) (*DeleteProjectResponse, error)
-	NewOsoBuildConfig(context.Context, *github_com_openshift_origin_pkg_build_api_v1.BuildConfig) (*github_com_openshift_origin_pkg_build_api_v1.BuildConfig, error)
-	StartOsoBuild(context.Context, *github_com_openshift_origin_pkg_build_api_v1.Build) (*github_com_openshift_origin_pkg_build_api_v1.Build, error)
 	BuildDockerImage(context.Context, *RawData) (*RawData, error)
 	RebuildDockerImage(context.Context, *RawData) (*RawData, error)
-	CreateDockerImageBuild(context.Context, *DockerBuildRequestData) (*DockerBuildResponseData, error)
-	UpdateDockerImageBuild(context.Context, *DockerBuildRequestData) (*DockerBuildResponseData, error)
+	CreateIntoBuildDockerImage(context.Context, *DockerBuildRequestData) (*DockerBuildResponseData, error)
+	UpdateIntoBuildDockerImage(context.Context, *DockerBuildRequestData) (*DockerBuildResponseData, error)
 }
 
 func RegisterSimpleServiceServer(s *grpc.Server, srv SimpleServiceServer) {
 	s.RegisterService(&_SimpleService_serviceDesc, srv)
+}
+
+func _SimpleService_CreateProjectIntoArbitrary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(ProjectCreationRequestData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleServiceServer).CreateProjectIntoArbitrary(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleService_RetrieveProjectIntoArbitrary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(ProjectRetrieveRequestData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleServiceServer).RetrieveProjectIntoArbitrary(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleService_UpdateProjectIntoArbitrary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(ProjectUpdationRequestData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleServiceServer).UpdateProjectIntoArbitrary(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func _SimpleService_DeleteProjectIntoArbitrary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+	in := new(ProjectDeletionRequestData)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	out, err := srv.(SimpleServiceServer).DeleteProjectIntoArbitrary(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func _SimpleService_CreateOriginProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
@@ -1294,18 +720,6 @@ func _SimpleService_CreateOriginProject_Handler(srv interface{}, ctx context.Con
 		return nil, err
 	}
 	out, err := srv.(SimpleServiceServer).CreateOriginProject(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func _SimpleService_CreateOriginProjectArbitrary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(CreateOriginProjectArbitraryRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(SimpleServiceServer).CreateOriginProjectArbitrary(ctx, in)
 	if err != nil {
 		return nil, err
 	}
@@ -1336,30 +750,6 @@ func _SimpleService_DeleteProject_Handler(srv interface{}, ctx context.Context, 
 	return out, nil
 }
 
-func _SimpleService_NewOsoBuildConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(github_com_openshift_origin_pkg_build_api_v1.BuildConfig)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(SimpleServiceServer).NewOsoBuildConfig(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func _SimpleService_StartOsoBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(github_com_openshift_origin_pkg_build_api_v1.Build)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(SimpleServiceServer).StartOsoBuild(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func _SimpleService_BuildDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
 	in := new(RawData)
 	if err := dec(in); err != nil {
@@ -1384,24 +774,24 @@ func _SimpleService_RebuildDockerImage_Handler(srv interface{}, ctx context.Cont
 	return out, nil
 }
 
-func _SimpleService_CreateDockerImageBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _SimpleService_CreateIntoBuildDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
 	in := new(DockerBuildRequestData)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(SimpleServiceServer).CreateDockerImageBuild(ctx, in)
+	out, err := srv.(SimpleServiceServer).CreateIntoBuildDockerImage(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func _SimpleService_UpdateDockerImageBuild_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
+func _SimpleService_UpdateIntoBuildDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
 	in := new(DockerBuildRequestData)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(SimpleServiceServer).UpdateDockerImageBuild(ctx, in)
+	out, err := srv.(SimpleServiceServer).UpdateIntoBuildDockerImage(ctx, in)
 	if err != nil {
 		return nil, err
 	}
@@ -1413,12 +803,24 @@ var _SimpleService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*SimpleServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateOriginProject",
-			Handler:    _SimpleService_CreateOriginProject_Handler,
+			MethodName: "CreateProjectIntoArbitrary",
+			Handler:    _SimpleService_CreateProjectIntoArbitrary_Handler,
 		},
 		{
-			MethodName: "CreateOriginProjectArbitrary",
-			Handler:    _SimpleService_CreateOriginProjectArbitrary_Handler,
+			MethodName: "RetrieveProjectIntoArbitrary",
+			Handler:    _SimpleService_RetrieveProjectIntoArbitrary_Handler,
+		},
+		{
+			MethodName: "UpdateProjectIntoArbitrary",
+			Handler:    _SimpleService_UpdateProjectIntoArbitrary_Handler,
+		},
+		{
+			MethodName: "DeleteProjectIntoArbitrary",
+			Handler:    _SimpleService_DeleteProjectIntoArbitrary_Handler,
+		},
+		{
+			MethodName: "CreateOriginProject",
+			Handler:    _SimpleService_CreateOriginProject_Handler,
 		},
 		{
 			MethodName: "FindProject",
@@ -1429,14 +831,6 @@ var _SimpleService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _SimpleService_DeleteProject_Handler,
 		},
 		{
-			MethodName: "NewOsoBuildConfig",
-			Handler:    _SimpleService_NewOsoBuildConfig_Handler,
-		},
-		{
-			MethodName: "StartOsoBuild",
-			Handler:    _SimpleService_StartOsoBuild_Handler,
-		},
-		{
 			MethodName: "BuildDockerImage",
 			Handler:    _SimpleService_BuildDockerImage_Handler,
 		},
@@ -1445,15 +839,454 @@ var _SimpleService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _SimpleService_RebuildDockerImage_Handler,
 		},
 		{
-			MethodName: "CreateDockerImageBuild",
-			Handler:    _SimpleService_CreateDockerImageBuild_Handler,
+			MethodName: "CreateIntoBuildDockerImage",
+			Handler:    _SimpleService_CreateIntoBuildDockerImage_Handler,
 		},
 		{
-			MethodName: "UpdateDockerImageBuild",
-			Handler:    _SimpleService_UpdateDockerImageBuild_Handler,
+			MethodName: "UpdateIntoBuildDockerImage",
+			Handler:    _SimpleService_UpdateIntoBuildDockerImage_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},
+}
+
+func (m *ProjectResponseDataArbitrary) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectResponseDataArbitrary) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Result) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Result)))
+		i += copy(data[i:], m.Result)
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			data[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if m.Datatype != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Datatype.Size()))
+		n1, err := m.Datatype.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n1
+	}
+	if m.Metadata != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Metadata.Size()))
+		n2, err := m.Metadata.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if m.ResultingCode != 0 {
+		data[i] = 0x30
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.ResultingCode))
+	}
+	if m.Raw != nil {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Raw.Size()))
+		n3, err := m.Raw.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	return i, nil
+}
+
+func (m *ProjectCreationRequestData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectCreationRequestData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
+			data[i] = 0x12
+			i++
+			v := m.Labels[k]
+			mapSize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			i = encodeVarintGrpc(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, _ := range m.Annotations {
+			data[i] = 0x1a
+			i++
+			v := m.Annotations[k]
+			mapSize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			i = encodeVarintGrpc(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			data[i] = 0x22
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	return i, nil
+}
+
+func (m *ProjectCreationResponseData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectCreationResponseData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Status) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Status)))
+		i += copy(data[i:], m.Status)
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			data[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if m.Phase != 0 {
+		data[i] = 0x20
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Phase))
+	}
+	if m.Raw != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Raw.Size()))
+		n4, err := m.Raw.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	return i, nil
+}
+
+func (m *ProjectRetrieveRequestData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectRetrieveRequestData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	return i, nil
+}
+
+func (m *ProjectRetrieveResponseData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectRetrieveResponseData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Status) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Status)))
+		i += copy(data[i:], m.Status)
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			data[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if m.Phase != 0 {
+		data[i] = 0x20
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Phase))
+	}
+	if m.Raw != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Raw.Size()))
+		n5, err := m.Raw.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+
+func (m *ProjectUpdationRequestData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectUpdationRequestData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Labels) > 0 {
+		for k, _ := range m.Labels {
+			data[i] = 0x12
+			i++
+			v := m.Labels[k]
+			mapSize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			i = encodeVarintGrpc(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, _ := range m.Annotations {
+			data[i] = 0x1a
+			i++
+			v := m.Annotations[k]
+			mapSize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			i = encodeVarintGrpc(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintGrpc(data, i, uint64(len(v)))
+			i += copy(data[i:], v)
+		}
+	}
+	return i, nil
+}
+
+func (m *ProjectDeletionRequestData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectDeletionRequestData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	return i, nil
+}
+
+func (m *ProjectDeletionResponseData) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ProjectDeletionResponseData) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Status) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintGrpc(data, i, uint64(len(m.Status)))
+		i += copy(data[i:], m.Status)
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			data[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if m.Phase != 0 {
+		data[i] = 0x20
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Phase))
+	}
+	if m.Raw != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintGrpc(data, i, uint64(m.Raw.Size()))
+		n6, err := m.Raw.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
 }
 
 func (m *CreateOriginProjectRequest) Marshal() (data []byte, err error) {
@@ -1521,58 +1354,6 @@ func (m *CreateOriginProjectResponse) MarshalTo(data []byte) (int, error) {
 		i++
 		i = encodeVarintGrpc(data, i, uint64(len(m.Phase)))
 		i += copy(data[i:], m.Phase)
-	}
-	return i, nil
-}
-
-func (m *CreateOriginProjectArbitraryRequest) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *CreateOriginProjectArbitraryRequest) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Odefv1RawData != nil {
-		if len(m.Odefv1RawData) > 0 {
-			data[i] = 0xa
-			i++
-			i = encodeVarintGrpc(data, i, uint64(len(m.Odefv1RawData)))
-			i += copy(data[i:], m.Odefv1RawData)
-		}
-	}
-	return i, nil
-}
-
-func (m *CreateOriginProjectArbitraryResponse) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *CreateOriginProjectArbitraryResponse) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Odefv1RawData != nil {
-		if len(m.Odefv1RawData) > 0 {
-			data[i] = 0xa
-			i++
-			i = encodeVarintGrpc(data, i, uint64(len(m.Odefv1RawData)))
-			i += copy(data[i:], m.Odefv1RawData)
-		}
 	}
 	return i, nil
 }
@@ -1674,1324 +1455,6 @@ func (m *DeleteProjectResponse) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
-func (m *SourceControlUser) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *SourceControlUser) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Name) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Name)))
-		i += copy(data[i:], m.Name)
-	}
-	if len(m.Email) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Email)))
-		i += copy(data[i:], m.Email)
-	}
-	return i, nil
-}
-
-func (m *GitSourceRevision) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *GitSourceRevision) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Commit) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Commit)))
-		i += copy(data[i:], m.Commit)
-	}
-	if m.Author != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Author.Size()))
-		n1, err := m.Author.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if m.Committer != nil {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Committer.Size()))
-		n2, err := m.Committer.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if len(m.Message) > 0 {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Message)))
-		i += copy(data[i:], m.Message)
-	}
-	return i, nil
-}
-
-func (m *SourceRevision) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *SourceRevision) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Type) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Type)))
-		i += copy(data[i:], m.Type)
-	}
-	if m.Git != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Git.Size()))
-		n3, err := m.Git.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	return i, nil
-}
-
-func (m *BuildPostCommitSpec) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *BuildPostCommitSpec) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Command) > 0 {
-		for _, s := range m.Command {
-			data[i] = 0xa
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				data[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			data[i] = uint8(l)
-			i++
-			i += copy(data[i:], s)
-		}
-	}
-	if len(m.Args) > 0 {
-		for _, s := range m.Args {
-			data[i] = 0x12
-			i++
-			l = len(s)
-			for l >= 1<<7 {
-				data[i] = uint8(uint64(l)&0x7f | 0x80)
-				l >>= 7
-				i++
-			}
-			data[i] = uint8(l)
-			i++
-			i += copy(data[i:], s)
-		}
-	}
-	if len(m.Script) > 0 {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Script)))
-		i += copy(data[i:], m.Script)
-	}
-	return i, nil
-}
-
-func (m *BuildOutput) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *BuildOutput) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.To != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.To.Size()))
-		n4, err := m.To.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.PushSecret != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.PushSecret.Size()))
-		n5, err := m.PushSecret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
-	return i, nil
-}
-
-func (m *JenkinsPipelineBuildStrategy) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *JenkinsPipelineBuildStrategy) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.JenkinsfilePath) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.JenkinsfilePath)))
-		i += copy(data[i:], m.JenkinsfilePath)
-	}
-	if len(m.Jenkinsfile) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Jenkinsfile)))
-		i += copy(data[i:], m.Jenkinsfile)
-	}
-	return i, nil
-}
-
-func (m *SecretSpec) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *SecretSpec) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.SecretSource != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.SecretSource.Size()))
-		n6, err := m.SecretSource.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if len(m.MountPath) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.MountPath)))
-		i += copy(data[i:], m.MountPath)
-	}
-	return i, nil
-}
-
-func (m *CustomBuildStrategy) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *CustomBuildStrategy) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.From != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.From.Size()))
-		n7, err := m.From.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.PullSecret != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.PullSecret.Size()))
-		n8, err := m.PullSecret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n8
-	}
-	if len(m.Env) > 0 {
-		for _, msg := range m.Env {
-			data[i] = 0x1a
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.ExposeDockerSocket {
-		data[i] = 0x20
-		i++
-		if m.ExposeDockerSocket {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	if m.ForcePull {
-		data[i] = 0x28
-		i++
-		if m.ForcePull {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	if len(m.Secrets) > 0 {
-		for _, msg := range m.Secrets {
-			data[i] = 0x32
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.BuildAPIVersion) > 0 {
-		data[i] = 0x3a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.BuildAPIVersion)))
-		i += copy(data[i:], m.BuildAPIVersion)
-	}
-	return i, nil
-}
-
-func (m *SourceBuildStrategy) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *SourceBuildStrategy) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.From != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.From.Size()))
-		n9, err := m.From.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n9
-	}
-	if m.PullSecret != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.PullSecret.Size()))
-		n10, err := m.PullSecret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n10
-	}
-	if len(m.Env) > 0 {
-		for _, msg := range m.Env {
-			data[i] = 0x1a
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.Scripts) > 0 {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Scripts)))
-		i += copy(data[i:], m.Scripts)
-	}
-	if m.Incremental {
-		data[i] = 0x28
-		i++
-		if m.Incremental {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	if m.ForcePull {
-		data[i] = 0x30
-		i++
-		if m.ForcePull {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	return i, nil
-}
-
-func (m *DockerBuildStrategy) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *DockerBuildStrategy) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.From != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.From.Size()))
-		n11, err := m.From.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n11
-	}
-	if m.PullSecret != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.PullSecret.Size()))
-		n12, err := m.PullSecret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n12
-	}
-	if m.NoCache {
-		data[i] = 0x18
-		i++
-		if m.NoCache {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	if len(m.Env) > 0 {
-		for _, msg := range m.Env {
-			data[i] = 0x22
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.ForcePull {
-		data[i] = 0x28
-		i++
-		if m.ForcePull {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	if len(m.DockerfilePath) > 0 {
-		data[i] = 0x32
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.DockerfilePath)))
-		i += copy(data[i:], m.DockerfilePath)
-	}
-	return i, nil
-}
-
-func (m *BuildStrategy) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *BuildStrategy) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Type) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Type)))
-		i += copy(data[i:], m.Type)
-	}
-	if m.DockerStrategy != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.DockerStrategy.Size()))
-		n13, err := m.DockerStrategy.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n13
-	}
-	if m.SourceStrategy != nil {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.SourceStrategy.Size()))
-		n14, err := m.SourceStrategy.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n14
-	}
-	if m.CustomStrategy != nil {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.CustomStrategy.Size()))
-		n15, err := m.CustomStrategy.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n15
-	}
-	if m.JenkinsPipelineStrategy != nil {
-		data[i] = 0x2a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.JenkinsPipelineStrategy.Size()))
-		n16, err := m.JenkinsPipelineStrategy.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n16
-	}
-	if m.OsoBuildStrategyType != 0 {
-		data[i] = 0x30
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.OsoBuildStrategyType))
-	}
-	return i, nil
-}
-
-func (m *SecretBuildSource) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *SecretBuildSource) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Secret != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Secret.Size()))
-		n17, err := m.Secret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n17
-	}
-	if len(m.DestinationDir) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.DestinationDir)))
-		i += copy(data[i:], m.DestinationDir)
-	}
-	return i, nil
-}
-
-func (m *ImageSourcePath) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *ImageSourcePath) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.SourcePath) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.SourcePath)))
-		i += copy(data[i:], m.SourcePath)
-	}
-	if len(m.DestinationDir) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.DestinationDir)))
-		i += copy(data[i:], m.DestinationDir)
-	}
-	return i, nil
-}
-
-func (m *ImageSource) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *ImageSource) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.From != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.From.Size()))
-		n18, err := m.From.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n18
-	}
-	if len(m.Paths) > 0 {
-		for _, msg := range m.Paths {
-			data[i] = 0x12
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.PullSecret != nil {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.PullSecret.Size()))
-		n19, err := m.PullSecret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n19
-	}
-	return i, nil
-}
-
-func (m *GitBuildSource) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *GitBuildSource) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Uri) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Uri)))
-		i += copy(data[i:], m.Uri)
-	}
-	if len(m.Ref) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Ref)))
-		i += copy(data[i:], m.Ref)
-	}
-	if len(m.HttpProxy) > 0 {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.HttpProxy)))
-		i += copy(data[i:], m.HttpProxy)
-	}
-	if len(m.HttpsProxy) > 0 {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.HttpsProxy)))
-		i += copy(data[i:], m.HttpsProxy)
-	}
-	return i, nil
-}
-
-func (m *BinaryBuildSource) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *BinaryBuildSource) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.AsFile) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.AsFile)))
-		i += copy(data[i:], m.AsFile)
-	}
-	return i, nil
-}
-
-func (m *BuildSource) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *BuildSource) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Type) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Type)))
-		i += copy(data[i:], m.Type)
-	}
-	if m.Binary != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Binary.Size()))
-		n20, err := m.Binary.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n20
-	}
-	if len(m.Dockerfile) > 0 {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Dockerfile)))
-		i += copy(data[i:], m.Dockerfile)
-	}
-	if m.Git != nil {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Git.Size()))
-		n21, err := m.Git.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n21
-	}
-	if len(m.Images) > 0 {
-		for _, msg := range m.Images {
-			data[i] = 0x2a
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if len(m.ContextDir) > 0 {
-		data[i] = 0x32
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.ContextDir)))
-		i += copy(data[i:], m.ContextDir)
-	}
-	if m.SourceSecret != nil {
-		data[i] = 0x3a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.SourceSecret.Size()))
-		n22, err := m.SourceSecret.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n22
-	}
-	if len(m.Secrets) > 0 {
-		for _, msg := range m.Secrets {
-			data[i] = 0x42
-			i++
-			i = encodeVarintGrpc(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
-	if m.OsoBuildSourceType != 0 {
-		data[i] = 0x48
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.OsoBuildSourceType))
-	}
-	return i, nil
-}
-
-func (m *OsoCommonSpec) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *OsoCommonSpec) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.ServiceAccount) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.ServiceAccount)))
-		i += copy(data[i:], m.ServiceAccount)
-	}
-	if m.Source != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Source.Size()))
-		n23, err := m.Source.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n23
-	}
-	if m.Revision != nil {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Revision.Size()))
-		n24, err := m.Revision.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n24
-	}
-	if m.Strategy != nil {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Strategy.Size()))
-		n25, err := m.Strategy.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n25
-	}
-	if m.Output != nil {
-		data[i] = 0x2a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Output.Size()))
-		n26, err := m.Output.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n26
-	}
-	if m.Resources != nil {
-		data[i] = 0x32
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Resources.Size()))
-		n27, err := m.Resources.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n27
-	}
-	if m.PostCommit != nil {
-		data[i] = 0x3a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.PostCommit.Size()))
-		n28, err := m.PostCommit.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n28
-	}
-	if m.CompletionDeadlineSeconds != 0 {
-		data[i] = 0x40
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.CompletionDeadlineSeconds))
-	}
-	return i, nil
-}
-
-func (m *WebHookTrigger) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *WebHookTrigger) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Secret) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Secret)))
-		i += copy(data[i:], m.Secret)
-	}
-	if m.AllowEnv {
-		data[i] = 0x10
-		i++
-		if m.AllowEnv {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	return i, nil
-}
-
-func (m *ImageChangeTrigger) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *ImageChangeTrigger) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.LastTriggeredImageID) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.LastTriggeredImageID)))
-		i += copy(data[i:], m.LastTriggeredImageID)
-	}
-	if m.From != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.From.Size()))
-		n29, err := m.From.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n29
-	}
-	return i, nil
-}
-
-func (m *OsoBuildTriggerPolicy) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *OsoBuildTriggerPolicy) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Type) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Type)))
-		i += copy(data[i:], m.Type)
-	}
-	if m.Github != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Github.Size()))
-		n30, err := m.Github.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n30
-	}
-	if m.Generic != nil {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Generic.Size()))
-		n31, err := m.Generic.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n31
-	}
-	if m.ImageChange != nil {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.ImageChange.Size()))
-		n32, err := m.ImageChange.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n32
-	}
-	if m.OsoBuildTriggerType != 0 {
-		data[i] = 0x28
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.OsoBuildTriggerType))
-	}
-	return i, nil
-}
-
-func (m *GenericWebHookCause) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *GenericWebHookCause) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Revision != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Revision.Size()))
-		n33, err := m.Revision.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n33
-	}
-	if len(m.Secret) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Secret)))
-		i += copy(data[i:], m.Secret)
-	}
-	return i, nil
-}
-
-func (m *GitHubWebHookCause) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *GitHubWebHookCause) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Revision != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Revision.Size()))
-		n34, err := m.Revision.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n34
-	}
-	if len(m.Secret) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Secret)))
-		i += copy(data[i:], m.Secret)
-	}
-	return i, nil
-}
-
-func (m *ImageChangeCause) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *ImageChangeCause) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.ImageID) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.ImageID)))
-		i += copy(data[i:], m.ImageID)
-	}
-	if m.FromRef != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.FromRef.Size()))
-		n35, err := m.FromRef.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n35
-	}
-	return i, nil
-}
-
-func (m *OsoBuildTriggerCause) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *OsoBuildTriggerCause) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Message) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Message)))
-		i += copy(data[i:], m.Message)
-	}
-	if m.GenericWebHook != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.GenericWebHook.Size()))
-		n36, err := m.GenericWebHook.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n36
-	}
-	if m.GithubWebHook != nil {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.GithubWebHook.Size()))
-		n37, err := m.GithubWebHook.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n37
-	}
-	if m.ImageChangeBuild != nil {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.ImageChangeBuild.Size()))
-		n38, err := m.ImageChangeBuild.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n38
-	}
-	return i, nil
-}
-
-func (m *OsoBuildStatus) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *OsoBuildStatus) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Phase) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Phase)))
-		i += copy(data[i:], m.Phase)
-	}
-	if m.Cancelled {
-		data[i] = 0x10
-		i++
-		if m.Cancelled {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
-	if len(m.Reason) > 0 {
-		data[i] = 0x1a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Reason)))
-		i += copy(data[i:], m.Reason)
-	}
-	if len(m.Message) > 0 {
-		data[i] = 0x22
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.Message)))
-		i += copy(data[i:], m.Message)
-	}
-	if m.StartTimestamp != nil {
-		data[i] = 0x2a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.StartTimestamp.Size()))
-		n39, err := m.StartTimestamp.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n39
-	}
-	if m.CompletionTimestamp != nil {
-		data[i] = 0x32
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.CompletionTimestamp.Size()))
-		n40, err := m.CompletionTimestamp.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n40
-	}
-	if m.Duration != 0 {
-		data[i] = 0x38
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Duration))
-	}
-	if len(m.OutputDockerImageReference) > 0 {
-		data[i] = 0x42
-		i++
-		i = encodeVarintGrpc(data, i, uint64(len(m.OutputDockerImageReference)))
-		i += copy(data[i:], m.OutputDockerImageReference)
-	}
-	if m.Config != nil {
-		data[i] = 0x4a
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.Config.Size()))
-		n41, err := m.Config.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n41
-	}
-	if m.OsoBuildPhase != 0 {
-		data[i] = 0x50
-		i++
-		i = encodeVarintGrpc(data, i, uint64(m.OsoBuildPhase))
-	}
-	return i, nil
-}
-
 func (m *DockerBuildConfigRequestData) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
@@ -3041,11 +1504,11 @@ func (m *DockerBuildConfigRequestData) MarshalTo(data []byte) (int, error) {
 		data[i] = 0x2a
 		i++
 		i = encodeVarintGrpc(data, i, uint64(m.CommonSpec.Size()))
-		n42, err := m.CommonSpec.MarshalTo(data[i:])
+		n7, err := m.CommonSpec.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n42
+		i += n7
 	}
 	if m.OsoBuildRunPolicy != 0 {
 		data[i] = 0x30
@@ -3113,11 +1576,11 @@ func (m *DockerBuildConfigResponseData) MarshalTo(data []byte) (int, error) {
 		data[i] = 0x12
 		i++
 		i = encodeVarintGrpc(data, i, uint64(m.Metadata.Size()))
-		n43, err := m.Metadata.MarshalTo(data[i:])
+		n8, err := m.Metadata.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n43
+		i += n8
 	}
 	return i, nil
 }
@@ -3153,11 +1616,11 @@ func (m *DockerBuildRequestData) MarshalTo(data []byte) (int, error) {
 		data[i] = 0x1a
 		i++
 		i = encodeVarintGrpc(data, i, uint64(m.ConfigSpec.Size()))
-		n44, err := m.ConfigSpec.MarshalTo(data[i:])
+		n9, err := m.ConfigSpec.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n44
+		i += n9
 	}
 	if len(m.TriggeredBy) > 0 {
 		for _, msg := range m.TriggeredBy {
@@ -3227,31 +1690,31 @@ func (m *DockerBuildResponseData) MarshalTo(data []byte) (int, error) {
 		data[i] = 0xa
 		i++
 		i = encodeVarintGrpc(data, i, uint64(m.Result.Size()))
-		n45, err := m.Result.MarshalTo(data[i:])
+		n10, err := m.Result.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n45
+		i += n10
 	}
 	if m.ConfigResult != nil {
 		data[i] = 0x12
 		i++
 		i = encodeVarintGrpc(data, i, uint64(m.ConfigResult.Size()))
-		n46, err := m.ConfigResult.MarshalTo(data[i:])
+		n11, err := m.ConfigResult.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n46
+		i += n11
 	}
 	if m.Metadata != nil {
 		data[i] = 0x1a
 		i++
 		i = encodeVarintGrpc(data, i, uint64(m.Metadata.Size()))
-		n47, err := m.Metadata.MarshalTo(data[i:])
+		n12, err := m.Metadata.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n47
+		i += n12
 	}
 	return i, nil
 }
@@ -3315,6 +1778,200 @@ func encodeVarintGrpc(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	return offset + 1
 }
+func (m *ProjectResponseDataArbitrary) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	l = len(m.Result)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			l = len(s)
+			n += 1 + l + sovGrpc(uint64(l))
+		}
+	}
+	if m.Datatype != nil {
+		l = m.Datatype.Size()
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if m.ResultingCode != 0 {
+		n += 1 + sovGrpc(uint64(m.ResultingCode))
+	}
+	if m.Raw != nil {
+		l = m.Raw.Size()
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	return n
+}
+
+func (m *ProjectCreationRequestData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGrpc(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, v := range m.Annotations {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGrpc(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			l = len(s)
+			n += 1 + l + sovGrpc(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ProjectCreationResponseData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			l = len(s)
+			n += 1 + l + sovGrpc(uint64(l))
+		}
+	}
+	if m.Phase != 0 {
+		n += 1 + sovGrpc(uint64(m.Phase))
+	}
+	if m.Raw != nil {
+		l = m.Raw.Size()
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	return n
+}
+
+func (m *ProjectRetrieveRequestData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	return n
+}
+
+func (m *ProjectRetrieveResponseData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			l = len(s)
+			n += 1 + l + sovGrpc(uint64(l))
+		}
+	}
+	if m.Phase != 0 {
+		n += 1 + sovGrpc(uint64(m.Phase))
+	}
+	if m.Raw != nil {
+		l = m.Raw.Size()
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	return n
+}
+
+func (m *ProjectUpdationRequestData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if len(m.Labels) > 0 {
+		for k, v := range m.Labels {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGrpc(uint64(mapEntrySize))
+		}
+	}
+	if len(m.Annotations) > 0 {
+		for k, v := range m.Annotations {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGrpc(uint64(len(k))) + 1 + len(v) + sovGrpc(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGrpc(uint64(mapEntrySize))
+		}
+	}
+	return n
+}
+
+func (m *ProjectDeletionRequestData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	return n
+}
+
+func (m *ProjectDeletionResponseData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	if len(m.Finalizers) > 0 {
+		for _, s := range m.Finalizers {
+			l = len(s)
+			n += 1 + l + sovGrpc(uint64(l))
+		}
+	}
+	if m.Phase != 0 {
+		n += 1 + sovGrpc(uint64(m.Phase))
+	}
+	if m.Raw != nil {
+		l = m.Raw.Size()
+		n += 1 + l + sovGrpc(uint64(l))
+	}
+	return n
+}
+
 func (m *CreateOriginProjectRequest) Size() (n int) {
 	var l int
 	_ = l
@@ -3341,30 +1998,6 @@ func (m *CreateOriginProjectResponse) Size() (n int) {
 	l = len(m.Phase)
 	if l > 0 {
 		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *CreateOriginProjectArbitraryRequest) Size() (n int) {
-	var l int
-	_ = l
-	if m.Odefv1RawData != nil {
-		l = len(m.Odefv1RawData)
-		if l > 0 {
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	return n
-}
-
-func (m *CreateOriginProjectArbitraryResponse) Size() (n int) {
-	var l int
-	_ = l
-	if m.Odefv1RawData != nil {
-		l = len(m.Odefv1RawData)
-		if l > 0 {
-			n += 1 + l + sovGrpc(uint64(l))
-		}
 	}
 	return n
 }
@@ -3406,566 +2039,6 @@ func (m *DeleteProjectResponse) Size() (n int) {
 	_ = l
 	if m.Flag != 0 {
 		n += 1 + sovGrpc(uint64(m.Flag))
-	}
-	return n
-}
-
-func (m *SourceControlUser) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Email)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *GitSourceRevision) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Commit)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Author != nil {
-		l = m.Author.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Committer != nil {
-		l = m.Committer.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *SourceRevision) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Type)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Git != nil {
-		l = m.Git.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *BuildPostCommitSpec) Size() (n int) {
-	var l int
-	_ = l
-	if len(m.Command) > 0 {
-		for _, s := range m.Command {
-			l = len(s)
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	if len(m.Args) > 0 {
-		for _, s := range m.Args {
-			l = len(s)
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	l = len(m.Script)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *BuildOutput) Size() (n int) {
-	var l int
-	_ = l
-	if m.To != nil {
-		l = m.To.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.PushSecret != nil {
-		l = m.PushSecret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *JenkinsPipelineBuildStrategy) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.JenkinsfilePath)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Jenkinsfile)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *SecretSpec) Size() (n int) {
-	var l int
-	_ = l
-	if m.SecretSource != nil {
-		l = m.SecretSource.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.MountPath)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *CustomBuildStrategy) Size() (n int) {
-	var l int
-	_ = l
-	if m.From != nil {
-		l = m.From.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.PullSecret != nil {
-		l = m.PullSecret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if len(m.Env) > 0 {
-		for _, e := range m.Env {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	if m.ExposeDockerSocket {
-		n += 2
-	}
-	if m.ForcePull {
-		n += 2
-	}
-	if len(m.Secrets) > 0 {
-		for _, e := range m.Secrets {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	l = len(m.BuildAPIVersion)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *SourceBuildStrategy) Size() (n int) {
-	var l int
-	_ = l
-	if m.From != nil {
-		l = m.From.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.PullSecret != nil {
-		l = m.PullSecret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if len(m.Env) > 0 {
-		for _, e := range m.Env {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	l = len(m.Scripts)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Incremental {
-		n += 2
-	}
-	if m.ForcePull {
-		n += 2
-	}
-	return n
-}
-
-func (m *DockerBuildStrategy) Size() (n int) {
-	var l int
-	_ = l
-	if m.From != nil {
-		l = m.From.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.PullSecret != nil {
-		l = m.PullSecret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.NoCache {
-		n += 2
-	}
-	if len(m.Env) > 0 {
-		for _, e := range m.Env {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	if m.ForcePull {
-		n += 2
-	}
-	l = len(m.DockerfilePath)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *BuildStrategy) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Type)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.DockerStrategy != nil {
-		l = m.DockerStrategy.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.SourceStrategy != nil {
-		l = m.SourceStrategy.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.CustomStrategy != nil {
-		l = m.CustomStrategy.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.JenkinsPipelineStrategy != nil {
-		l = m.JenkinsPipelineStrategy.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.OsoBuildStrategyType != 0 {
-		n += 1 + sovGrpc(uint64(m.OsoBuildStrategyType))
-	}
-	return n
-}
-
-func (m *SecretBuildSource) Size() (n int) {
-	var l int
-	_ = l
-	if m.Secret != nil {
-		l = m.Secret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.DestinationDir)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *ImageSourcePath) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.SourcePath)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.DestinationDir)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *ImageSource) Size() (n int) {
-	var l int
-	_ = l
-	if m.From != nil {
-		l = m.From.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if len(m.Paths) > 0 {
-		for _, e := range m.Paths {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	if m.PullSecret != nil {
-		l = m.PullSecret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *GitBuildSource) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Uri)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Ref)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.HttpProxy)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.HttpsProxy)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *BinaryBuildSource) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.AsFile)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *BuildSource) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Type)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Binary != nil {
-		l = m.Binary.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Dockerfile)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Git != nil {
-		l = m.Git.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if len(m.Images) > 0 {
-		for _, e := range m.Images {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	l = len(m.ContextDir)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.SourceSecret != nil {
-		l = m.SourceSecret.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if len(m.Secrets) > 0 {
-		for _, e := range m.Secrets {
-			l = e.Size()
-			n += 1 + l + sovGrpc(uint64(l))
-		}
-	}
-	if m.OsoBuildSourceType != 0 {
-		n += 1 + sovGrpc(uint64(m.OsoBuildSourceType))
-	}
-	return n
-}
-
-func (m *OsoCommonSpec) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.ServiceAccount)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Source != nil {
-		l = m.Source.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Revision != nil {
-		l = m.Revision.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Strategy != nil {
-		l = m.Strategy.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Output != nil {
-		l = m.Output.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Resources != nil {
-		l = m.Resources.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.PostCommit != nil {
-		l = m.PostCommit.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.CompletionDeadlineSeconds != 0 {
-		n += 1 + sovGrpc(uint64(m.CompletionDeadlineSeconds))
-	}
-	return n
-}
-
-func (m *WebHookTrigger) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Secret)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.AllowEnv {
-		n += 2
-	}
-	return n
-}
-
-func (m *ImageChangeTrigger) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.LastTriggeredImageID)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.From != nil {
-		l = m.From.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *OsoBuildTriggerPolicy) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Type)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Github != nil {
-		l = m.Github.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Generic != nil {
-		l = m.Generic.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.ImageChange != nil {
-		l = m.ImageChange.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.OsoBuildTriggerType != 0 {
-		n += 1 + sovGrpc(uint64(m.OsoBuildTriggerType))
-	}
-	return n
-}
-
-func (m *GenericWebHookCause) Size() (n int) {
-	var l int
-	_ = l
-	if m.Revision != nil {
-		l = m.Revision.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Secret)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *GitHubWebHookCause) Size() (n int) {
-	var l int
-	_ = l
-	if m.Revision != nil {
-		l = m.Revision.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Secret)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *ImageChangeCause) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.ImageID)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.FromRef != nil {
-		l = m.FromRef.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *OsoBuildTriggerCause) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.GenericWebHook != nil {
-		l = m.GenericWebHook.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.GithubWebHook != nil {
-		l = m.GithubWebHook.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.ImageChangeBuild != nil {
-		l = m.ImageChangeBuild.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	return n
-}
-
-func (m *OsoBuildStatus) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Phase)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Cancelled {
-		n += 2
-	}
-	l = len(m.Reason)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	l = len(m.Message)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.StartTimestamp != nil {
-		l = m.StartTimestamp.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.CompletionTimestamp != nil {
-		l = m.CompletionTimestamp.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Duration != 0 {
-		n += 1 + sovGrpc(uint64(m.Duration))
-	}
-	l = len(m.OutputDockerImageReference)
-	if l > 0 {
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.Config != nil {
-		l = m.Config.Size()
-		n += 1 + l + sovGrpc(uint64(l))
-	}
-	if m.OsoBuildPhase != 0 {
-		n += 1 + sovGrpc(uint64(m.OsoBuildPhase))
 	}
 	return n
 }
@@ -4116,6 +2189,1617 @@ func sovGrpc(x uint64) (n int) {
 }
 func sozGrpc(x uint64) (n int) {
 	return sovGrpc(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *ProjectResponseDataArbitrary) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectResponseDataArbitrary: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectResponseDataArbitrary: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Result = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Finalizers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Finalizers = append(m.Finalizers, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Datatype", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Datatype == nil {
+				m.Datatype = &K8STypeMeta{}
+			}
+			if err := m.Datatype.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Metadata == nil {
+				m.Metadata = &K8SObjectMeta{}
+			}
+			if err := m.Metadata.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ResultingCode", wireType)
+			}
+			m.ResultingCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.ResultingCode |= (K8SNamespacePhase(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Raw", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Raw == nil {
+				m.Raw = &RawData{}
+			}
+			if err := m.Raw.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectCreationRequestData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectCreationRequestData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectCreationRequestData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Labels == nil {
+				m.Labels = make(map[string]string)
+			}
+			m.Labels[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Annotations == nil {
+				m.Annotations = make(map[string]string)
+			}
+			m.Annotations[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Finalizers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Finalizers = append(m.Finalizers, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectCreationResponseData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectCreationResponseData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectCreationResponseData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Finalizers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Finalizers = append(m.Finalizers, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Phase", wireType)
+			}
+			m.Phase = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Phase |= (K8SNamespacePhase(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Raw", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Raw == nil {
+				m.Raw = &RawData{}
+			}
+			if err := m.Raw.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectRetrieveRequestData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectRetrieveRequestData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectRetrieveRequestData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectRetrieveResponseData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectRetrieveResponseData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectRetrieveResponseData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Finalizers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Finalizers = append(m.Finalizers, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Phase", wireType)
+			}
+			m.Phase = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Phase |= (K8SNamespacePhase(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Raw", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Raw == nil {
+				m.Raw = &RawData{}
+			}
+			if err := m.Raw.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectUpdationRequestData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectUpdationRequestData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectUpdationRequestData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Labels", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Labels == nil {
+				m.Labels = make(map[string]string)
+			}
+			m.Labels[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Annotations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapvalue uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapvalue := int(stringLenmapvalue)
+			if intStringLenmapvalue < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+			if postStringIndexmapvalue > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := string(data[iNdEx:postStringIndexmapvalue])
+			iNdEx = postStringIndexmapvalue
+			if m.Annotations == nil {
+				m.Annotations = make(map[string]string)
+			}
+			m.Annotations[mapkey] = mapvalue
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectDeletionRequestData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectDeletionRequestData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectDeletionRequestData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProjectDeletionResponseData) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGrpc
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProjectDeletionResponseData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProjectDeletionResponseData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Finalizers", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Finalizers = append(m.Finalizers, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Phase", wireType)
+			}
+			m.Phase = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Phase |= (K8SNamespacePhase(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Raw", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGrpc
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Raw == nil {
+				m.Raw = &RawData{}
+			}
+			if err := m.Raw.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGrpc(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthGrpc
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *CreateOriginProjectRequest) Unmarshal(data []byte) error {
 	l := len(data)
@@ -4311,168 +3995,6 @@ func (m *CreateOriginProjectResponse) Unmarshal(data []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Phase = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CreateOriginProjectArbitraryRequest) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: CreateOriginProjectArbitraryRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CreateOriginProjectArbitraryRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Odefv1RawData", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Odefv1RawData = append(m.Odefv1RawData[:0], data[iNdEx:postIndex]...)
-			if m.Odefv1RawData == nil {
-				m.Odefv1RawData = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CreateOriginProjectArbitraryResponse) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: CreateOriginProjectArbitraryResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CreateOriginProjectArbitraryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Odefv1RawData", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Odefv1RawData = append(m.Odefv1RawData[:0], data[iNdEx:postIndex]...)
-			if m.Odefv1RawData == nil {
-				m.Odefv1RawData = []byte{}
-			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4778,4252 +4300,6 @@ func (m *DeleteProjectResponse) Unmarshal(data []byte) error {
 				b := data[iNdEx]
 				iNdEx++
 				m.Flag |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SourceControlUser) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SourceControlUser: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SourceControlUser: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Email", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Email = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GitSourceRevision) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GitSourceRevision: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GitSourceRevision: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Commit", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Commit = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Author", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Author == nil {
-				m.Author = &SourceControlUser{}
-			}
-			if err := m.Author.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Committer", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Committer == nil {
-				m.Committer = &SourceControlUser{}
-			}
-			if err := m.Committer.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SourceRevision) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SourceRevision: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SourceRevision: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Type = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Git", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Git == nil {
-				m.Git = &GitSourceRevision{}
-			}
-			if err := m.Git.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BuildPostCommitSpec) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BuildPostCommitSpec: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BuildPostCommitSpec: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Command", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Command = append(m.Command, string(data[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Args", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Args = append(m.Args, string(data[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Script", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Script = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BuildOutput) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BuildOutput: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BuildOutput: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.To == nil {
-				m.To = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.To.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PushSecret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PushSecret == nil {
-				m.PushSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.PushSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *JenkinsPipelineBuildStrategy) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: JenkinsPipelineBuildStrategy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: JenkinsPipelineBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field JenkinsfilePath", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.JenkinsfilePath = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Jenkinsfile", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Jenkinsfile = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SecretSpec) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SecretSpec: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SecretSpec: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SecretSource", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SecretSource == nil {
-				m.SecretSource = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.SecretSource.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MountPath", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.MountPath = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *CustomBuildStrategy) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: CustomBuildStrategy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CustomBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.From == nil {
-				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PullSecret == nil {
-				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Env = append(m.Env, &k8s_io_kubernetes_pkg_api_v1.EnvVar{})
-			if err := m.Env[len(m.Env)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ExposeDockerSocket", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ExposeDockerSocket = bool(v != 0)
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForcePull", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ForcePull = bool(v != 0)
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secrets", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secrets = append(m.Secrets, &SecretSpec{})
-			if err := m.Secrets[len(m.Secrets)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BuildAPIVersion", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.BuildAPIVersion = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SourceBuildStrategy) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SourceBuildStrategy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SourceBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.From == nil {
-				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PullSecret == nil {
-				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Env = append(m.Env, &k8s_io_kubernetes_pkg_api_v1.EnvVar{})
-			if err := m.Env[len(m.Env)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Scripts", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Scripts = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Incremental", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Incremental = bool(v != 0)
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForcePull", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ForcePull = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DockerBuildStrategy) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DockerBuildStrategy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DockerBuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.From == nil {
-				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PullSecret == nil {
-				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NoCache", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.NoCache = bool(v != 0)
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Env = append(m.Env, &k8s_io_kubernetes_pkg_api_v1.EnvVar{})
-			if err := m.Env[len(m.Env)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForcePull", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ForcePull = bool(v != 0)
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DockerfilePath", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DockerfilePath = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BuildStrategy) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BuildStrategy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BuildStrategy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Type = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DockerStrategy", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.DockerStrategy == nil {
-				m.DockerStrategy = &DockerBuildStrategy{}
-			}
-			if err := m.DockerStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SourceStrategy", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SourceStrategy == nil {
-				m.SourceStrategy = &SourceBuildStrategy{}
-			}
-			if err := m.SourceStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CustomStrategy", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CustomStrategy == nil {
-				m.CustomStrategy = &CustomBuildStrategy{}
-			}
-			if err := m.CustomStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field JenkinsPipelineStrategy", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.JenkinsPipelineStrategy == nil {
-				m.JenkinsPipelineStrategy = &JenkinsPipelineBuildStrategy{}
-			}
-			if err := m.JenkinsPipelineStrategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildStrategyType", wireType)
-			}
-			m.OsoBuildStrategyType = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.OsoBuildStrategyType |= (BuildStrategy_OsoBuildStrategyType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SecretBuildSource) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SecretBuildSource: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SecretBuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Secret == nil {
-				m.Secret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.Secret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DestinationDir", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DestinationDir = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ImageSourcePath) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ImageSourcePath: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ImageSourcePath: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SourcePath", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SourcePath = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DestinationDir", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DestinationDir = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ImageSource) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ImageSource: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ImageSource: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.From == nil {
-				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Paths", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Paths = append(m.Paths, &ImageSourcePath{})
-			if err := m.Paths[len(m.Paths)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PullSecret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PullSecret == nil {
-				m.PullSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.PullSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GitBuildSource) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GitBuildSource: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GitBuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uri", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uri = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ref", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Ref = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HttpProxy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.HttpProxy = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HttpsProxy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.HttpsProxy = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BinaryBuildSource) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BinaryBuildSource: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BinaryBuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AsFile", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AsFile = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BuildSource) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BuildSource: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BuildSource: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Type = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Binary", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Binary == nil {
-				m.Binary = &BinaryBuildSource{}
-			}
-			if err := m.Binary.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Dockerfile", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Dockerfile = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Git", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Git == nil {
-				m.Git = &GitBuildSource{}
-			}
-			if err := m.Git.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Images", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Images = append(m.Images, &ImageSource{})
-			if err := m.Images[len(m.Images)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContextDir", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ContextDir = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SourceSecret", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.SourceSecret == nil {
-				m.SourceSecret = &k8s_io_kubernetes_pkg_api_v1.LocalObjectReference{}
-			}
-			if err := m.SourceSecret.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secrets", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secrets = append(m.Secrets, &SecretBuildSource{})
-			if err := m.Secrets[len(m.Secrets)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildSourceType", wireType)
-			}
-			m.OsoBuildSourceType = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.OsoBuildSourceType |= (BuildSource_OsoBuildSourceType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *OsoCommonSpec) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: OsoCommonSpec: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: OsoCommonSpec: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ServiceAccount", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ServiceAccount = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Source", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Source == nil {
-				m.Source = &BuildSource{}
-			}
-			if err := m.Source.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Revision == nil {
-				m.Revision = &SourceRevision{}
-			}
-			if err := m.Revision.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Strategy", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Strategy == nil {
-				m.Strategy = &BuildStrategy{}
-			}
-			if err := m.Strategy.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Output", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Output == nil {
-				m.Output = &BuildOutput{}
-			}
-			if err := m.Output.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Resources == nil {
-				m.Resources = &k8s_io_kubernetes_pkg_api_v1.ResourceRequirements{}
-			}
-			if err := m.Resources.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PostCommit", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.PostCommit == nil {
-				m.PostCommit = &BuildPostCommitSpec{}
-			}
-			if err := m.PostCommit.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CompletionDeadlineSeconds", wireType)
-			}
-			m.CompletionDeadlineSeconds = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.CompletionDeadlineSeconds |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *WebHookTrigger) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: WebHookTrigger: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WebHookTrigger: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secret = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AllowEnv", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.AllowEnv = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ImageChangeTrigger) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ImageChangeTrigger: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ImageChangeTrigger: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LastTriggeredImageID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LastTriggeredImageID = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.From == nil {
-				m.From = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.From.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *OsoBuildTriggerPolicy) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: OsoBuildTriggerPolicy: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: OsoBuildTriggerPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Type = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Github", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Github == nil {
-				m.Github = &WebHookTrigger{}
-			}
-			if err := m.Github.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Generic", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Generic == nil {
-				m.Generic = &WebHookTrigger{}
-			}
-			if err := m.Generic.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ImageChange", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ImageChange == nil {
-				m.ImageChange = &ImageChangeTrigger{}
-			}
-			if err := m.ImageChange.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildTriggerType", wireType)
-			}
-			m.OsoBuildTriggerType = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.OsoBuildTriggerType |= (OsoBuildTriggerPolicy_OsoBuildTriggerType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GenericWebHookCause) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GenericWebHookCause: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GenericWebHookCause: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Revision == nil {
-				m.Revision = &SourceRevision{}
-			}
-			if err := m.Revision.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secret = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GitHubWebHookCause) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GitHubWebHookCause: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GitHubWebHookCause: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Revision == nil {
-				m.Revision = &SourceRevision{}
-			}
-			if err := m.Revision.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Secret", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Secret = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ImageChangeCause) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ImageChangeCause: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ImageChangeCause: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ImageID", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ImageID = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FromRef", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FromRef == nil {
-				m.FromRef = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.FromRef.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *OsoBuildTriggerCause) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: OsoBuildTriggerCause: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: OsoBuildTriggerCause: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GenericWebHook", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.GenericWebHook == nil {
-				m.GenericWebHook = &GenericWebHookCause{}
-			}
-			if err := m.GenericWebHook.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GithubWebHook", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.GithubWebHook == nil {
-				m.GithubWebHook = &GitHubWebHookCause{}
-			}
-			if err := m.GithubWebHook.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ImageChangeBuild", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ImageChangeBuild == nil {
-				m.ImageChangeBuild = &ImageChangeCause{}
-			}
-			if err := m.ImageChangeBuild.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGrpc(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *OsoBuildStatus) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGrpc
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: OsoBuildStatus: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: OsoBuildStatus: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Phase", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Phase = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cancelled", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Cancelled = bool(v != 0)
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Reason = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Message = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StartTimestamp", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.StartTimestamp == nil {
-				m.StartTimestamp = &k8s_io_kubernetes_pkg_api_unversioned.Time{}
-			}
-			if err := m.StartTimestamp.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CompletionTimestamp", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CompletionTimestamp == nil {
-				m.CompletionTimestamp = &k8s_io_kubernetes_pkg_api_unversioned.Time{}
-			}
-			if err := m.CompletionTimestamp.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
-			}
-			m.Duration = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.Duration |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OutputDockerImageReference", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.OutputDockerImageReference = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGrpc
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Config == nil {
-				m.Config = &k8s_io_kubernetes_pkg_api_v1.ObjectReference{}
-			}
-			if err := m.Config.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OsoBuildPhase", wireType)
-			}
-			m.OsoBuildPhase = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGrpc
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.OsoBuildPhase |= (OsoBuildStatus_OsoBuildPhase(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -9566,7 +4842,7 @@ func (m *DockerBuildConfigResponseData) Unmarshal(data []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Metadata == nil {
-				m.Metadata = &k8s_io_kubernetes_pkg_api_v1.ObjectMeta{}
+				m.Metadata = &K8SObjectMeta{}
 			}
 			if err := m.Metadata.Unmarshal(data[iNdEx:postIndex]); err != nil {
 				return err
@@ -10109,7 +5385,7 @@ func (m *DockerBuildResponseData) Unmarshal(data []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Metadata == nil {
-				m.Metadata = &k8s_io_kubernetes_pkg_api_v1.ObjectMeta{}
+				m.Metadata = &K8SObjectMeta{}
 			}
 			if err := m.Metadata.Unmarshal(data[iNdEx:postIndex]); err != nil {
 				return err
@@ -10352,185 +5628,91 @@ var (
 )
 
 var fileDescriptorGrpc = []byte{
-	// 2875 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xdc, 0x5a, 0x4b, 0x6f, 0x1c, 0x59,
-	0xf5, 0x9f, 0x76, 0xdb, 0x6d, 0xfb, 0xb4, 0xed, 0xb4, 0xaf, 0x3d, 0x89, 0xa7, 0xe3, 0x64, 0x9c,
-	0x4a, 0x32, 0x93, 0x7f, 0x92, 0x7f, 0x37, 0x71, 0x66, 0x42, 0x92, 0x99, 0x04, 0xc5, 0xed, 0xbc,
-	0x26, 0x26, 0x6e, 0xae, 0x33, 0x41, 0x03, 0x02, 0x54, 0xdd, 0x7d, 0xbb, 0x5d, 0x71, 0x75, 0x55,
-	0x4d, 0x3d, 0x9c, 0x98, 0x08, 0x16, 0xb3, 0x18, 0x84, 0xd8, 0xa0, 0x19, 0x21, 0x58, 0xb2, 0x63,
-	0x81, 0x10, 0xdf, 0x00, 0x09, 0x89, 0xc5, 0x2c, 0x91, 0x10, 0x2b, 0x36, 0x08, 0x58, 0x21, 0xf1,
-	0x1d, 0x38, 0xf7, 0x51, 0xcf, 0xae, 0xee, 0xd8, 0x4e, 0x40, 0xc0, 0x22, 0x71, 0xdd, 0xdb, 0xe7,
-	0xfc, 0xce, 0xb9, 0xe7, 0x75, 0xcf, 0xbd, 0x55, 0xf0, 0x86, 0xa3, 0xeb, 0x5e, 0xbd, 0x6d, 0xd4,
-	0x6d, 0xcf, 0x76, 0x5a, 0x97, 0xeb, 0x3d, 0xd7, 0x69, 0xd7, 0x1c, 0xd7, 0xf6, 0x6d, 0x32, 0xc7,
-	0x7f, 0xaa, 0xb5, 0x8d, 0x9a, 0xfc, 0xa9, 0xba, 0xdc, 0xb3, 0xed, 0x9e, 0xc9, 0xea, 0xba, 0x63,
-	0xd4, 0x75, 0xcb, 0xb2, 0x7d, 0xdd, 0x37, 0x6c, 0xcb, 0x93, 0xd4, 0xd5, 0xf7, 0x7b, 0x86, 0xbf,
-	0x1d, 0xb4, 0x6a, 0x6d, 0xbb, 0x5f, 0xb7, 0x1d, 0x66, 0x79, 0xdb, 0x46, 0xd7, 0xaf, 0xdb, 0xae,
-	0xd1, 0x33, 0xac, 0xba, 0xb3, 0xd3, 0xab, 0xb7, 0x02, 0xc3, 0xec, 0x08, 0xe6, 0xdd, 0x4b, 0xf5,
-	0x1e, 0xb3, 0x98, 0xab, 0xfb, 0xac, 0xa3, 0xb8, 0xdf, 0xdd, 0xb9, 0xea, 0xd5, 0x0c, 0xbb, 0xbe,
-	0x13, 0xb4, 0x98, 0x6b, 0x31, 0x9f, 0x79, 0x82, 0x87, 0x53, 0x07, 0xd6, 0x2e, 0x73, 0x3d, 0x94,
-	0xc4, 0x3a, 0x03, 0x6c, 0x17, 0x87, 0xb3, 0x0d, 0x0a, 0xd1, 0x9a, 0x50, 0x6d, 0xb8, 0x0c, 0x27,
-	0x36, 0x85, 0x56, 0x4d, 0xd7, 0x7e, 0xc2, 0xda, 0x3e, 0x65, 0x1f, 0x07, 0xcc, 0xf3, 0x09, 0x81,
-	0x71, 0x4b, 0xef, 0xb3, 0xa5, 0xc2, 0x4a, 0xe1, 0xdc, 0x34, 0x15, 0xcf, 0xe4, 0x24, 0x40, 0xd7,
-	0xb0, 0x74, 0xd3, 0xf8, 0x2e, 0xaa, 0xb0, 0x34, 0xb6, 0x52, 0xc4, 0x5f, 0x12, 0x33, 0x5a, 0x03,
-	0x8e, 0xe7, 0x22, 0x7a, 0x0e, 0x1a, 0x86, 0x91, 0x39, 0x18, 0x33, 0x3a, 0x0a, 0x10, 0x9f, 0xc8,
-	0x22, 0x4c, 0x38, 0xdb, 0xba, 0xc7, 0x10, 0x89, 0x4f, 0xc9, 0x81, 0xf6, 0x00, 0x4e, 0xe7, 0x80,
-	0xdc, 0x72, 0x5b, 0x86, 0xef, 0xea, 0xee, 0x5e, 0xa8, 0xdf, 0x19, 0x98, 0xb5, 0x3b, 0xac, 0xbb,
-	0x7b, 0x89, 0xea, 0x4f, 0xd7, 0x75, 0x5f, 0x17, 0xb8, 0x33, 0x34, 0x3d, 0xa9, 0x6d, 0xc0, 0x99,
-	0xd1, 0x60, 0x4a, 0xb5, 0xfd, 0xa1, 0x9d, 0x03, 0x72, 0xc7, 0xb0, 0x3a, 0x2f, 0xb6, 0x94, 0xf6,
-	0x1e, 0x2c, 0xa4, 0x28, 0x0f, 0x24, 0xe6, 0x3c, 0x2c, 0xae, 0x33, 0x13, 0xdd, 0xb7, 0x0f, 0x41,
-	0x17, 0xe0, 0xf5, 0x0c, 0xad, 0x12, 0x85, 0xc4, 0x5d, 0x53, 0xef, 0x09, 0xe2, 0x22, 0x15, 0xcf,
-	0xda, 0x0d, 0x98, 0xdf, 0xb2, 0x03, 0xb7, 0xcd, 0x1a, 0xb6, 0xe5, 0xbb, 0xb6, 0xf9, 0xa1, 0xc7,
-	0xdc, 0x5c, 0x47, 0xa3, 0x67, 0x58, 0x5f, 0x37, 0xcc, 0xd0, 0x33, 0x62, 0xa0, 0xfd, 0xb6, 0x00,
-	0xf3, 0x77, 0x0d, 0x5f, 0x42, 0x50, 0xb6, 0x6b, 0xf0, 0x30, 0x24, 0x47, 0xa1, 0x84, 0x41, 0xde,
-	0x37, 0x7c, 0x85, 0xa0, 0x46, 0xe4, 0x1a, 0x94, 0xf4, 0xc0, 0xdf, 0xb6, 0x5d, 0x01, 0x52, 0x5e,
-	0x3d, 0x55, 0x4b, 0x27, 0x50, 0x6d, 0x40, 0x15, 0xaa, 0x18, 0xc8, 0x57, 0x60, 0x5a, 0x82, 0xf8,
-	0xcc, 0x5d, 0x2a, 0xee, 0x97, 0x3b, 0xe6, 0x21, 0x4b, 0x30, 0xd9, 0x67, 0x9e, 0xa7, 0xf7, 0xd8,
-	0xd2, 0xb8, 0x50, 0x2a, 0x1c, 0x6a, 0x1f, 0xc1, 0x5c, 0x46, 0x7f, 0x5c, 0xbf, 0xbf, 0xe7, 0x44,
-	0xeb, 0xe7, 0xcf, 0xe4, 0x32, 0x14, 0x31, 0x7f, 0x87, 0x29, 0x3e, 0x60, 0x03, 0xca, 0xa9, 0xb5,
-	0x6f, 0xc2, 0xc2, 0x1a, 0x4f, 0xea, 0xa6, 0xed, 0xf9, 0x0d, 0xa1, 0xca, 0x96, 0xc3, 0xda, 0x5c,
-	0x17, 0xae, 0x98, 0x6e, 0xf1, 0xd0, 0xe7, 0x19, 0x13, 0x0e, 0xb9, 0x64, 0xdd, 0xed, 0x85, 0x89,
-	0x24, 0x9e, 0xb9, 0x35, 0xbd, 0xb6, 0x6b, 0x38, 0xbe, 0x58, 0x37, 0x5a, 0x53, 0x8e, 0xb4, 0x9f,
-	0x17, 0xa0, 0x2c, 0xd0, 0x37, 0x03, 0xdf, 0x09, 0x7c, 0x72, 0x03, 0xc6, 0x7c, 0x5b, 0xe8, 0x5c,
-	0x5e, 0xfd, 0xff, 0x9a, 0xcc, 0xfb, 0x5a, 0x9c, 0xf7, 0x35, 0xcc, 0xfb, 0x1a, 0xe6, 0x7d, 0x6d,
-	0xf7, 0x52, 0x6d, 0xb3, 0x25, 0x03, 0xa3, 0xcb, 0x5c, 0x66, 0xa1, 0xd2, 0xc8, 0x48, 0x28, 0x80,
-	0x13, 0x78, 0xdb, 0x5b, 0xac, 0xed, 0xb2, 0x70, 0x9d, 0xab, 0xa3, 0x61, 0x36, 0xec, 0xb6, 0x6e,
-	0x66, 0xb1, 0x12, 0x28, 0xda, 0x13, 0x58, 0xfe, 0x80, 0x59, 0x3b, 0x86, 0xe5, 0x35, 0x0d, 0x87,
-	0x99, 0x86, 0xc5, 0x84, 0xc2, 0x5b, 0x3e, 0x2f, 0x3a, 0xbd, 0x3d, 0x72, 0x0e, 0x8e, 0x3c, 0x91,
-	0xbf, 0x77, 0x0d, 0x93, 0x35, 0x75, 0x7f, 0x5b, 0xd9, 0x3c, 0x3b, 0x4d, 0x56, 0xa0, 0x9c, 0x98,
-	0x52, 0x41, 0x98, 0x9c, 0xd2, 0x3e, 0x29, 0x00, 0x48, 0xb1, 0xc2, 0xc6, 0x8f, 0x61, 0xc6, 0x93,
-	0x23, 0xe1, 0x17, 0x65, 0x97, 0xc3, 0x2c, 0x28, 0x85, 0x43, 0x96, 0x61, 0xba, 0x6f, 0x07, 0x96,
-	0x2f, 0x94, 0x95, 0x6a, 0xc4, 0x13, 0xda, 0x67, 0x45, 0x58, 0x68, 0x04, 0x9e, 0x6f, 0xf7, 0xd3,
-	0x0b, 0xbd, 0x85, 0xa9, 0xe7, 0xda, 0xfd, 0xc3, 0x79, 0x47, 0xb0, 0x4a, 0xff, 0x98, 0xe6, 0xab,
-	0xf0, 0x4f, 0x88, 0x42, 0xae, 0x40, 0x91, 0x59, 0xbb, 0x18, 0x57, 0x45, 0x04, 0x3b, 0x33, 0x1a,
-	0xec, 0xb6, 0xb5, 0xfb, 0x58, 0x77, 0x29, 0x67, 0x20, 0x35, 0x20, 0xec, 0x99, 0x63, 0x7b, 0x6c,
-	0xdd, 0x6e, 0xef, 0x30, 0x77, 0x8b, 0xff, 0xef, 0x8b, 0xbc, 0x9a, 0xa2, 0x39, 0xbf, 0x70, 0xa3,
-	0x75, 0x6d, 0xb4, 0x5e, 0x13, 0x45, 0x2f, 0x4d, 0x08, 0xb2, 0x78, 0x82, 0xbc, 0x03, 0x93, 0xd2,
-	0xc4, 0xde, 0x52, 0x49, 0x68, 0x52, 0x1d, 0xc8, 0xec, 0xc8, 0xaf, 0x34, 0x24, 0xe5, 0xb1, 0x23,
-	0x36, 0xcc, 0x5b, 0xcd, 0xfb, 0x8f, 0xe5, 0xf6, 0xb7, 0x34, 0x29, 0x63, 0x27, 0x33, 0xad, 0xfd,
-	0x66, 0x0c, 0x16, 0xa4, 0xf7, 0xfe, 0xa7, 0x9d, 0x82, 0x55, 0x45, 0x56, 0x06, 0x2f, 0xac, 0x70,
-	0x6a, 0xc8, 0x93, 0xc7, 0xb0, 0x10, 0xbb, 0xcf, 0x2c, 0x5f, 0x0f, 0x1d, 0x90, 0x9c, 0x4a, 0x3b,
-	0xa8, 0x94, 0x71, 0x90, 0xf6, 0x3b, 0x34, 0xa0, 0xf4, 0xe7, 0x7f, 0x85, 0x01, 0xd1, 0x10, 0x96,
-	0xdd, 0xd0, 0xdb, 0xdb, 0x4c, 0x54, 0xcc, 0x29, 0x1a, 0x0e, 0x43, 0xd3, 0x8e, 0x1f, 0xd4, 0xb4,
-	0xa3, 0xe3, 0xf7, 0x2d, 0x98, 0xeb, 0x08, 0xeb, 0x44, 0x45, 0xac, 0x24, 0xec, 0x9f, 0x99, 0xd5,
-	0x7e, 0x39, 0x0e, 0xb3, 0x69, 0x03, 0xe6, 0x6d, 0x34, 0x0f, 0x42, 0xb4, 0x90, 0x4a, 0x59, 0xe5,
-	0x74, 0x36, 0x29, 0x72, 0x3c, 0x42, 0x33, 0xac, 0x1c, 0xcc, 0x13, 0x91, 0x1f, 0x81, 0x15, 0xf3,
-	0xc1, 0x72, 0xf2, 0x83, 0x66, 0x58, 0x39, 0x58, 0x5b, 0xd4, 0xb6, 0x08, 0x6c, 0x3c, 0x1f, 0x2c,
-	0xa7, 0x02, 0xd2, 0x0c, 0x2b, 0xe9, 0xc2, 0xb1, 0x27, 0xe9, 0xad, 0x21, 0x42, 0x9d, 0x10, 0xa8,
-	0x17, 0xb3, 0xa8, 0xa3, 0x76, 0x12, 0x3a, 0x0c, 0x0c, 0xe5, 0x2c, 0x22, 0x7f, 0x8a, 0xf8, 0x11,
-	0x37, 0x39, 0x77, 0xd1, 0x1c, 0x86, 0x5a, 0x46, 0x48, 0x8a, 0xb0, 0xb6, 0x99, 0xc3, 0x49, 0x73,
-	0xf1, 0xb4, 0x4d, 0x58, 0xcc, 0xa3, 0x26, 0x00, 0x25, 0xe9, 0xa8, 0xca, 0x6b, 0xfc, 0x59, 0xda,
-	0xb9, 0x52, 0xe0, 0xcf, 0xd2, 0x4c, 0x95, 0x31, 0xb2, 0x00, 0x47, 0x32, 0x8b, 0xab, 0x14, 0xb5,
-	0x1f, 0x60, 0x6b, 0x25, 0x03, 0x5a, 0x82, 0xca, 0xed, 0xe7, 0x03, 0x6c, 0x06, 0x64, 0xae, 0x1c,
-	0x7e, 0x43, 0x53, 0x08, 0x22, 0x6e, 0xb1, 0x89, 0xc4, 0x66, 0x9d, 0x1f, 0x53, 0xd6, 0x0d, 0x57,
-	0xed, 0x67, 0x99, 0x59, 0x6c, 0x90, 0x8e, 0xdc, 0xef, 0x63, 0xa7, 0x24, 0x55, 0x10, 0xdb, 0x31,
-	0xb6, 0xfd, 0x5e, 0x34, 0x52, 0xe1, 0x9b, 0x98, 0xd9, 0x37, 0xf4, 0x9f, 0xb0, 0x87, 0x49, 0x60,
-	0xbf, 0x8a, 0x8a, 0xf2, 0x2e, 0x1e, 0x21, 0x50, 0x05, 0xd9, 0x43, 0x95, 0x57, 0xdf, 0xcc, 0x7a,
-	0x38, 0xb3, 0x14, 0x2a, 0xa9, 0x33, 0x85, 0xa8, 0xf8, 0x2a, 0x0a, 0x91, 0xe6, 0xc2, 0x1c, 0x36,
-	0x86, 0x49, 0xf7, 0x55, 0xa0, 0x18, 0xb8, 0x86, 0x32, 0x18, 0x7f, 0xe4, 0x33, 0x2e, 0xeb, 0x2a,
-	0xf3, 0xf0, 0x47, 0x5e, 0x6c, 0xb6, 0x7d, 0xdf, 0xc1, 0xee, 0xfd, 0xd9, 0x9e, 0x6a, 0xf9, 0xe2,
-	0x09, 0x6e, 0x79, 0x3e, 0xf0, 0xe4, 0xcf, 0xb2, 0xd0, 0x27, 0x66, 0xb0, 0xfb, 0x9f, 0x5f, 0x43,
-	0x03, 0xbb, 0x7b, 0x49, 0xb1, 0xd8, 0x42, 0xea, 0xde, 0x1d, 0xde, 0x38, 0xa9, 0x86, 0x5c, 0x8e,
-	0xb4, 0x2f, 0xc6, 0x55, 0x0b, 0xa9, 0xe8, 0xf2, 0xea, 0x11, 0x36, 0xed, 0x2d, 0x01, 0x38, 0xac,
-	0xf7, 0x1d, 0x10, 0x47, 0x15, 0x03, 0xd7, 0x35, 0x2e, 0x81, 0x6a, 0x29, 0x89, 0x19, 0xf2, 0x25,
-	0xd9, 0x53, 0xcb, 0x2a, 0x72, 0x32, 0xa7, 0xa7, 0x4e, 0x82, 0x72, 0x52, 0xec, 0xc2, 0x4b, 0x06,
-	0xf7, 0x9f, 0x87, 0x45, 0x82, 0x7b, 0xf7, 0xf8, 0x08, 0xef, 0x52, 0x45, 0xca, 0xd5, 0x68, 0xe3,
-	0xa1, 0x80, 0x3d, 0xf3, 0x79, 0x20, 0xca, 0xda, 0x9c, 0x98, 0x11, 0xad, 0xa2, 0xac, 0x74, 0xd2,
-	0xf9, 0x93, 0x2f, 0xd1, 0x2a, 0x26, 0x70, 0xc8, 0x7b, 0x71, 0x5f, 0x33, 0x25, 0xb4, 0x3d, 0x95,
-	0xdf, 0xd7, 0x24, 0x57, 0x19, 0xb5, 0x37, 0xdf, 0x06, 0x12, 0xd5, 0x19, 0xf1, 0x93, 0xa8, 0x5a,
-	0xd3, 0xa2, 0x6a, 0xd5, 0xf2, 0xab, 0x96, 0x20, 0x8b, 0x6b, 0x56, 0xc4, 0x45, 0x73, 0x90, 0xb4,
-	0x87, 0x40, 0x06, 0x29, 0xc9, 0x24, 0x14, 0xd1, 0xec, 0x58, 0xaa, 0xe6, 0x00, 0xd6, 0x23, 0x47,
-	0xc9, 0x72, 0x25, 0xfd, 0x8c, 0xe5, 0x6a, 0x1a, 0x26, 0x84, 0x99, 0x2b, 0x45, 0x32, 0x05, 0xe3,
-	0x0f, 0x6d, 0x2c, 0x57, 0xe3, 0xda, 0x3f, 0x8a, 0x30, 0x8b, 0x80, 0xfc, 0x94, 0x63, 0x5b, 0xa2,
-	0x03, 0xc7, 0x1a, 0x80, 0x67, 0xb0, 0x5d, 0xa3, 0xcd, 0x6e, 0xb5, 0xdb, 0xbc, 0x43, 0x56, 0x61,
-	0x95, 0x99, 0xe5, 0x3e, 0x95, 0x66, 0x53, 0x01, 0x76, 0x7c, 0xc4, 0xea, 0xa8, 0x22, 0x25, 0xd7,
-	0x61, 0xca, 0x55, 0x47, 0x2d, 0x95, 0xac, 0x27, 0xf3, 0xb7, 0xb4, 0xe8, 0x40, 0x16, 0xd1, 0x63,
-	0x44, 0x4f, 0x79, 0xe9, 0x1d, 0xec, 0xc4, 0xc8, 0x6d, 0x80, 0x46, 0xe4, 0x5c, 0x57, 0x5b, 0x9c,
-	0xb6, 0xd4, 0x26, 0x95, 0xaf, 0xab, 0x3c, 0x90, 0x51, 0x45, 0x4a, 0x9a, 0x30, 0xed, 0x32, 0xa9,
-	0xb7, 0x27, 0xc2, 0xef, 0x85, 0xc1, 0x45, 0x15, 0x39, 0x3f, 0xe6, 0x1b, 0xb2, 0x49, 0xf3, 0x68,
-	0x0c, 0x42, 0x1a, 0x58, 0xac, 0xa2, 0x23, 0xa5, 0x8a, 0xd7, 0xd3, 0xb9, 0xaa, 0xa4, 0x4f, 0x9e,
-	0x34, 0xc1, 0x46, 0xde, 0x87, 0x37, 0xf0, 0xd8, 0xe9, 0x98, 0x4c, 0x14, 0x63, 0xa6, 0x77, 0xc4,
-	0xbe, 0xc9, 0x30, 0x31, 0x3a, 0x3c, 0x60, 0xf9, 0x1d, 0xc1, 0x70, 0x02, 0x6d, 0x1d, 0xe6, 0xbe,
-	0xce, 0x5a, 0xf7, 0x6c, 0x7b, 0xe7, 0x91, 0x6b, 0xf4, 0x7a, 0x78, 0xc2, 0x3e, 0x9a, 0xda, 0x9a,
-	0xa6, 0xa3, 0x6d, 0xa6, 0x0a, 0x53, 0xba, 0x69, 0xda, 0x4f, 0xb1, 0xa1, 0x12, 0x1e, 0x9e, 0xa2,
-	0xd1, 0x58, 0xfb, 0x51, 0x01, 0x88, 0x88, 0xa5, 0xc6, 0xb6, 0x6e, 0xf5, 0x58, 0x08, 0xb5, 0x0a,
-	0x8b, 0xa6, 0xee, 0xf9, 0x6a, 0xc8, 0x3a, 0x82, 0xe4, 0xfe, 0xba, 0x02, 0xce, 0xfd, 0x2d, 0xda,
-	0x3a, 0xc6, 0x0e, 0xbd, 0x75, 0x68, 0xbf, 0x2e, 0xc2, 0xeb, 0x61, 0x52, 0x28, 0xfc, 0xa6, 0x6d,
-	0x1a, 0xed, 0xfc, 0x46, 0xed, 0x0a, 0x94, 0xe4, 0x8d, 0x9e, 0x12, 0x39, 0x10, 0x80, 0x69, 0xfb,
-	0x50, 0x45, 0x4d, 0xae, 0xc2, 0xa4, 0xb8, 0x77, 0x33, 0xda, 0xc3, 0x22, 0x37, 0xc3, 0x18, 0x92,
-	0x93, 0x75, 0xec, 0xe3, 0x63, 0x63, 0xa9, 0xd8, 0xd5, 0x72, 0x4b, 0x60, 0xca, 0x9e, 0x34, 0xc9,
-	0x46, 0x76, 0x60, 0xc1, 0x4e, 0x2f, 0x52, 0x94, 0x96, 0x09, 0x51, 0x5a, 0xae, 0x65, 0xd1, 0x72,
-	0xed, 0x91, 0x9d, 0x15, 0x55, 0x26, 0x0f, 0x55, 0xfb, 0x16, 0x2c, 0xe4, 0xd0, 0xf2, 0x72, 0x82,
-	0x75, 0xe6, 0x5e, 0xd0, 0xc2, 0x52, 0x53, 0x86, 0xc9, 0xbb, 0x72, 0x81, 0x58, 0x67, 0x8e, 0xa8,
-	0x7e, 0x40, 0xea, 0x8a, 0xc5, 0xa6, 0x02, 0x33, 0x0d, 0xdb, 0xea, 0x1a, 0x3d, 0x35, 0x53, 0x14,
-	0xbc, 0x36, 0x72, 0x7b, 0x58, 0x75, 0x0c, 0x58, 0x50, 0xbc, 0xca, 0x66, 0x0d, 0x3d, 0xf0, 0xd2,
-	0xd5, 0xa1, 0x70, 0xc0, 0xea, 0x10, 0x87, 0xf1, 0x58, 0x32, 0x8c, 0xb5, 0x6d, 0x20, 0x52, 0xe5,
-	0x7f, 0xb9, 0xa4, 0x00, 0x2a, 0x09, 0x1b, 0x48, 0x39, 0x78, 0xa6, 0x31, 0x52, 0x49, 0x10, 0x0e,
-	0xc9, 0x5d, 0x98, 0xe4, 0xc1, 0x4b, 0x55, 0x13, 0x71, 0xe0, 0xd0, 0x0f, 0xb9, 0xb5, 0x9f, 0x8c,
-	0xc5, 0x2d, 0xac, 0xf2, 0x55, 0x24, 0x3b, 0xbc, 0x3a, 0x2b, 0xa4, 0xae, 0xce, 0xf8, 0x89, 0xa0,
-	0x97, 0x32, 0xff, 0xb0, 0xb3, 0x4a, 0x8e, 0x93, 0x68, 0x86, 0x95, 0xdc, 0x83, 0x59, 0x99, 0x21,
-	0x21, 0x56, 0x31, 0x3f, 0xbe, 0x07, 0xbd, 0x40, 0xd3, 0x8c, 0x64, 0x03, 0x2a, 0x89, 0x80, 0x17,
-	0x0b, 0x52, 0xc9, 0xb2, 0x32, 0x22, 0x59, 0x24, 0xd4, 0x00, 0xa7, 0xf6, 0xc3, 0x09, 0x98, 0x8b,
-	0x5b, 0x7b, 0xdd, 0x0f, 0xbc, 0xf8, 0x9a, 0xba, 0x90, 0xb8, 0xa6, 0xe6, 0x8d, 0x5b, 0x5b, 0x47,
-	0x93, 0x9a, 0x26, 0xeb, 0xa8, 0x4a, 0x17, 0x4f, 0x70, 0x6f, 0xbb, 0x4c, 0xf7, 0xd4, 0x7e, 0x85,
-	0xde, 0x96, 0xa3, 0xe1, 0x17, 0x93, 0x64, 0x0b, 0x37, 0x50, 0x5f, 0x77, 0xfd, 0x47, 0x06, 0xce,
-	0xf8, 0x7a, 0xdf, 0x51, 0x9b, 0xce, 0x85, 0x11, 0x0e, 0x4e, 0xbc, 0x0b, 0xa8, 0x71, 0x3e, 0x9a,
-	0x81, 0x20, 0x98, 0x90, 0x71, 0x51, 0x8f, 0x91, 0x4b, 0x07, 0x47, 0xce, 0xc3, 0xe1, 0xc5, 0xbe,
-	0x13, 0xb8, 0xa2, 0xbf, 0x17, 0xfb, 0x52, 0x91, 0x46, 0x63, 0x72, 0x13, 0xaa, 0x72, 0x47, 0x94,
-	0x9d, 0x85, 0x30, 0x7d, 0x14, 0x87, 0x62, 0xc7, 0x99, 0xa6, 0x23, 0x28, 0xc8, 0x6d, 0x7e, 0xad,
-	0xcc, 0x4b, 0x81, 0x68, 0x83, 0x0e, 0x1c, 0xe8, 0x8a, 0x19, 0x3b, 0xfd, 0xd9, 0xb0, 0x52, 0x35,
-	0x85, 0x13, 0x41, 0x54, 0xbe, 0x8b, 0xc3, 0x2a, 0x9f, 0xf4, 0x79, 0x34, 0x14, 0x3c, 0x34, 0x0d,
-	0xa1, 0x75, 0x45, 0xf3, 0x13, 0x4f, 0xf0, 0x46, 0xea, 0x21, 0x7b, 0x2a, 0xab, 0x5b, 0x93, 0x59,
-	0x1d, 0xc3, 0xea, 0x61, 0x75, 0xc3, 0x01, 0x0d, 0x2c, 0x8b, 0x0f, 0xc6, 0xc8, 0x0c, 0x4c, 0x35,
-	0xa4, 0x05, 0x55, 0x55, 0xbb, 0xa3, 0x63, 0xaf, 0xd5, 0xa9, 0x8c, 0xf3, 0x06, 0xeb, 0xb6, 0xeb,
-	0xda, 0x6e, 0x65, 0x82, 0xcc, 0xc2, 0x74, 0x23, 0x0c, 0xa1, 0x4a, 0x49, 0xfb, 0xe3, 0x04, 0x2c,
-	0x27, 0xce, 0xfd, 0xb2, 0x32, 0xaa, 0x97, 0x01, 0xfc, 0x45, 0x41, 0xee, 0xd5, 0xfd, 0x0a, 0x94,
-	0x1d, 0xf9, 0x2a, 0xe0, 0x21, 0xff, 0x49, 0xdd, 0x9d, 0x26, 0xa6, 0x70, 0xef, 0x9c, 0xf2, 0x65,
-	0xc6, 0x7b, 0xea, 0xde, 0xe9, 0xec, 0xbe, 0xf6, 0x01, 0x1a, 0xb1, 0xf1, 0xe0, 0x77, 0x03, 0x4b,
-	0x4e, 0xab, 0x40, 0x8e, 0x27, 0xc8, 0x0d, 0xde, 0x82, 0x87, 0x9d, 0xa1, 0x0a, 0xe3, 0x13, 0x39,
-	0x22, 0xe2, 0xf6, 0x91, 0x26, 0x18, 0x88, 0x09, 0xf3, 0xa1, 0xbd, 0x69, 0x24, 0x44, 0x9e, 0xe0,
-	0x6f, 0x8e, 0xb8, 0x16, 0x19, 0x30, 0x4f, 0xb4, 0x8a, 0x08, 0x85, 0x0e, 0x02, 0x63, 0xbf, 0x56,
-	0x32, 0xf5, 0x16, 0x33, 0x3d, 0x8c, 0x60, 0x6e, 0x8b, 0xab, 0x07, 0x12, 0xb1, 0x21, 0x58, 0x6f,
-	0x5b, 0xbe, 0xbb, 0x47, 0x15, 0x0e, 0xf9, 0x0e, 0x94, 0x13, 0xef, 0x03, 0xd5, 0x69, 0xe0, 0xc6,
-	0x81, 0x60, 0x6f, 0xc5, 0xfc, 0x12, 0x3b, 0x89, 0x58, 0xbd, 0x06, 0xe5, 0x84, 0x5c, 0x7e, 0xa8,
-	0xdc, 0x61, 0x7b, 0xe1, 0x31, 0x13, 0x1f, 0x79, 0xc5, 0xda, 0xd5, 0xcd, 0x20, 0x7a, 0xb1, 0x26,
-	0x06, 0xd7, 0xc7, 0xae, 0x16, 0xaa, 0x37, 0xa1, 0x92, 0xc5, 0x3e, 0x08, 0xbf, 0xd6, 0x80, 0xf9,
-	0x01, 0xab, 0xf2, 0xd8, 0x6e, 0xea, 0x2e, 0xb6, 0x79, 0xcc, 0x54, 0xf7, 0x1e, 0x58, 0xe9, 0x75,
-	0x13, 0x53, 0x60, 0x11, 0x2a, 0xf2, 0x79, 0x03, 0x3b, 0x6a, 0xcf, 0xdf, 0xb4, 0x4c, 0x3c, 0x52,
-	0x68, 0xcf, 0xe1, 0x44, 0xce, 0xea, 0xe5, 0x7b, 0x2b, 0x11, 0xd7, 0x28, 0x1f, 0x0b, 0x8c, 0xcf,
-	0xd4, 0xcb, 0x2b, 0x39, 0xc0, 0x86, 0x68, 0xaa, 0xcf, 0x7c, 0xbd, 0xc3, 0xdf, 0x9b, 0xc9, 0x9d,
-	0xe7, 0xdc, 0x7e, 0x6a, 0xc2, 0x57, 0x91, 0x87, 0x46, 0x9c, 0xda, 0xa7, 0xe3, 0x70, 0x34, 0x21,
-	0xfd, 0xe5, 0xd3, 0x69, 0x43, 0x1c, 0x38, 0x71, 0x09, 0x22, 0xda, 0x8b, 0xf9, 0xd7, 0x59, 0xa3,
-	0xbc, 0x4d, 0x13, 0xfc, 0xe4, 0x0e, 0x94, 0xfd, 0xb0, 0xd9, 0x5d, 0xdb, 0x8b, 0x2e, 0x2f, 0x47,
-	0xe7, 0xa7, 0xdc, 0xcc, 0x92, 0x8c, 0xfc, 0xea, 0x48, 0x85, 0xb5, 0x3c, 0x3b, 0xaf, 0x8e, 0xd0,
-	0xe8, 0x45, 0x01, 0xfd, 0x51, 0x3a, 0xa0, 0xe5, 0xb5, 0xfd, 0x97, 0xf7, 0x09, 0xf8, 0x1f, 0x1b,
-	0xca, 0x7f, 0x2f, 0xc0, 0xb1, 0x94, 0xce, 0x89, 0x00, 0xbc, 0xc2, 0xb7, 0x6f, 0x2f, 0x30, 0xfd,
-	0x61, 0x6d, 0x5e, 0x7a, 0xbb, 0xa0, 0x8a, 0x9a, 0x7c, 0x0d, 0x66, 0xda, 0x61, 0x38, 0x73, 0xee,
-	0xb0, 0x47, 0x7b, 0x71, 0x34, 0xc4, 0xc2, 0x69, 0x0a, 0x22, 0x15, 0xf5, 0xc5, 0x43, 0x47, 0xfd,
-	0x03, 0xdc, 0x8b, 0xe4, 0xdb, 0x65, 0x7e, 0x41, 0x62, 0xb7, 0xa2, 0x80, 0x56, 0xb7, 0x79, 0xf1,
-	0x0c, 0x8f, 0x78, 0x39, 0x5a, 0xdb, 0x43, 0x64, 0xb1, 0x84, 0x19, 0x9a, 0x9c, 0x5a, 0xfd, 0x71,
-	0x19, 0x66, 0xb7, 0x0c, 0xbe, 0x99, 0x6d, 0xc9, 0xc3, 0x3d, 0xf9, 0xbc, 0x00, 0x0b, 0x39, 0xef,
-	0xd9, 0xc9, 0xf9, 0x81, 0xcb, 0xe2, 0xa1, 0x1f, 0x1c, 0x54, 0x2f, 0xec, 0x8b, 0x56, 0xda, 0x49,
-	0x3b, 0xfd, 0xc9, 0x1f, 0xfe, 0xf6, 0xf9, 0xd8, 0x89, 0xea, 0x12, 0xff, 0xb0, 0xc1, 0xee, 0x18,
-	0xad, 0xba, 0x4a, 0x49, 0xaf, 0xfe, 0x9c, 0xe7, 0xed, 0xf7, 0xae, 0x17, 0xce, 0x93, 0x5f, 0x14,
-	0x60, 0x79, 0xd4, 0xdb, 0x7f, 0x72, 0x79, 0x1f, 0x22, 0xb3, 0x1f, 0x1e, 0x54, 0xdf, 0x39, 0x18,
-	0x93, 0x52, 0x78, 0x59, 0x28, 0x7c, 0x54, 0x9b, 0x1f, 0x50, 0x98, 0x6b, 0xfa, 0x1c, 0xca, 0x89,
-	0xcf, 0x05, 0xc8, 0x40, 0x17, 0x3c, 0xf8, 0xd5, 0x41, 0xf5, 0xf4, 0x48, 0x9a, 0xb4, 0x99, 0xc8,
-	0x48, 0x33, 0x7d, 0x1f, 0x66, 0x53, 0x9f, 0x10, 0x90, 0x81, 0x72, 0x93, 0xf7, 0x35, 0x42, 0xf5,
-	0xec, 0x0b, 0xa8, 0x94, 0x0a, 0x2b, 0x42, 0x85, 0xea, 0x70, 0x15, 0xc8, 0xaf, 0x0a, 0x30, 0x8f,
-	0xed, 0x53, 0x98, 0x52, 0x32, 0x23, 0xc8, 0xb5, 0x5a, 0xfc, 0x05, 0x4d, 0x2d, 0xfa, 0x82, 0xa6,
-	0x26, 0xbf, 0xa0, 0x11, 0xf1, 0x2e, 0xde, 0xfc, 0x85, 0x51, 0x9f, 0x60, 0xad, 0x1e, 0x9e, 0x55,
-	0xd3, 0x84, 0xb6, 0xcb, 0xda, 0x31, 0xa1, 0x2d, 0x12, 0xe0, 0x1f, 0x41, 0x2c, 0x73, 0x52, 0x38,
-	0xeb, 0xa7, 0x05, 0x0c, 0x7f, 0xde, 0x67, 0x87, 0x1a, 0x63, 0x1c, 0x1d, 0x5c, 0x60, 0xf5, 0x30,
-	0x4c, 0x99, 0x30, 0x4a, 0xe8, 0x27, 0x34, 0x63, 0x50, 0x11, 0x64, 0x89, 0x86, 0x9a, 0x1c, 0xcb,
-	0xba, 0x49, 0xd5, 0x81, 0xea, 0xb0, 0x1f, 0xb4, 0x37, 0x85, 0x8c, 0x37, 0xb4, 0x45, 0x2e, 0xc3,
-	0xd5, 0x9f, 0xd6, 0xe5, 0x25, 0x6e, 0x2c, 0xc6, 0x03, 0x42, 0x59, 0xeb, 0xe5, 0x05, 0x5d, 0x10,
-	0x82, 0xce, 0x56, 0x57, 0xf2, 0x04, 0xd5, 0x9f, 0x8b, 0xbf, 0x51, 0x94, 0x7e, 0x5a, 0x80, 0xa3,
-	0x32, 0xd3, 0x12, 0x42, 0xa5, 0xf9, 0xdf, 0xda, 0xdf, 0x56, 0x54, 0x7d, 0x7b, 0x24, 0x5d, 0x5c,
-	0x81, 0xb5, 0xe3, 0x42, 0xb1, 0xd7, 0xb5, 0x0a, 0x57, 0x2c, 0xbb, 0xfa, 0xcf, 0x50, 0x91, 0x0f,
-	0x9d, 0xce, 0xbf, 0x45, 0x91, 0xb7, 0x85, 0x22, 0xa7, 0xaa, 0xcb, 0x59, 0x45, 0x32, 0xd6, 0x59,
-	0xdb, 0xfc, 0xe2, 0x2f, 0x27, 0x0b, 0xbf, 0xc7, 0x7f, 0x7f, 0xc6, 0x7f, 0x3f, 0xfb, 0xeb, 0xc9,
-	0xd7, 0xe0, 0xff, 0x78, 0x58, 0x7d, 0x8c, 0x87, 0x8f, 0xbd, 0x40, 0xb7, 0x6c, 0x14, 0x66, 0xbb,
-	0xac, 0x26, 0x3f, 0x59, 0x13, 0x9f, 0x7f, 0xb5, 0x82, 0xae, 0x92, 0xbe, 0x06, 0x77, 0x5d, 0xa7,
-	0xcd, 0x4b, 0x39, 0x73, 0xbf, 0x51, 0x92, 0x73, 0xad, 0x92, 0x20, 0xba, 0xfc, 0xcf, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x1c, 0x08, 0x03, 0x55, 0x11, 0x27, 0x00, 0x00,
+	// 1369 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xd4, 0x58, 0xdd, 0x6f, 0xdb, 0x54,
+	0x14, 0x9f, 0x93, 0x26, 0xeb, 0x4e, 0xda, 0x29, 0xbb, 0xfb, 0x4a, 0xdd, 0xb4, 0xb4, 0xde, 0xca,
+	0xb6, 0x76, 0x24, 0x2c, 0x93, 0xb6, 0x6e, 0xd3, 0x26, 0xb5, 0x29, 0x9b, 0xc6, 0xca, 0x1a, 0xdc,
+	0xf1, 0x00, 0x12, 0x42, 0x37, 0xce, 0x6d, 0x30, 0x73, 0x6c, 0xcf, 0x76, 0x3a, 0x85, 0x0a, 0x1e,
+	0x78, 0xe0, 0x81, 0x47, 0x26, 0x10, 0x88, 0x7f, 0x88, 0x17, 0x24, 0x04, 0xe2, 0x85, 0x17, 0x10,
+	0xf0, 0x57, 0xf0, 0xc4, 0xfd, 0x70, 0x1c, 0xdb, 0x71, 0xbe, 0x56, 0x04, 0xdb, 0x43, 0x55, 0xfb,
+	0xfa, 0x7c, 0xfc, 0xee, 0x39, 0xbf, 0x73, 0xee, 0xb9, 0x81, 0x39, 0x1b, 0x63, 0xb7, 0xac, 0xe9,
+	0x65, 0xcb, 0xb5, 0xec, 0xfa, 0xd5, 0x72, 0xd3, 0xb1, 0xb5, 0x92, 0xed, 0x58, 0x9e, 0x85, 0x8e,
+	0xb3, 0x4f, 0x25, 0x4d, 0x2f, 0x89, 0x4f, 0x72, 0xb1, 0x69, 0x59, 0x4d, 0x83, 0x94, 0xb1, 0xad,
+	0x97, 0xb1, 0x69, 0x5a, 0x1e, 0xf6, 0x74, 0xcb, 0x74, 0x85, 0xb4, 0x2c, 0xc7, 0x0c, 0xb5, 0xac,
+	0x06, 0x31, 0xc4, 0x37, 0xe5, 0xa7, 0x14, 0x14, 0x6b, 0x8e, 0xf5, 0x11, 0xd1, 0x3c, 0x95, 0xb8,
+	0x36, 0x55, 0x22, 0x5b, 0xd8, 0xc3, 0x1b, 0x4e, 0x5d, 0xf7, 0x1c, 0xec, 0x74, 0x10, 0x82, 0x29,
+	0x13, 0xb7, 0x48, 0x41, 0x5a, 0x92, 0x2e, 0x1e, 0x53, 0xf9, 0x33, 0x3a, 0x03, 0x59, 0x87, 0xb8,
+	0x6d, 0xc3, 0x2b, 0xa4, 0xf8, 0xaa, 0xff, 0x86, 0x16, 0x01, 0xf6, 0x74, 0x13, 0x1b, 0xfa, 0xc7,
+	0xc4, 0x71, 0x0b, 0xe9, 0xa5, 0x34, 0xfd, 0x16, 0x5a, 0x41, 0xd7, 0x61, 0xba, 0x41, 0x8d, 0x7b,
+	0x1d, 0x9b, 0x14, 0xa6, 0xa8, 0x66, 0xae, 0x32, 0x5f, 0x8a, 0xee, 0xa4, 0xf4, 0x60, 0xdd, 0x7d,
+	0x44, 0x3f, 0xbf, 0x45, 0x3c, 0xac, 0x06, 0xc2, 0xe8, 0x06, 0x4c, 0xb7, 0xe8, 0x0a, 0x7b, 0x2f,
+	0x64, 0xb8, 0xe2, 0x42, 0x82, 0xe2, 0x4e, 0x9d, 0x6d, 0x43, 0xa8, 0x76, 0xc5, 0xd1, 0x3d, 0x98,
+	0x15, 0xe8, 0x74, 0xb3, 0x59, 0xa5, 0x1b, 0x2f, 0x64, 0xa9, 0xfe, 0xf1, 0xca, 0x72, 0x82, 0xfe,
+	0x43, 0xba, 0x37, 0xd7, 0xc6, 0x1a, 0xa9, 0x7d, 0x88, 0x5d, 0xa2, 0x46, 0xf5, 0xd0, 0x25, 0x48,
+	0x3b, 0xf8, 0x69, 0xe1, 0x28, 0x77, 0x7f, 0x36, 0xae, 0xae, 0xe2, 0xa7, 0x2c, 0x6e, 0x2a, 0x93,
+	0x51, 0xfe, 0x4e, 0x81, 0xec, 0x07, 0xb5, 0xea, 0x10, 0x9e, 0x0b, 0x95, 0x3c, 0x69, 0x13, 0xd7,
+	0x63, 0x32, 0x89, 0x21, 0x7d, 0x08, 0x59, 0x03, 0xd7, 0x89, 0xe1, 0xd2, 0x90, 0xa6, 0xa9, 0x83,
+	0x6b, 0x71, 0x07, 0x83, 0xed, 0x95, 0xb6, 0xb9, 0xe2, 0x1b, 0xa6, 0xe7, 0x74, 0x54, 0xdf, 0x0a,
+	0x7a, 0x1f, 0x72, 0x21, 0x22, 0xf0, 0x5c, 0xe4, 0x2a, 0xb7, 0x26, 0x30, 0xba, 0xd1, 0xd3, 0x16,
+	0x96, 0xc3, 0xf6, 0x62, 0x99, 0x9e, 0x8a, 0x67, 0x5a, 0xbe, 0x01, 0xb9, 0x10, 0x2a, 0x94, 0x87,
+	0xf4, 0x63, 0xd2, 0xf1, 0x37, 0xcc, 0x1e, 0xd1, 0x29, 0xc8, 0xec, 0x63, 0xa3, 0x4d, 0x7c, 0x06,
+	0x89, 0x97, 0x9b, 0xa9, 0x75, 0x49, 0xbe, 0x03, 0xf9, 0xb8, 0xef, 0x49, 0xf4, 0x95, 0x1f, 0x24,
+	0x98, 0xef, 0xdb, 0x57, 0x8f, 0xd9, 0x83, 0x08, 0xed, 0x52, 0x87, 0x6d, 0xb7, 0x4b, 0x68, 0xf1,
+	0x36, 0x06, 0xa1, 0x33, 0x36, 0xe3, 0x0a, 0x67, 0xf3, 0x58, 0xa4, 0x12, 0xf2, 0x5d, 0x32, 0x65,
+	0xc6, 0x20, 0xd3, 0xeb, 0x01, 0x97, 0x54, 0xe2, 0x39, 0x3a, 0xd9, 0x27, 0x23, 0xb8, 0x14, 0x8e,
+	0x40, 0x4f, 0xe5, 0x25, 0x8e, 0xc0, 0xaf, 0xbd, 0x72, 0x7a, 0xc7, 0x6e, 0xfc, 0xab, 0xe5, 0x94,
+	0x60, 0xef, 0xf0, 0xe5, 0x94, 0x64, 0x74, 0x68, 0x39, 0xfd, 0x9f, 0xe5, 0xd2, 0xa3, 0xd7, 0x16,
+	0x31, 0xc8, 0x18, 0xb1, 0x0d, 0xd3, 0xab, 0xa7, 0xf2, 0x12, 0xd3, 0xab, 0x06, 0x32, 0x6f, 0x14,
+	0x64, 0xc7, 0xd1, 0x9b, 0xba, 0x19, 0x54, 0x0e, 0x8f, 0x42, 0xe2, 0x6e, 0xa2, 0xa8, 0x53, 0x71,
+	0xd4, 0x4a, 0x15, 0xe6, 0x13, 0x2d, 0x8a, 0x20, 0xa1, 0xe3, 0x90, 0xd2, 0x1b, 0xbe, 0x41, 0xfa,
+	0xc4, 0x92, 0x23, 0x36, 0xe9, 0x27, 0x87, 0xbf, 0x28, 0x17, 0x01, 0xdd, 0xd5, 0xcd, 0xc6, 0x68,
+	0x38, 0xca, 0x2d, 0x38, 0x19, 0x91, 0xf4, 0xdd, 0x9c, 0x87, 0x59, 0x7a, 0x6e, 0xed, 0xed, 0x5f,
+	0xf1, 0x77, 0xcb, 0x75, 0x66, 0xd4, 0xe8, 0xa2, 0xb2, 0x0a, 0xa7, 0x78, 0x16, 0xc9, 0x18, 0x8e,
+	0xd6, 0xe0, 0x74, 0x4c, 0xd6, 0x77, 0x45, 0x85, 0xf7, 0x0c, 0xdc, 0xe4, 0xc2, 0x69, 0x95, 0x3f,
+	0x2b, 0xbf, 0x64, 0xa0, 0xb8, 0x65, 0x69, 0x8f, 0x89, 0xb3, 0xd9, 0xd6, 0x8d, 0x46, 0xd5, 0x32,
+	0xf7, 0xf4, 0xe6, 0xa8, 0xba, 0x5d, 0x82, 0x9c, 0x2d, 0x6c, 0xb3, 0xb4, 0xfa, 0x01, 0x09, 0x2f,
+	0xa1, 0x0d, 0x98, 0xa6, 0x2d, 0xad, 0xd9, 0xec, 0xf2, 0x25, 0x57, 0x59, 0x89, 0x67, 0x77, 0xc7,
+	0xb5, 0xb8, 0xcb, 0x47, 0x42, 0xae, 0x66, 0x19, 0xba, 0xd6, 0x51, 0x03, 0x35, 0x54, 0x84, 0x63,
+	0x4e, 0xdb, 0x14, 0xcb, 0x9c, 0x58, 0xc7, 0xd4, 0xde, 0x02, 0xba, 0x0d, 0xa0, 0x59, 0xad, 0x96,
+	0x65, 0xee, 0xda, 0x44, 0x1b, 0x34, 0x6d, 0x50, 0x17, 0xd5, 0x40, 0x48, 0x0d, 0x29, 0x20, 0x03,
+	0x4e, 0x58, 0xbe, 0x7f, 0x35, 0x70, 0x22, 0x66, 0x8e, 0x3b, 0x71, 0x2b, 0xc3, 0xc2, 0x13, 0xec,
+	0x22, 0xb0, 0xa2, 0xf6, 0x1b, 0x46, 0xb5, 0xa0, 0xcf, 0x1d, 0xe5, 0xb1, 0x58, 0x9f, 0xc8, 0x45,
+	0x52, 0xa7, 0xfb, 0x20, 0xda, 0xe9, 0xa6, 0xb9, 0xd9, 0xdb, 0x13, 0x99, 0x7d, 0x61, 0x7b, 0x5d,
+	0x15, 0x4e, 0xf4, 0x45, 0x15, 0xcd, 0xc0, 0x74, 0x0d, 0x3b, 0xd8, 0x30, 0x88, 0x91, 0x3f, 0x82,
+	0x00, 0xb2, 0xbb, 0xc4, 0xd1, 0xb1, 0x91, 0x97, 0xa8, 0xa1, 0xbc, 0x78, 0xde, 0xa6, 0xa5, 0xec,
+	0x7a, 0x3b, 0xa6, 0xd1, 0xc9, 0xa7, 0x14, 0x1b, 0x16, 0x12, 0x76, 0x1f, 0xea, 0x7f, 0xd4, 0x3f,
+	0xeb, 0x6e, 0xc4, 0xaf, 0x06, 0xf1, 0x12, 0x19, 0x61, 0x53, 0x13, 0x8d, 0xb0, 0xca, 0xe7, 0x53,
+	0x70, 0x26, 0xe4, 0xf2, 0xf0, 0x35, 0xb4, 0xcd, 0x28, 0xce, 0x70, 0x73, 0x8a, 0xa7, 0x39, 0x9a,
+	0xcb, 0x93, 0xa4, 0x58, 0x0d, 0xe9, 0xa3, 0xbb, 0x90, 0xf3, 0x4b, 0x8b, 0x34, 0x36, 0x3b, 0x7c,
+	0x18, 0xcc, 0x55, 0xce, 0x8f, 0x28, 0xca, 0x2a, 0x6e, 0xd3, 0x66, 0x1d, 0x56, 0x44, 0x6f, 0x06,
+	0x5c, 0xce, 0x70, 0x13, 0x95, 0x21, 0x88, 0x46, 0xb1, 0xf8, 0xdd, 0x28, 0x8b, 0xb3, 0xdc, 0xe0,
+	0xf5, 0x31, 0x0d, 0xbe, 0xb0, 0xfc, 0xfd, 0x4d, 0x82, 0xb3, 0x11, 0xcc, 0x21, 0xd6, 0x5d, 0x0b,
+	0xee, 0x64, 0x12, 0xcf, 0xe7, 0xe2, 0xa0, 0x04, 0xec, 0xf2, 0x93, 0x37, 0xb8, 0xb3, 0xbd, 0x0d,
+	0x33, 0x5a, 0x97, 0xc3, 0xdd, 0x1b, 0x5d, 0xae, 0xf2, 0xda, 0x18, 0x6c, 0xe8, 0x39, 0x57, 0x23,
+	0x26, 0x22, 0x54, 0x4f, 0x4f, 0x46, 0xf5, 0x07, 0x70, 0xd4, 0x3f, 0x98, 0xd8, 0x21, 0x6b, 0xd5,
+	0x03, 0x16, 0x8b, 0xf8, 0x84, 0x56, 0x18, 0xcd, 0xc5, 0xdb, 0x66, 0x87, 0x56, 0x27, 0xc7, 0x3d,
+	0xa3, 0x86, 0x97, 0x2a, 0x5f, 0xce, 0xc0, 0xec, 0xae, 0xde, 0xb2, 0x0d, 0x42, 0xcb, 0x78, 0x5f,
+	0xd7, 0x08, 0xfa, 0x4a, 0xea, 0x9e, 0xf5, 0xfe, 0x09, 0x76, 0xdf, 0xf4, 0xac, 0xde, 0x5d, 0x77,
+	0x75, 0xfc, 0xfb, 0x91, 0x7c, 0x79, 0x80, 0x6c, 0xe2, 0x2d, 0x5a, 0x59, 0xf8, 0xec, 0xe7, 0xbf,
+	0x9e, 0xa5, 0xce, 0x2a, 0xa8, 0xbc, 0x7f, 0x85, 0xde, 0xd2, 0xd9, 0x7d, 0xdc, 0x2f, 0x48, 0xf7,
+	0xa6, 0xb4, 0x8a, 0xbe, 0x93, 0xa0, 0xd8, 0x1d, 0xd5, 0x27, 0x42, 0x96, 0x70, 0x25, 0x98, 0x10,
+	0xd9, 0x32, 0x47, 0x36, 0x8f, 0xe6, 0xfa, 0x91, 0x95, 0x0f, 0x58, 0x3f, 0xf9, 0x04, 0x7d, 0x4b,
+	0xa3, 0xc6, 0x67, 0xda, 0xc9, 0xb0, 0x25, 0x8c, 0xc1, 0xcf, 0x87, 0x4d, 0x1e, 0x81, 0x2d, 0x32,
+	0x93, 0x8c, 0x87, 0x2d, 0x61, 0xd6, 0x7d, 0x3e, 0x6c, 0xab, 0x43, 0xb0, 0x3d, 0x93, 0xe0, 0x64,
+	0xc2, 0x1c, 0xd8, 0x0f, 0x6a, 0xf0, 0xf8, 0x29, 0xaf, 0x8d, 0x25, 0x2b, 0x00, 0x2a, 0xe7, 0x38,
+	0xa6, 0x05, 0xb9, 0xc0, 0x30, 0x59, 0x0d, 0xbd, 0x1e, 0x87, 0xc4, 0xb8, 0x76, 0x00, 0xb9, 0xd0,
+	0xb4, 0x88, 0x94, 0xb8, 0x83, 0xfe, 0xa1, 0x53, 0x3e, 0x37, 0x54, 0x26, 0xea, 0x1c, 0x0d, 0x75,
+	0xfe, 0x29, 0xcc, 0x46, 0xb2, 0x85, 0xfa, 0xce, 0x89, 0xa4, 0x61, 0x54, 0x5e, 0x19, 0x21, 0xe5,
+	0x43, 0x58, 0xe2, 0x10, 0xe4, 0xd5, 0x81, 0x10, 0x10, 0x81, 0x3c, 0xef, 0x61, 0xa2, 0x9d, 0xdd,
+	0x6f, 0xe1, 0x26, 0x41, 0x83, 0x6e, 0x07, 0xf2, 0xa0, 0x0f, 0xca, 0x2b, 0xdc, 0xcf, 0x9c, 0x72,
+	0x8a, 0xf9, 0xa1, 0x57, 0x88, 0x72, 0x83, 0x9b, 0xab, 0x33, 0xcb, 0xbc, 0x9e, 0x5d, 0x40, 0x2a,
+	0xa9, 0x1f, 0xde, 0xd1, 0x1a, 0x77, 0xb4, 0x22, 0x2f, 0x25, 0x39, 0x2a, 0x1f, 0xf0, 0xff, 0x41,
+	0x6c, 0xbf, 0x08, 0x9a, 0x1b, 0xab, 0x81, 0xbe, 0x6d, 0xbe, 0x3a, 0xde, 0xe9, 0x27, 0x5f, 0x18,
+	0x2a, 0xd7, 0x2b, 0x05, 0x65, 0x9e, 0x83, 0x3b, 0xad, 0xe4, 0x19, 0xb8, 0x78, 0x04, 0xbe, 0x0e,
+	0x7a, 0xc6, 0x7f, 0x03, 0xe6, 0x02, 0x07, 0xb3, 0x2c, 0x17, 0xe3, 0x60, 0x62, 0x51, 0xda, 0xdc,
+	0xf9, 0xfe, 0x8f, 0x45, 0xe9, 0x47, 0xfa, 0xf7, 0x3b, 0xfd, 0xfb, 0xe6, 0xcf, 0xc5, 0x23, 0x70,
+	0x89, 0x4e, 0xef, 0xa5, 0x27, 0xba, 0xd9, 0xec, 0xb4, 0xb1, 0x69, 0x51, 0x67, 0x96, 0x43, 0x4a,
+	0xe2, 0x07, 0x55, 0xfe, 0x1b, 0x69, 0xbd, 0xbd, 0xe7, 0x7b, 0xdf, 0x84, 0x7b, 0x8e, 0xad, 0xb1,
+	0xc3, 0x84, 0x38, 0xef, 0x65, 0xc5, 0x5a, 0x3d, 0xcb, 0x85, 0xae, 0xfe, 0x13, 0x00, 0x00, 0xff,
+	0xff, 0x03, 0xc7, 0xb9, 0x01, 0xaf, 0x15, 0x00, 0x00,
 }

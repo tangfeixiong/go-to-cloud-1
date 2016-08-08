@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/glog"
 
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/logger"
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client"
 )
 
 var (
@@ -36,7 +36,7 @@ func init() {
 func main() {
 	flag.Parse()
 	glog.V(10).Infoln("Set glog level with 10")
-	if _, _, err := client.CreateBuild(fakeBuild, fakeProject, nil, fakeGitURI, fakeGitRef, fakeContextDir, nil, fakeDockerfile, nil, nil); err != nil {
+	if _, _, err := origin.CreateBuild(fakeBuild, fakeProject, nil, fakeGitURI, fakeGitRef, fakeContextDir, nil, fakeDockerfile, nil, nil); err != nil {
 		logger.Logger.Printf("Failed: %s", err)
 	}
 }

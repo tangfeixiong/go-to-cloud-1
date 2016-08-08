@@ -1,0 +1,440 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+//import "google/protobuf/any.proto";
+
+//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
+//import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
+//import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
+
+package paas.ci.osopb3;
+
+option go_package = "osopb3";
+option java_package = "com.qingyuanos.core.googleprotobuf.osopb3";
+option java_outer_classname = "BaseModel";
+
+//
+// A copy of Kubernetes api
+//
+message K8sTypeMeta {
+  string kind = 1;
+
+  string apiVersion = 2;
+}
+
+message K8sListMeta {
+  string selfLink = 1;
+
+  string resourceVersion = 2;
+}
+
+message K8sUnversionedTime {
+  int64 seconds = 1;
+
+  int32 nanos = 2;
+}
+
+message K8sResourceQuantity {
+  string string = 1;
+}
+
+message OwnerReference {
+  string apiVersion = 5;
+
+  string kind = 1;
+
+  string name = 3;
+
+  string uid = 4;
+
+  bool controller = 6;
+}
+
+message K8sObjectMeta {
+  string name = 1;
+
+  string generateName = 2;
+
+  string namespace = 3;
+
+  string selfLink = 4;
+
+  string uid = 5;
+
+  string resourceVersion = 6;
+
+  int64 generation = 7;
+
+  K8sUnversionedTime creationTimestamp = 8;
+
+  K8sUnversionedTime deletionTimestamp = 9;
+
+  int64 deletionGracePeriodSeconds = 10;
+
+  map<string, string> labels = 11;
+
+  map<string, string> annotations = 12;
+
+  repeated OwnerReference ownerReferences = 13;
+
+  repeated string finalizers = 14;
+}
+
+message K8sObjectReference {
+  string kind = 1;
+
+  string namespace = 2;
+
+  string name = 3;
+
+  string uid = 4;
+
+  string apiVersion = 5;
+
+  string resourceVersion = 6;
+
+  string fieldPath = 7;	
+}
+
+message K8sLocalObjectReference {
+  string name = 1;
+}
+
+message K8sResourceRequirements {
+  map<string, K8sResourceQuantity> limits = 1;
+
+  map<string, K8sResourceQuantity> requests = 2;
+}
+
+message SecretKeySelector {
+  K8sLocalObjectReference localObjectReference = 1;
+
+  string key = 2;
+}
+
+message ConfigMapKeySelector {
+  K8sLocalObjectReference localObjectReference = 1;
+
+  string key = 2;
+}
+
+message ResourceFieldSelector {
+  string containerName = 1;
+
+  string resource = 2;
+
+  K8sResourceQuantity divisor = 3;
+}
+
+message ObjectFieldSelector {
+  string apiVersion = 1;
+
+  string fieldPath = 2;
+}
+
+message EnvVarSource {
+  ObjectFieldSelector fieldRef = 1;
+
+  ResourceFieldSelector resourceFieldRef = 2;
+
+  ConfigMapKeySelector configMapKeyRef = 3;
+
+  SecretKeySelector secretKeyRef = 4;
+}
+
+message K8sEnvVar {
+  string name = 1;
+
+  string value = 2;
+
+  EnvVarSource valueFrom = 3;
+}
+
+enum K8sNamespacePhase {
+	Active = 0;
+	Terminating = 1;
+}
+
+//
+// A copy of OpenShift Build Protobuf
+//
+message SourceControlUser {
+  string name = 1;
+
+  string email = 2;
+}
+
+message GitSourceRevision {
+  string commit = 1;
+
+  SourceControlUser author = 2;
+
+  SourceControlUser committer = 3;
+
+  string message = 4;
+}
+
+message SourceRevision {
+  string type = 1;
+
+  GitSourceRevision git = 2;
+}
+	
+message BuildPostCommitSpec {
+	repeated string command = 1;
+	
+	repeated string args = 2;
+	
+	string script = 3; 
+}		
+	
+message BuildOutput {
+	K8sObjectReference to = 1;
+	
+	K8sLocalObjectReference pushSecret = 2;
+}
+	
+message JenkinsPipelineBuildStrategy {
+	string jenkinsfilePath = 1;
+	
+	string jenkinsfile = 2;
+}
+		
+message SecretSpec {
+  K8sLocalObjectReference secretSource = 1;
+
+  string mountPath = 2;
+}
+		
+message CustomBuildStrategy {
+	K8sObjectReference from = 1;
+	
+	K8sLocalObjectReference pullSecret = 2;
+	
+	repeated K8sEnvVar env = 3;
+		
+	bool exposeDockerSocket = 4;
+	
+	bool forcePull = 5;
+	
+	repeated SecretSpec secrets = 6;
+
+	string buildAPIVersion = 7;
+}
+		
+message SourceBuildStrategy {
+	K8sObjectReference from = 1;
+	
+	K8sLocalObjectReference pullSecret = 2;
+	
+	repeated K8sEnvVar env = 3;
+	
+	string scripts = 4;
+	
+	bool incremental = 5;
+	
+	bool forcePull = 6;
+}
+				
+message DockerBuildStrategy {
+	K8sObjectReference from = 1;
+	
+	K8sLocalObjectReference pullSecret = 2;
+	
+	bool noCache = 3;
+	
+	repeated K8sEnvVar env = 4;
+	
+	bool forcePull = 5;
+	
+	string dockerfilePath = 6;
+}
+
+message BuildStrategy {
+  string type = 1;
+
+  DockerBuildStrategy dockerStrategy = 2;
+
+  SourceBuildStrategy sourceStrategy = 3;
+
+  CustomBuildStrategy customStrategy = 4;
+
+  JenkinsPipelineBuildStrategy jenkinsPipelineStrategy = 5;
+
+    enum OsoBuildStrategyType {
+		Docker = 0;
+		Source = 1;
+		Custom = 2;
+		JenkinsPipeline = 3;
+	}
+	OsoBuildStrategyType osoBuildStrategyType = 6;
+}
+
+message SecretBuildSource {
+	K8sLocalObjectReference secret = 1;
+	
+	string destinationDir = 2;
+}
+	
+message ImageSourcePath {
+	string sourcePath = 1;
+	
+	string destinationDir = 2;
+}
+
+message ImageSource {
+	K8sObjectReference from = 1;
+	
+	repeated ImageSourcePath paths = 2;
+	
+	K8sLocalObjectReference pullSecret = 3;
+}
+
+message GitBuildSource {
+	string uri = 1;
+	
+	string ref = 2;
+	
+	string httpProxy = 3;
+	
+	string httpsProxy = 4;
+}
+
+message BinaryBuildSource {
+	string asFile = 1;
+}
+
+message BuildSource {
+  string type = 1;
+
+  BinaryBuildSource binary = 2;
+
+  string dockerfile = 3;
+
+  GitBuildSource git = 4;
+
+  repeated ImageSource images = 5;
+
+  string contextDir = 6;
+
+  K8sLocalObjectReference sourceSecret = 7;
+
+  repeated SecretBuildSource secrets = 8;
+
+	enum OsoBuildSourceType {
+		Git = 0;
+		Dockerfile = 1;
+		Binary =2;
+		Image = 3;
+		None = 4;
+	}
+	OsoBuildSourceType osoBuildSourceType = 9;
+}
+
+message OsoCommonSpec {
+  string serviceAccount = 1;
+
+  BuildSource source = 2;
+
+  SourceRevision revision = 3;
+
+  BuildStrategy strategy = 4;
+
+  BuildOutput output = 5;
+
+  K8sResourceRequirements resources = 6;
+
+  BuildPostCommitSpec postCommit = 7;
+
+  int64 completionDeadlineSeconds = 8;
+}
+
+message WebHookTrigger {
+  string secret = 1;
+
+  bool allowEnv = 2;
+}
+
+message ImageChangeTrigger {
+  string lastTriggeredImageID = 1;
+
+  K8sObjectReference from = 2;
+}
+
+message OsoBuildTriggerPolicy {
+  string type = 1;
+
+  WebHookTrigger github = 2;
+
+  WebHookTrigger generic = 3;
+
+  ImageChangeTrigger imageChange = 4;
+	
+	enum OsoBuildTriggerType {
+	    GitHub = 0;
+        Generic = 1;
+        ImageChange = 2;
+	    ConfigChange = 3;
+        GoGits = 4;
+    }
+	OsoBuildTriggerType osoBuildTriggerType = 5;
+}
+
+message GenericWebHookCause {
+  SourceRevision revision = 1;
+
+  string secret = 2;
+}
+
+message GitHubWebHookCause {
+  SourceRevision revision = 1;
+
+  string secret = 2;
+}
+
+message ImageChangeCause {
+  string imageID = 1;
+
+  K8sObjectReference fromRef = 2;
+}
+
+message OsoBuildTriggerCause {
+  string message = 1;
+
+  GenericWebHookCause genericWebHook = 2;
+
+  GitHubWebHookCause githubWebHook = 3;
+
+  ImageChangeCause imageChangeBuild = 4;
+}
+	
+message OsoBuildStatus {
+  string phase = 1;
+
+  bool cancelled = 2;
+
+  string reason = 3;
+
+  string message = 4;
+
+  K8sUnversionedTime startTimestamp = 5;
+
+  K8sUnversionedTime completionTimestamp = 6;
+
+  int64 duration = 7;
+
+  string outputDockerImageReference = 8;
+
+  K8sObjectReference config = 9;
+	
+	enum OsoBuildPhase {
+		New = 0;
+		Pending = 1;
+		Running = 2;
+		Complete = 3;
+		Failed = 4;
+		Error = 5;
+		Cancelled = 6;
+	}	
+	OsoBuildPhase osoBuildPhase = 10;
+}

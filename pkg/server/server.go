@@ -47,7 +47,7 @@ func (s *APIContextServer) GRPCServer(server *grpc.Server) *APIContextServer {
 	}
 	s.grpcServer = server
 	osopb3.RegisterSimpleServiceServer(server, service.Usrs)
-	osopb3.RegisterSimpleManageServiceServer(server, service.Usrs)
+	//osopb3.RegisterSimpleManageServiceServer(server, service.Usrs)
 	return s
 }
 
@@ -85,11 +85,11 @@ func runGrpcServer() error {
 // newGateway returns a new gateway server which translates HTTP into gRPC.
 func newGateway(ctx context.Context, opts ...runtime.ServeMuxOption) (http.Handler, error) {
 	mux := runtime.NewServeMux(opts...)
-	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
-	err := osopb3.RegisterSimpleManageServiceHandlerFromEndpoint(ctx, mux, "localhost:8086", dialOpts)
-	if err != nil {
-		return nil, err
-	}
+	//dialOpts := []grpc.DialOption{grpc.WithInsecure()}
+	//err := osopb3.RegisterSimpleManageServiceHandlerFromEndpoint(ctx, mux, "localhost:8086", dialOpts)
+	//if err != nil {
+	//	return nil, err
+	//}
 	//err = osopb3.RegisterStreamServiceHandlerFromEndpoint(ctx, mux, *abeEndpoint, dialOpts)
 	//if err != nil {
 	//	return nil, err
