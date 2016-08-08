@@ -29,7 +29,7 @@ type integrationFactory struct {
 	//osoclient osopb3.SimpleServiceClient
 }
 
-func NewIntegrationFactory(server string) IntegrationFactory {
+func NewIntegrationFactory(server string) integrationFactory {
 	if server == "" {
 		return &integrationFactory{server: ":50051"}
 	}
