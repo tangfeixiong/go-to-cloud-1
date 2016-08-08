@@ -1,0 +1,59 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    qinguanos.com/harpoon: '{"version": "v1alpha", "lib": ["grpc", "protobuf", "kubernetes", "openshift origin"]}'
+  labels:
+    heritage: qingyuanos.io
+    app: qingyuan-paas
+  name: apaas
+  # namespace: qingyuancloud
+spec:
+  type: ClusterIP
+  ports:
+  - port: 50051
+    protocol: TCP
+    name: grpc
+  selector:
+    name: apaas
+    
+--- 
+apiVersion: v1
+kind: Deployment
+metadata:
+  annotations:
+    qinguanos.com/harpoon: '{"version": "v1alpha", "lib": ["grpc", "protobuf", "kubernetes", "openshift origin"]}'
+  labels:
+    heritage: qingyuanos.io
+    app: qingyuan-paas
+  name: apaas
+  # namespace: qingyuancloud
+spec:
+  replicas: 1
+  selector:
+    name: apaas
+  template:
+    metadata:
+      labels:
+        name: apaas
+    spec:
+      containers:
+        # args: ["--polling-seconds=180", "--loglevel=2", "--kubectl-context=kube", "--ssl-dir=/home/ubuntu", "--stack-provider=noop", "--k8sapi-context=kube"]
+        # command: ["/bin/caas"]
+      - env:
+        - name: MONGODB_CLUSTER
+          value: 10.123.240.139:9999 # 172.17.4.200
+        - name: PRIVATE_REGISTRY_SECRETS 
+          value: qingyuanos.local=qingyuanosregistrysecret,qingyuancloud.local=qingyuanosregistrysecret
+        - name: APAAS_HOST
+          value: 192.168.1.215:50051
+		- name: KUBECONFIG
+		  value: /root/.kube/config
+		- name: KUBERNETES_MASTER
+		  value: https://172.17.4.50
+        image: tangfeixiong/apaas
+        imagePullPolicy: IfNotPresent
+        name: apaas
+        ports:
+        - containerPort: 50051
