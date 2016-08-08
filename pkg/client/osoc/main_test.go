@@ -20,6 +20,8 @@ func TestMain(m *testing.M) {
 	ret := m.Run()
 
 	stopServerGRPC()
+
+	os.Exit(ret)
 }
 
 var (
@@ -36,8 +38,7 @@ func startServerGRPC() {
 	}
 
 	_grpcsvr = grpc.NewServer()
-	//osopb3.RegisterSimpleServiceServer(_grpcsvr, Usrs)
-	osopb3.RegisterSimpleManageServiceServer(_grpcsvr, service.Usrs)
+	osopb3.RegisterSimpleServiceServer(_grpcsvr, service.Usrs)
 
 	fmt.Printf("grpc server is running on %s\n", _host)
 

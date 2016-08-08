@@ -1,12 +1,13 @@
 package service
 
 import (
+	"bytes"
 	"errors"
 	"time"
 
 	restful "github.com/emicklei/go-restful"
-
 	//google_protobuf "github.com/golang/protobuf/ptypes/any"
+	"github.com/helm/helm-classic/codec"
 
 	"golang.org/x/net/context"
 	//"google.golang.org/grpc"
@@ -15,13 +16,77 @@ import (
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
 )
 
-func (u *UserResource) CreateOriginProject(ctx context.Context,
-	req *osopb3.CreateOriginProjectRequest) (*osopb3.CreateOriginProjectResponse, error) {
+func (u *UserResource) CreateProjectIntoArbitrary(ctx context.Context,
+	req *osopb3.ProjectCreationRequestData) (*osopb3.ProjectResponseDataArbitrary, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) CreateOriginProjectArbitrary(ctx context.Context,
-	req *osopb3.CreateOriginProjectArbitraryRequest) (*osopb3.CreateOriginProjectArbitraryResponse, error) {
+func (u *UserResource) RetrieveProjectIntoArbitrary(ctx context.Context,
+	in *osopb3.ProjectRetrieveRequestData) (*osopb3.ProjectResponseDataArbitrary, error) {
+	if in.Name == "" {
+		return nil, errors.New("Unexpected")
+	}
+	raw, obj, err := origin.RetrieveProject(in.Name)
+	if err != nil {
+		return nil, err
+	}
+	if len(raw) == 0 || obj == nil {
+		return nil, errUnexpected
+	}
+	out := &osopb3.ProjectResponseDataArbitrary{
+		Name:          obj.Name,
+		Result:        string(obj.Status.Phase),
+		Finalizers:    []string{},
+		ResultingCode: osopb3.K8SNamespacePhase(osopb3.K8SNamespacePhase_value[string(obj.Status.Phase)]),
+		//Project: &google_protobuf.Any{
+		//	TypeUrl: "type.googleapis.com/github.com/openshift/origin/pkg/project/api/v1",
+		//	Value:   raw,
+		//},
+	}
+	for _, v := range obj.Spec.Finalizers {
+		out.Finalizers = append(out.Finalizers, string(v))
+	}
+	var b *bytes.Buffer = &bytes.Buffer{}
+	if err := codec.JSON.Encode(b).One(obj.TypeMeta); err == nil {
+		o, err := codec.JSON.Decode(b.Bytes()).One()
+		if err == nil {
+			out.Datatype = new(osopb3.K8STypeMeta)
+			_ = o.Object(out.Datatype)
+		}
+	}
+	b.Reset()
+	if err := codec.JSON.Encode(b).One(obj.ObjectMeta); err == nil {
+		o, err := codec.JSON.Decode(b.Bytes()).One()
+		if err == nil {
+			out.Metadata = new(osopb3.K8SObjectMeta)
+			_ = o.Object(out.Metadata)
+		}
+	}
+	b.Reset()
+	if err := codec.JSON.Encode(b).One(obj); err == nil {
+		_, err := codec.JSON.Decode(b.Bytes()).One()
+		if err == nil {
+			out.Raw = &osopb3.RawData{
+				ObjectName:  obj.Name,
+				ObjectBytes: b.Bytes(),
+			}
+		}
+	}
+	return out, nil
+}
+
+func (u *UserResource) UpdateProjectIntoArbitrary(ctx context.Context,
+	req *osopb3.ProjectUpdationRequestData) (*osopb3.ProjectResponseDataArbitrary, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) DeleteProjectIntoArbitrary(ctx context.Context,
+	req *osopb3.ProjectDeletionRequestData) (*osopb3.ProjectResponseDataArbitrary, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) CreateOriginProject(ctx context.Context,
+	req *osopb3.CreateOriginProjectRequest) (*osopb3.CreateOriginProjectResponse, error) {
 	return nil, errNotImplemented
 }
 

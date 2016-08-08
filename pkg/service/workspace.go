@@ -8,6 +8,6 @@ import (
 )
 
 func (u *UserResource) EnterWorkspace(ctx context.Context,
-	in *osopb3.CreateOriginProjectArbitraryRequest) (*osopb3.CreateOriginProjectArbitraryResponse, error) {
+	in *osopb3.RawData) (*osopb3.RawData, error) {
 	return nil, errNotImplemented
 }
