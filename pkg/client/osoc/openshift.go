@@ -29,7 +29,7 @@ type integrationFactory struct {
 	//osoclient osopb3.SimpleServiceClient
 }
 
-func NewIntegrationFactory(server string) integrationFactory {
+func NewIntegrationFactory(server string) *integrationFactory {
 	if server == "" {
 		return &integrationFactory{server: ":50051"}
 	}
@@ -63,10 +63,10 @@ func (itft *integrationFactory) RetrieveProjectByName(in *osopb3.ProjectCreation
 		logger.Printf("Did not connect: %v\n", err)
 		return nil, err
 	}
-	defer conn.Close()
+	defer cc.Close()
 	client := osopb3.NewSimpleServiceClient(cc)
 
-	return retrieveProjectByName(client, context.Background(), in)
+	return RetrieveProjectByName(client, context.Background(), in)
 }
 
 func CreateDockerBuildIntoImage(c osopb3.SimpleServiceClient,
@@ -82,16 +82,16 @@ func CreateDockerBuildIntoImage(c osopb3.SimpleServiceClient,
 		logger.Printf("Could not receive result: %v", err)
 		return nil, err
 	}
-	if out.Raw != nil && len(out.Raw.ObjectBytes) > 0 {
-		logger.Printf("Received: %s\n%s\n", out.Raw.ObjectName, string(out.Raw.ObjectBytes))
-	}
+	//if out.Raw != nil && len(out.Raw.ObjectBytes) > 0 {
+	//	logger.Printf("Received: %s\n%s\n", out.Raw.ObjectName, string(out.Raw.ObjectBytes))
+	//}
 	return out, nil
 }
 
 func (itft *integrationFactory) CreateDockerBuildIntoImage(ctx context.Context,
 	in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
 
-	conn, err := grpc.Dial(bd.server, grpc.WithInsecure())
+	conn, err := grpc.Dial(itft.server, grpc.WithInsecure())
 	if err != nil {
 		logger.Printf("Did not connect: %v\n", err)
 		return nil, err
@@ -99,7 +99,8 @@ func (itft *integrationFactory) CreateDockerBuildIntoImage(ctx context.Context,
 	defer conn.Close()
 	c := osopb3.NewSimpleServiceClient(conn)
 
-	p, err := RetrieveProjectByName(c, context.Background(), &osopb3.ProjectCreationRequestData{Name: name})
+	p, err := RetrieveProjectByName(c, context.Background(),
+		&osopb3.ProjectCreationRequestData{Name: in.ProjectName})
 	if err != nil {
 		return nil, err
 	}
