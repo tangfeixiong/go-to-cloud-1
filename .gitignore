@@ -1,3 +1,4 @@
+build/docker/apaas
 *vendor
 _vendor/src/**/.[a-zA-Z]*
 _vendor/src/k8s.io/*/.[a-zA-Z]*
