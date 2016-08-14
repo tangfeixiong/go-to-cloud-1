@@ -1,0 +1,87 @@
+
+[vagrant@localhost go-to-cloud-1]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig create -f examples/github101.json --loglevel=10
+I0814 17:20:10.545153    2006 loader.go:330] Config loaded from file /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig
+I0814 17:20:10.564772    2006 round_trippers.go:299] curl -k -v -XGET  -H "Accept: application/json, */*" -H "User-Agent: oc/v1.3.0 (linux/amd64) openshift/88b8a33" https://172.17.4.50:30443/oapi
+I0814 17:20:10.605004    2006 round_trippers.go:318] GET https://172.17.4.50:30443/oapi 200 OK in 39 milliseconds
+I0814 17:20:10.605461    2006 round_trippers.go:324] Response Headers:
+I0814 17:20:10.605944    2006 round_trippers.go:327]     Cache-Control: no-store
+I0814 17:20:10.606305    2006 round_trippers.go:327]     Content-Type: application/json
+I0814 17:20:10.606631    2006 round_trippers.go:327]     Date: Sun, 14 Aug 2016 17:20:10 GMT
+I0814 17:20:10.606987    2006 round_trippers.go:327]     Content-Length: 93
+I0814 17:20:10.609543    2006 request.go:901] Response Body: {"kind":"APIVersions","apiVersion":"v1","versions":["v1"],"serverAddressByClientCIDRs":null}
+I0814 17:20:10.611951    2006 round_trippers.go:299] curl -k -v -XGET  -H "Accept: application/json, */*" -H "User-Agent: oc/v1.3.0 (linux/amd64) openshift/88b8a33" https://172.17.4.50:30443/version
+I0814 17:20:10.613266    2006 round_trippers.go:318] GET https://172.17.4.50:30443/version 404 Not Found in 0 milliseconds
+I0814 17:20:10.613351    2006 round_trippers.go:324] Response Headers:
+I0814 17:20:10.613367    2006 round_trippers.go:327]     Content-Length: 19
+I0814 17:20:10.613379    2006 round_trippers.go:327]     Content-Type: text/plain; charset=utf-8
+I0814 17:20:10.613391    2006 round_trippers.go:327]     Cache-Control: no-store
+I0814 17:20:10.613403    2006 round_trippers.go:327]     Date: Sun, 14 Aug 2016 17:20:10 GMT
+I0814 17:20:10.613482    2006 request.go:901] Response Body: 404: Page Not Found
+I0814 17:20:10.614332    2006 request.go:991] Response Body: 404: Page Not Found
+I0814 17:20:10.618074    2006 cached_discovery.go:80] returning cached discovery info from /home/vagrant/.kube/172.17.4.50_30443/servergroups.json
+I0814 17:20:10.619009    2006 cached_discovery.go:38] returning cached discovery info from /home/vagrant/.kube/172.17.4.50_30443/v1/serverresources.json
+I0814 17:20:10.627214    2006 decoder.go:202] decoding stream as JSON
+I0814 17:20:10.644689    2006 request.go:562] Request Body: {"kind":"Build","apiVersion":"v1","metadata":{"name":"nc-alpine","namespace":"tangfx","creationTimestamp":null,"labels":{"ci":"build101"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"FROM alpine:edge\nRUN apk add --update netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git","ref":"master"},"contextDir":"edge"},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"alpine:latest"},"noCache":true}},"output":{"to":{"kind":"DockerImage","name":"docker.io/tangfeixiong/netcat-alpine:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"triggeredBy":null},"status":{"phase":""}}
+I0814 17:20:10.645475    2006 round_trippers.go:299] curl -k -v -XPOST  -H "Content-Type: application/json" -H "User-Agent: oc/v1.3.0 (linux/amd64) openshift/88b8a33" -H "Accept: application/json, */*" https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/builds
+I0814 17:20:10.653743    2006 round_trippers.go:318] POST https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/builds 201 Created in 7 milliseconds
+I0814 17:20:10.653774    2006 round_trippers.go:324] Response Headers:
+I0814 17:20:10.653780    2006 round_trippers.go:327]     Cache-Control: no-store
+I0814 17:20:10.653788    2006 round_trippers.go:327]     Content-Type: application/json
+I0814 17:20:10.653797    2006 round_trippers.go:327]     Date: Sun, 14 Aug 2016 17:20:10 GMT
+I0814 17:20:10.653805    2006 round_trippers.go:327]     Content-Length: 956
+I0814 17:20:10.653899    2006 request.go:901] Response Body: {"kind":"Build","apiVersion":"v1","metadata":{"name":"nc-alpine","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/nc-alpine","uid":"5ac448d8-6243-11e6-80b8-865acfd544b8","resourceVersion":"178","creationTimestamp":"2016-08-14T17:20:10Z","labels":{"ci":"build101"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"FROM alpine:edge\nRUN apk add --update netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git","ref":"master"},"contextDir":"edge","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"alpine:latest"},"noCache":true}},"output":{"to":{"kind":"DockerImage","name":"docker.io/tangfeixiong/netcat-alpine:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"triggeredBy":null},"status":{"phase":"New"}}
+build "nc-alpine" created
+
+{
+    "kind": "Build",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "nc-alpine",
+        "namespace": "tangfx",
+        "selfLink": "/oapi/v1/namespaces/tangfx/builds/nc-alpine",
+        "uid": "5ac448d8-6243-11e6-80b8-865acfd544b8",
+        "resourceVersion": "178",
+        "creationTimestamp": "2016-08-14T17:20:10Z",
+        "labels": {
+            "ci": "build101"
+        }
+    },
+    "spec": {
+        "serviceAccount": "builder",
+        "source": {
+            "type": "Git",
+            "dockerfile": "FROM alpine:edge\nRUN apk add --update netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]",
+            "git": {
+                "uri": "https://github.com/tangfeixiong/docker-nc.git",
+                "ref": "master"
+            },
+            "contextDir": "edge",
+            "secrets": null
+        },
+        "strategy": {
+            "type": "Docker",
+            "dockerStrategy": {
+                "from": {
+                    "kind": "DockerImage",
+                    "name": "alpine:latest"
+                },
+                "noCache": true
+            }
+        },
+        "output": {
+            "to": {
+                "kind": "DockerImage",
+                "name": "docker.io/tangfeixiong/netcat-alpine:latest"
+            },
+            "pushSecret": {
+                "name": "localdockerconfig"
+            }
+        },
+        "resources": {},
+        "postCommit": {},
+        "triggeredBy": null
+    },
+    "status": {
+        "phase": "New"
+    }
+}

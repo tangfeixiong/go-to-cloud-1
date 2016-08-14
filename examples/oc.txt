@@ -1,0 +1,42 @@
+
+[vagrant@localhost openshift]$ oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig secret new localdockerconfig .dockerconfigjson=/home/vagrant/.docker/config.json
+secret/localdockerconfig
+
+[vagrant@localhost openshift]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get secrets
+NAME                       TYPE                                  DATA      AGE
+builder-dockercfg-27yn4    kubernetes.io/dockercfg               1         1h
+builder-token-6g6ew        kubernetes.io/service-account-token   3         1h
+builder-token-7blct        kubernetes.io/service-account-token   3         1h
+default-dockercfg-ltnnh    kubernetes.io/dockercfg               1         1h
+default-token-0srif        kubernetes.io/service-account-token   3         1h
+default-token-d81p4        kubernetes.io/service-account-token   3         1h
+deployer-dockercfg-exv3o   kubernetes.io/dockercfg               1         1h
+deployer-token-dxg3m       kubernetes.io/service-account-token   3         1h
+deployer-token-zzqx4       kubernetes.io/service-account-token   3         1h
+localdockerconfig          kubernetes.io/dockerconfigjson        1         15m
+
+
+[vagrant@localhost openshift]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get sa
+NAME       SECRETS   AGE
+builder    2         1h
+default    2         1h
+deployer   2         1h
+
+[vagrant@localhost openshift]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig secrets link builder localdockerconfig
+
+[vagrant@localhost openshift]$ oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get sa builder -o yaml
+apiVersion: v1
+imagePullSecrets:
+- name: builder-dockercfg-27yn4
+kind: ServiceAccount
+metadata:
+  creationTimestamp: 2016-08-14T13:43:21Z
+  name: builder
+  namespace: tangfx
+  resourceVersion: "31086"
+  selfLink: /api/v1/namespaces/tangfx/serviceaccounts/builder
+  uid: 10d7b4a2-6225-11e6-89c6-0800274654e7
+secrets:
+- name: builder-token-6g6ew
+- name: builder-dockercfg-27yn4
+- name: localdockerconfig

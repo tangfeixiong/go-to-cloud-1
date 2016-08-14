@@ -1,0 +1,120 @@
+
+[vagrant@localhost go-to-cloud-1]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig create -f examples/nc101-buildconfig.yaml 
+buildconfig "nc" created
+
+[vagrant@localhost go-to-cloud-1]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get bc
+NAME      TYPE      FROM         LATEST
+nc        Docker    Git@master   0
+
+[vagrant@localhost go-to-cloud-1]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get buildconfigs nc -o yaml
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  creationTimestamp: 2016-08-14T16:57:26Z
+  name: nc
+  namespace: tangfx
+  resourceVersion: "171"
+  selfLink: /oapi/v1/namespaces/tangfx/buildconfigs/nc
+  uid: 2de87e8e-6240-11e6-80b8-865acfd544b8
+spec:
+  output:
+    pushSecret:
+      name: localdockerconfig
+    to:
+      kind: DockerImage
+      name: 172.17.4.50:30005/tangfx/nc:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    contextDir: edge
+    git:
+      ref: master
+      uri: https://github.com/tangfeixiong/docker-nc.git
+    type: Git
+  strategy:
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: alpine:edge
+      noCache: true
+    type: Docker
+  triggers: []
+status:
+  lastVersion: 2
+
+[vagrant@localhost go-to-cloud-1]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig start-build nc --follow --loglevel=10
+...
+I0814 16:58:28.748898   31156 cached_discovery.go:80] returning cached discovery info from /home/vagrant/.kube/172.17.4.50_30443/servergroups.json
+I0814 16:58:28.750146   31156 cached_discovery.go:38] returning cached discovery info from /home/vagrant/.kube/172.17.4.50_30443/v1/serverresources.json
+I0814 16:58:28.763850   31156 request.go:562] Request Body: {"kind":"BuildRequest","apiVersion":"v1","metadata":{"name":"nc","creationTimestamp":null},"triggeredBy":[{"message":"Manually triggered"}]}
+I0814 16:58:28.763963   31156 round_trippers.go:299] curl -k -v -XPOST  -H "Accept: application/json, */*" -H "Content-Type: application/json" -H "User-Agent: oc/v1.3.0 (linux/amd64) openshift/88b8a33" https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/buildconfigs/nc/instantiate
+I0814 16:58:28.795453   31156 round_trippers.go:318] POST https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/buildconfigs/nc/instantiate 201 Created in 31 milliseconds
+I0814 16:58:28.795477   31156 round_trippers.go:324] Response Headers:
+I0814 16:58:28.795498   31156 round_trippers.go:327]     Cache-Control: no-store
+I0814 16:58:28.795503   31156 round_trippers.go:327]     Content-Type: application/json
+I0814 16:58:28.795507   31156 round_trippers.go:327]     Date: Sun, 14 Aug 2016 16:58:28 GMT
+I0814 16:58:28.795512   31156 round_trippers.go:327]     Content-Length: 1085
+I0814 16:58:28.795562   31156 request.go:901] Response Body: {"kind":"Build","apiVersion":"v1","metadata":{"name":"nc-2","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/buildconfigs/nc-2/instantiate","uid":"52cc1be9-6240-11e6-80b8-865acfd544b8","resourceVersion":"172","creationTimestamp":"2016-08-14T16:58:28Z","labels":{"buildconfig":"nc","openshift.io/build-config.name":"nc","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"nc","openshift.io/build.number":"2"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git","ref":"master"},"contextDir":"edge","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"alpine:edge"},"pullSecret":{"name":"localdockerconfig"},"noCache":true}},"output":{"to":{"kind":"DockerImage","name":"172.17.4.50:30005/tangfx/nc:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"triggeredBy":[{"message":"Manually triggered"}]},"status":{"phase":"New","config":{"kind":"BuildConfig","namespace":"tangfx","name":"nc"}}}
+nc-2
+I0814 16:58:28.815436   31156 round_trippers.go:299] curl -k -v -XGET  -H "Accept: application/json, */*" -H "User-Agent: oc/v1.3.0 (linux/amd64) openshift/88b8a33" https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/builds/nc-2/log?follow=true
+I0814 16:58:38.820130   31156 round_trippers.go:318] GET https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/builds/nc-2/log?follow=true 504 Gateway Timeout in 10004 milliseconds
+I0814 16:58:38.820159   31156 round_trippers.go:324] Response Headers:
+I0814 16:58:38.820165   31156 round_trippers.go:327]     Date: Sun, 14 Aug 2016 16:58:38 GMT
+I0814 16:58:38.820166   31156 round_trippers.go:327]     Content-Length: 206
+I0814 16:58:38.820185   31156 round_trippers.go:327]     Cache-Control: no-store
+I0814 16:58:38.820190   31156 round_trippers.go:327]     Content-Type: application/json
+error getting logs: Timeout: timed out waiting for build nc-2 to start after 10s
+
+[vagrant@localhost go-to-cloud-1]$ /data/src/github.com/openshift/origin/_output/local/bin/linux/amd64/oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get builds nc-2 -o yaml
+apiVersion: v1
+kind: Build
+metadata:
+  annotations:
+    openshift.io/build-config.name: nc
+    openshift.io/build.number: "2"
+  creationTimestamp: 2016-08-14T16:58:28Z
+  labels:
+    buildconfig: nc
+    openshift.io/build-config.name: nc
+    openshift.io/build.start-policy: Serial
+  name: nc-2
+  namespace: tangfx
+  resourceVersion: "172"
+  selfLink: /oapi/v1/namespaces/tangfx/builds/nc-2
+  uid: 52cc1be9-6240-11e6-80b8-865acfd544b8
+spec:
+  output:
+    pushSecret:
+      name: localdockerconfig
+    to:
+      kind: DockerImage
+      name: 172.17.4.50:30005/tangfx/nc:latest
+  postCommit: {}
+  resources: {}
+  serviceAccount: builder
+  source:
+    contextDir: edge
+    git:
+      ref: master
+      uri: https://github.com/tangfeixiong/docker-nc.git
+    type: Git
+  strategy:
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: alpine:edge
+      noCache: true
+      pullSecret:
+        name: localdockerconfig
+    type: Docker
+  triggeredBy:
+  - message: Manually triggered
+status:
+  config:
+    kind: BuildConfig
+    name: nc
+    namespace: tangfx
+  phase: New
+
+

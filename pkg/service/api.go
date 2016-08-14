@@ -35,8 +35,7 @@ type UserResource struct {
 }
 
 var (
-	Usrs   *UserResource
-	logger *log.Logger = log.New(os.Stdout, "[tangfx] ", log.LstdFlags|log.Lshortfile)
+	Usrs *UserResource
 
 	blankEntity []byte = []byte("{}")
 	//var errorEntity []byte = []byte(`{"description": "Something went wrong. Please contact support at http://support.example.com."}`)

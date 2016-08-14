@@ -8,12 +8,13 @@ import (
 )
 
 var (
-	fakeUser    string = "tangfeixiong"
-	fakeProject string = "gogogo"
+	fakeUser    string = "system:admin"
+	fakeProject string = "tangfx"
 	fakeBuild   string = "netcat-http"
 
 	fakeDockerfile string = `"FROM alpine:edge\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]"`
-	fakeGitSecrets        = map[string]string{"github-qingyuancloud-tangfx": "user-account:keep-secret"}
+
+	fakeGitSecrets        = map[string]string{"gogs": "tangfx:tangfx"}
 	fakeGitURI     string = "https://github.com/tangfeixiong/docker-nc.git"
 	fakeGitRef     string = "master"
 	fakeContextDir string = "latest"
@@ -25,6 +26,14 @@ var (
 			"paths":      [...]map[string]string{fakeImagePath},
 			"pullSecret": "base64:encoding"}}}
 )
+
+func TestBuild_simplecreate(t *testing.T) {
+	data, _, err := CreateBuild(fakeBuild, fakeProject, nil, fakeGitURI, fakeGitRef, fakeContextDir, nil, fakeDockerfile, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("Build:\n%s\n", string(data))
+}
 
 func TestWhoAmI(t *testing.T) {
 	if _, err := WhoAmI(); err != nil {
@@ -38,33 +47,55 @@ func TestIsUserExist(t *testing.T) {
 	}
 }
 
-func TestCreateProject(t *testing.T) {
-	if _, _, err := CreateProject(fakeProject); err != nil {
+func TestProject_create(t *testing.T) {
+	data, _, err := CreateProject(fakeProject)
+	if err != nil {
 		t.Fatal(err)
 	}
+	t.Logf("Project:\n%s\n", string(data))
 }
 
-func TestDeleteProject(t *testing.T) {
+func TestProject_retrieve(t *testing.T) {
+	data, _, err := RetrieveProject("default")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("Project:\n%s\n", string(data))
+}
+
+func TestProject_delete(t *testing.T) {
 	if err := DeleteProject(fakeProject); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestRetrieveProjects(t *testing.T) {
+func TestReadProjects(t *testing.T) {
 	if err := RetrieveProjects(); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestRetrieveProject(t *testing.T) {
-	if err := RetrieveProject(fakeProject); err != nil {
+func TestBuildConfig_retrieve(t *testing.T) {
+	data, _, err := RetrieveBuildConfig("default", "fake")
+	if err != nil {
 		t.Fatal(err)
+	}
+	if len(data) > 0 {
+		t.Logf("BuildConfig:\n%s\n", string(data))
+	} else {
+		t.Log("nothing")
 	}
 }
 
-func TestCreateBuild(t *testing.T) {
-	if _, _, err := CreateBuild(fakeBuild, fakeProject, nil, fakeGitURI, fakeGitRef, fakeContextDir, nil, fakeDockerfile, nil, nil); err != nil {
+func TestBuild_retrieve(t *testing.T) {
+	data, _, err := RetrieveBuild("default", "fake")
+	if err != nil {
 		t.Fatal(err)
+	}
+	if len(data) > 0 {
+		t.Logf("Build:\n%s\n", string(data))
+	} else {
+		t.Log("nothing")
 	}
 }
 

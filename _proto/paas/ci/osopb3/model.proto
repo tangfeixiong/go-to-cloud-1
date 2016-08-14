@@ -1,11 +1,12 @@
 syntax = "proto3";
 
+//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
+
 import "google/api/annotations.proto";
 //import "google/protobuf/any.proto";
 
-//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
-//import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
-//import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
+import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
+import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
 
 package paas.ci.osopb3;
 
@@ -13,147 +14,6 @@ option go_package = "osopb3";
 option java_package = "com.qingyuanos.core.googleprotobuf.osopb3";
 option java_outer_classname = "BaseModel";
 
-//
-// A copy of Kubernetes api
-//
-message K8sTypeMeta {
-  string kind = 1;
-
-  string apiVersion = 2;
-}
-
-message K8sListMeta {
-  string selfLink = 1;
-
-  string resourceVersion = 2;
-}
-
-message K8sUnversionedTime {
-  int64 seconds = 1;
-
-  int32 nanos = 2;
-}
-
-message K8sResourceQuantity {
-  string string = 1;
-}
-
-message OwnerReference {
-  string apiVersion = 5;
-
-  string kind = 1;
-
-  string name = 3;
-
-  string uid = 4;
-
-  bool controller = 6;
-}
-
-message K8sObjectMeta {
-  string name = 1;
-
-  string generateName = 2;
-
-  string namespace = 3;
-
-  string selfLink = 4;
-
-  string uid = 5;
-
-  string resourceVersion = 6;
-
-  int64 generation = 7;
-
-  K8sUnversionedTime creationTimestamp = 8;
-
-  K8sUnversionedTime deletionTimestamp = 9;
-
-  int64 deletionGracePeriodSeconds = 10;
-
-  map<string, string> labels = 11;
-
-  map<string, string> annotations = 12;
-
-  repeated OwnerReference ownerReferences = 13;
-
-  repeated string finalizers = 14;
-}
-
-message K8sObjectReference {
-  string kind = 1;
-
-  string namespace = 2;
-
-  string name = 3;
-
-  string uid = 4;
-
-  string apiVersion = 5;
-
-  string resourceVersion = 6;
-
-  string fieldPath = 7;	
-}
-
-message K8sLocalObjectReference {
-  string name = 1;
-}
-
-message K8sResourceRequirements {
-  map<string, K8sResourceQuantity> limits = 1;
-
-  map<string, K8sResourceQuantity> requests = 2;
-}
-
-message SecretKeySelector {
-  K8sLocalObjectReference localObjectReference = 1;
-
-  string key = 2;
-}
-
-message ConfigMapKeySelector {
-  K8sLocalObjectReference localObjectReference = 1;
-
-  string key = 2;
-}
-
-message ResourceFieldSelector {
-  string containerName = 1;
-
-  string resource = 2;
-
-  K8sResourceQuantity divisor = 3;
-}
-
-message ObjectFieldSelector {
-  string apiVersion = 1;
-
-  string fieldPath = 2;
-}
-
-message EnvVarSource {
-  ObjectFieldSelector fieldRef = 1;
-
-  ResourceFieldSelector resourceFieldRef = 2;
-
-  ConfigMapKeySelector configMapKeyRef = 3;
-
-  SecretKeySelector secretKeyRef = 4;
-}
-
-message K8sEnvVar {
-  string name = 1;
-
-  string value = 2;
-
-  EnvVarSource valueFrom = 3;
-}
-
-enum K8sNamespacePhase {
-	Active = 0;
-	Terminating = 1;
-}
 
 //
 // A copy of OpenShift Build Protobuf
@@ -178,6 +38,8 @@ message SourceRevision {
   string type = 1;
 
   GitSourceRevision git = 2;
+
+  OsoBuildSourceType buildSourceType = 3;
 }
 	
 message BuildPostCommitSpec {
@@ -189,9 +51,9 @@ message BuildPostCommitSpec {
 }		
 	
 message BuildOutput {
-	K8sObjectReference to = 1;
+	k8s.io.kubernetes.pkg.api.v1.ObjectReference to = 1;
 	
-	K8sLocalObjectReference pushSecret = 2;
+	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference pushSecret = 2;
 }
 	
 message JenkinsPipelineBuildStrategy {
@@ -201,17 +63,17 @@ message JenkinsPipelineBuildStrategy {
 }
 		
 message SecretSpec {
-  K8sLocalObjectReference secretSource = 1;
+  k8s.io.kubernetes.pkg.api.v1.LocalObjectReference secretSource = 1;
 
   string mountPath = 2;
 }
 		
 message CustomBuildStrategy {
-	K8sObjectReference from = 1;
+	k8s.io.kubernetes.pkg.api.v1.ObjectReference from = 1;
 	
-	K8sLocalObjectReference pullSecret = 2;
+	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference pullSecret = 2;
 	
-	repeated K8sEnvVar env = 3;
+	repeated k8s.io.kubernetes.pkg.api.v1.EnvVar env = 3;
 		
 	bool exposeDockerSocket = 4;
 	
@@ -223,11 +85,11 @@ message CustomBuildStrategy {
 }
 		
 message SourceBuildStrategy {
-	K8sObjectReference from = 1;
+	k8s.io.kubernetes.pkg.api.v1.ObjectReference from = 1;
 	
-	K8sLocalObjectReference pullSecret = 2;
+	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference pullSecret = 2;
 	
-	repeated K8sEnvVar env = 3;
+	repeated k8s.io.kubernetes.pkg.api.v1.EnvVar env = 3;
 	
 	string scripts = 4;
 	
@@ -237,13 +99,13 @@ message SourceBuildStrategy {
 }
 				
 message DockerBuildStrategy {
-	K8sObjectReference from = 1;
+	k8s.io.kubernetes.pkg.api.v1.ObjectReference from = 1;
 	
-	K8sLocalObjectReference pullSecret = 2;
+	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference pullSecret = 2;
 	
 	bool noCache = 3;
 	
-	repeated K8sEnvVar env = 4;
+	repeated k8s.io.kubernetes.pkg.api.v1.EnvVar env = 4;
 	
 	bool forcePull = 5;
 	
@@ -271,7 +133,7 @@ message BuildStrategy {
 }
 
 message SecretBuildSource {
-	K8sLocalObjectReference secret = 1;
+	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference secret = 1;
 	
 	string destinationDir = 2;
 }
@@ -283,11 +145,11 @@ message ImageSourcePath {
 }
 
 message ImageSource {
-	K8sObjectReference from = 1;
+	k8s.io.kubernetes.pkg.api.v1.ObjectReference from = 1;
 	
 	repeated ImageSourcePath paths = 2;
 	
-	K8sLocalObjectReference pullSecret = 3;
+	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference pullSecret = 3;
 }
 
 message GitBuildSource {
@@ -304,6 +166,14 @@ message BinaryBuildSource {
 	string asFile = 1;
 }
 
+enum OsoBuildSourceType {
+	Git = 0;
+	Dockerfile = 1;
+	Binary =2;
+	Image = 3;
+	None = 4;
+}
+
 message BuildSource {
   string type = 1;
 
@@ -317,18 +187,11 @@ message BuildSource {
 
   string contextDir = 6;
 
-  K8sLocalObjectReference sourceSecret = 7;
+  k8s.io.kubernetes.pkg.api.v1.LocalObjectReference sourceSecret = 7;
 
   repeated SecretBuildSource secrets = 8;
 
-	enum OsoBuildSourceType {
-		Git = 0;
-		Dockerfile = 1;
-		Binary =2;
-		Image = 3;
-		None = 4;
-	}
-	OsoBuildSourceType osoBuildSourceType = 9;
+  OsoBuildSourceType osoBuildSourceType = 9;
 }
 
 message OsoCommonSpec {
@@ -342,7 +205,7 @@ message OsoCommonSpec {
 
   BuildOutput output = 5;
 
-  K8sResourceRequirements resources = 6;
+  k8s.io.kubernetes.pkg.api.v1.ResourceRequirements resources = 6;
 
   BuildPostCommitSpec postCommit = 7;
 
@@ -358,15 +221,15 @@ message WebHookTrigger {
 message ImageChangeTrigger {
   string lastTriggeredImageID = 1;
 
-  K8sObjectReference from = 2;
+  k8s.io.kubernetes.pkg.api.v1.ObjectReference from = 2;
 }
 
 message OsoBuildTriggerPolicy {
   string type = 1;
 
-  WebHookTrigger github = 2;
+  WebHookTrigger githubWebHook = 2;
 
-  WebHookTrigger generic = 3;
+  WebHookTrigger genericWebHook = 3;
 
   ImageChangeTrigger imageChange = 4;
 	
@@ -375,7 +238,6 @@ message OsoBuildTriggerPolicy {
         Generic = 1;
         ImageChange = 2;
 	    ConfigChange = 3;
-        GoGits = 4;
     }
 	OsoBuildTriggerType osoBuildTriggerType = 5;
 }
@@ -395,7 +257,7 @@ message GitHubWebHookCause {
 message ImageChangeCause {
   string imageID = 1;
 
-  K8sObjectReference fromRef = 2;
+  k8s.io.kubernetes.pkg.api.v1.ObjectReference fromRef = 2;
 }
 
 message OsoBuildTriggerCause {
@@ -417,15 +279,15 @@ message OsoBuildStatus {
 
   string message = 4;
 
-  K8sUnversionedTime startTimestamp = 5;
+  k8s.io.kubernetes.pkg.api.unversioned.Time startTimestamp = 5;
 
-  K8sUnversionedTime completionTimestamp = 6;
+  k8s.io.kubernetes.pkg.api.unversioned.Time completionTimestamp = 6;
 
   int64 duration = 7;
 
   string outputDockerImageReference = 8;
 
-  K8sObjectReference config = 9;
+  k8s.io.kubernetes.pkg.api.v1.ObjectReference config = 9;
 	
 	enum OsoBuildPhase {
 		New = 0;
@@ -437,4 +299,9 @@ message OsoBuildStatus {
 		Cancelled = 6;
 	}	
 	OsoBuildPhase osoBuildPhase = 10;
+}
+
+enum OsoBuildOutputKind {
+	ImageStreamTag = 0;
+	DockerImage = 1;
 }

@@ -2,9 +2,14 @@ package service
 
 import (
 	"errors"
+	"log"
+	"os"
 )
 
 var (
-	errNotImplemented error = errors.New("Not Implemented")
+	errNotFound       error = errors.New("Not found")
+	errNotImplemented error = errors.New("Not implemented")
 	errUnexpected     error = errors.New("Unexpected")
+
+	logger *log.Logger = log.New(os.Stdout, "[service package] ", log.LstdFlags|log.Lshortfile)
 )

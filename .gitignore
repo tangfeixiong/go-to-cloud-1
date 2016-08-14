@@ -1,4 +1,7 @@
 build/docker/apaas
+build/docker/openshift.local.config
+build/docker/ssl
+
 *vendor
 _vendor/src/**/.[a-zA-Z]*
 _vendor/src/k8s.io/*/.[a-zA-Z]*

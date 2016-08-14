@@ -1,9 +1,5 @@
 package origin
 
-import (
-	"errors"
-)
-
 const (
 	loginLong = `
 Log in to your server and save login for subsequent use
@@ -128,10 +124,4 @@ base image changes will use the source specified on the build config.
   # Start a new build for build config "hello-world" and wait until the build completes. It
   # exits with a non-zero return code if the build fails.
   $ %[1]s start-build hello-world --wait`
-)
-
-var (
-	errNotFound       error = errors.New("Not found")
-	errNotImplemented error = errors.New("Not implemented")
-	errUnexpected     error = errors.New("Unexpected")
 )

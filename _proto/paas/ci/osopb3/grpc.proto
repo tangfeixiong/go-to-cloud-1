@@ -6,16 +6,23 @@ option java_outer_classname = "GrpcServer";
 
 package paas.ci.osopb3;
 
+//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
+
 import "google/api/annotations.proto";
 //import "google/protobuf/any.proto";
 
-//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
-//import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
-//import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
+import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
+import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
 
 import "paas/ci/osopb3/model.proto";
 
 service SimpleService {
+
+	rpc Version(VersionRequestData) returns (VersionResponseData) {
+		option (google.api.http) = {
+          get: "/version"
+        };
+	}
 
 	rpc CreateProjectIntoArbitrary(ProjectCreationRequestData) returns (ProjectResponseDataArbitrary) {
 		option (google.api.http) = {
@@ -71,20 +78,32 @@ service SimpleService {
 	//rpc LookupProjects(LookupProjectsRequest) returns (LookupProjectsResponse);
 
 	//rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
+	
+	rpc CreateIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+		option (google.api.http) = {
+	      post: "/v1/dockerbuilds"
+		  body: "*"
+		};
+	}
 
-	//rpc NewOsoBuildConfig(github.com.openshift.origin.pkg.build.api.v1.BuildConfig) returns (github.com.openshift.origin.pkg.build.api.v1.BuildConfig) {
-	//	option (google.api.http) = {
-	//    post: "/v1/oapiv1/buildconfigs"
-	//	  body: "*"
-	//	};
-	//}
+	rpc RetrieveIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+		option (google.api.http) = {
+	      get: "/v1/dockerbuilds/{buildername}/build/{buildname}"
+		};
+	}
+	
+	rpc UpdateIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+		option (google.api.http) = {
+	      put: "/v1/dockerbuilds/{buildername}"
+		  body: "*"
+		};
+	}
 
-	//rpc StartOsoBuild(github.com.openshift.origin.pkg.build.api.v1.Build) returns (github.com.openshift.origin.pkg.build.api.v1.Build) {
-	//	option (google.api.http) = {
-	//    post: "/v1/oapiv1/builds"
-	//	  body: "*"
-	//	};		
-	//}
+	rpc DeleteIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+		option (google.api.http) = {
+	      delete: "/v1/dockerbuilds/{buildername}"
+		};
+	}
 	
 	rpc BuildDockerImage(RawData) returns (RawData) {
 		option (google.api.http) = {
@@ -99,28 +118,22 @@ service SimpleService {
 		  body: "*"
 		};
 	}
-	
-	rpc CreateIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
-		option (google.api.http) = {
-	      post: "/v1/dockerbuilds"
-		  body: "*"
-		};
-	}
-	
-	rpc UpdateIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
-		option (google.api.http) = {
-	      put: "/v1/dockerbuilds/{buildname}"
-		  body: "*"
-		};
-	}
+
+	//rpc NewOsoBuildConfig(github.com.openshift.origin.pkg.build.api.v1.BuildConfig) returns (github.com.openshift.origin.pkg.build.api.v1.BuildConfig) {
+	//	option (google.api.http) = {
+	//    post: "/v1/oapiv1/buildconfigs"
+	//	  body: "*"
+	//	};
+	//}
+
+	//rpc StartOsoBuild(github.com.openshift.origin.pkg.build.api.v1.Build) returns (github.com.openshift.origin.pkg.build.api.v1.Build) {
+	//	option (google.api.http) = {
+	//    post: "/v1/oapiv1/builds"
+	//	  body: "*"
+	//	};		
+	//}
 
 	//rpc RebuildDockerImage(RebuildDockerImageRequest) returns (stream RebuildDockerImageResponse) {
-	//}
-
-	//rpc CatBuildMessage(CatBuildMessageRequest) returns (CatBuildMessageResponse) {
-	//}
-
-	//rpc RmBuildMessage(RmBuildMessageRequest) returns (RmBuildMessageResponse) {
 	//}
 
 	//rpc CpDockerfileBuildSource(CpDockerfileBuildSourceRequest) returns (CpDockerfileBuildSourceResponse) {
@@ -136,6 +149,11 @@ service SimpleService {
 	//}
 }
 
+enum K8sNamespacePhase {
+	Active = 0;
+	Terminating = 1;
+}
+
 //
 // Project
 //
@@ -146,8 +164,8 @@ message ProjectResponseDataArbitrary {
 
 	repeated string finalizers = 3;
 	
-	K8sTypeMeta datatype = 4;
-	K8sObjectMeta metadata = 5;
+	k8s.io.kubernetes.pkg.api.unversioned.TypeMeta datatype = 4;
+	k8s.io.kubernetes.pkg.api.v1.ObjectMeta metadata = 5;
 	K8sNamespacePhase resultingCode = 6;
 	
 	RawData raw = 7;
@@ -282,14 +300,14 @@ message DockerBuildConfigRequestData {
 message DockerBuildConfigResponseData {
 	int64 state = 1;
 
-	K8sObjectMeta metadata = 2;	
+	RawJSON raw = 2;
 }
 
 message DockerBuildRequestData {
 	string name = 1;
 	string projectName = 2;
 	
-	DockerBuildConfigRequestData configSpec = 3;
+	DockerBuildConfigRequestData configuration = 3;
 	repeated OsoBuildTriggerCause triggeredBy = 4;
 	
 	map<string, string> labels = 5;
@@ -297,28 +315,28 @@ message DockerBuildRequestData {
 }
 
 message DockerBuildResponseData {
-	OsoBuildStatus result = 1;
+	OsoBuildStatus status = 1;
 
-	DockerBuildConfigResponseData configResult = 2;
-
-	K8sObjectMeta metadata = 3;	
+	RawJSON raw = 2;
 }
 
-// message DockerBuildResponseRaw {
-//     string name = 1;	
-//     RawData raw = 2;
-// }
+message RawJSON {
+    string objectGVK = 1;	
+    bytes objectJSON = 2;
+}
 
 message RawData {
 	string objectName = 1;
 	bytes objectBytes = 2;
 }
 
-//message BuildSpec {
-//	BuildCommonSpec commonSpec = 1;
-//	repeated BuildTriggerCause triggeredBy = 2;
-//}	
-//
+message VersionRequestData {
+}	
+
+message VersionResponseData {
+	string version = 1;
+}	
+
 //message BuildRequest {
 //	string    name    = 1;
 //	string    project = 2;

@@ -25,7 +25,8 @@ func TestMain(m *testing.M) {
 }
 
 var (
-	_host    = "172.17.4.50:50051"
+	_host    = "0.0.0.0:50051"
+	_server  = "172.17.4.50:50051"
 	_grpcsvr *grpc.Server
 )
 

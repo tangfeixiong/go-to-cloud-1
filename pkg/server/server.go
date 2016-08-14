@@ -57,13 +57,17 @@ func (s *APIContextServer) WebService(service *restful.WebService) *APIContextSe
 }
 
 func runGrpcServer() error {
-	lstn, err := net.Listen("tcp", ":8086")
+	host := ":50051"
+	if v, ok := os.LookupEnv("APAAS_HOST"); ok && v != "" {
+		host = v
+	}
+	lstn, err := net.Listen("tcp", host)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
 		return err
 	}
 
-	fmt.Printf("grpc server is running on %s\n", ":8086")
+	fmt.Printf("grpc server is running on %s\n", host)
 
 	//s := grpc.NewServer()
 	//examples.RegisterEchoServiceServer(s, newEchoServer())

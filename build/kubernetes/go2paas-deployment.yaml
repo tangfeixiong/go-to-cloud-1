@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    qinguanos.com: harpoon 
+  labels:
+    heritage: qingyuanos.io
+    app: qingyuan-paas
+  name: apaas
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      name: apaas
+      version: '0.1'
+  template:
+    metadata:
+      labels:
+        name: apaas
+        version: '0.1'
+    spec:
+      containers:
+      - env:
+        - name: K8S_KUBECONFIG
+          value: /root/.kube/config
+        - name: K8S_KUBECONTEXT
+          value: kube
+        - name: OSO_KUBECONFIG
+          value: /openshift.local.config/master/admin.kubeconfig
+        - name: OSO_KUBECONTEXT
+          value: default/127-0-0-1:8443/system:admin
+        - name: APAAS_HOST
+          value: :50051
+        - name: PRIVATE_REGISTRY_SECRETS 
+          value: qingyuanos.local=qingyuanosregistrysecret,qingyuancloud.local=qingyuanosregistrysecret
+        image: tangfeixiong/gotopaas
+        imagePullPolicy: IfNotPresent
+        name: apaas
+        ports:
+        - containerPort: 50051
+

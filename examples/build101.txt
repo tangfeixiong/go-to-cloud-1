@@ -1,0 +1,159 @@
+
+[vagrant@localhost go-to-cloud-1]$ GOPATH=/work go build -o /data/bin/tcdockerbuild -v github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/tcdockerbuild
+...
+[appliance/openshift/origin, createBuild] 2016/08/14 18:16:41 build.go:717: Build: kind:"Build" apiVersion:"v1" 
+I0814 18:16:41.026862   14512 request.go:548] Request Body: {
+  "kind": "Build",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "netcat-http",
+    "namespace": "tangfx",
+    "creationTimestamp": "2016-08-14T18:16:40Z"
+  },
+  "spec": {
+    "serviceAccount": "builder",
+    "source": {
+      "type": "Git",
+      "git": {
+        "uri": "https://github.com/tangfeixiong/docker-nc.git",
+        "ref": "master"
+      },
+      "contextDir": "latest"
+    },
+    "strategy": {
+      "type": "Docker",
+      "dockerStrategy": {
+        "from": {
+          "kind": "DockerImage",
+          "name": "alpine:edge"
+        }
+      }
+    },
+    "output": {
+      "to": {
+        "kind": "DockerImage",
+        "name": "docker.io/tangfeixiong/nc-http-dev:latest"
+      },
+      "pushSecret": {
+        "name": "localdockerconfig"
+      }
+    },
+    "resources": {},
+    "postCommit": {},
+    "triggeredBy": null
+  },
+  "status": {
+    "phase": "New"
+  }
+}
+I0814 18:16:41.026908   14512 round_trippers.go:299] curl -k -v -XPOST  -H "User-Agent: tcdockerbuild/ (linux/amd64) openshift/unknown" -H "Accept: application/json, */*" https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/builds
+I0814 18:16:41.032752   14512 round_trippers.go:318] POST https://172.17.4.50:30443/oapi/v1/namespaces/tangfx/builds 201 Created in 5 milliseconds
+I0814 18:16:41.032783   14512 round_trippers.go:324] Response Headers:
+I0814 18:16:41.032789   14512 round_trippers.go:327]     Cache-Control: no-store
+I0814 18:16:41.032795   14512 round_trippers.go:327]     Content-Type: application/json
+I0814 18:16:41.032799   14512 round_trippers.go:327]     Date: Sun, 14 Aug 2016 18:16:41 GMT
+I0814 18:16:41.032803   14512 round_trippers.go:327]     Content-Length: 741
+[appliance/openshift/origin, createBuild] 2016/08/14 18:16:41 build.go:758: Build: {"kind":"Build","apiVersion":"v1","metadata":{"name":"netcat-http","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/netcat-http","uid":"3f96e87e-624b-11e6-80b8-865acfd544b8","resourceVersion":"179","creationTimestamp":"2016-08-14T18:16:41Z"},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git","ref":"master"},"contextDir":"latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"alpine:edge"}}},"output":{"to":{"kind":"DockerImage","name":"docker.io/tangfeixiong/nc-http-dev:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"triggeredBy":null},"status":{"phase":"New"}}
+
+
+#### Using Build API 
+
+Failed: invalid character ':' after top-level value[vagrant@localhost go-to-cloud-1]$ /data/bin/tcdockerbuild -v 10
+...
+[appliance/openshift/origin, createBuild] 2016/08/14 17:22:12 config_factory.go:97: cmd client config: &{Kind: APIVersion: Preferences:{Colors:false Extensions:map[]} Clusters:map[vagrant-single-cluster:0xc8204888c0 openshift-origin-single:0xc820488a80 kube-cluster:0xc820488c40] AuthInfos:map[vagrant-single-admin:0xc82025cdc0 openshift-origin-single:0xc82025cf20 cluster-admin:0xc82025d080] Contexts:map[vagrant-single:0xc8203180a0 openshift-origin-single:0xc8203181e0 kube-admin:0xc820318320] CurrentContext:openshift-origin-single Extensions:map[]}
+[appliance/openshift/origin, createBuild] 2016/08/14 17:22:12 config_factory.go:102: rest kclient config: &{config:{Kind: APIVersion: Preferences:{Colors:false Extensions:map[]} Clusters:map[vagrant-single-cluster:0xc8204888c0 openshift-origin-single:0xc820488a80 kube-cluster:0xc820488c40] AuthInfos:map[vagrant-single-admin:0xc82025cdc0 openshift-origin-single:0xc82025cf20 cluster-admin:0xc82025d080] Contexts:map[vagrant-single:0xc8203180a0 openshift-origin-single:0xc8203181e0 kube-admin:0xc820318320] CurrentContext:openshift-origin-single Extensions:map[]} contextName:openshift-origin-single overrides:0xc82016b800 fallbackReader:<nil> configAccess:0xc8200efc40}
+[appliance/openshift/origin, createBuild] 2016/08/14 17:22:12 build.go:529: openshift client: &{RESTClient:0xc8207104e0}
+[appliance/openshift/origin, createBuild] 2016/08/14 17:22:12 build.go:570: Build: {"name":"netcat-http","namespace":"tangfx","creationTimestamp":"2016-08-14T17:22:12Z","Spec":{"ServiceAccount":"builder","Source":{"Binary":null,"Dockerfile":"\"FROM alpine:edge\\nRUN apk add --update netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\\nCOPY entrypoint.sh /\\nENTRYPOINT [\\\"/entrypoint.sh\\\"]\\nCMD [\\\"nc\\\"]\"","Git":{"URI":"https://github.com/tangfeixiong/docker-nc.git","Ref":"master","HTTPProxy":null,"HTTPSProxy":null},"Images":null,"ContextDir":"latest","SourceSecret":null,"Secrets":null},"Revision":null,"Strategy":{"DockerStrategy":{"From":{"kind":"DockerImage","name":"alpine:edge"},"PullSecret":null,"NoCache":false,"Env":null,"ForcePull":false,"DockerfilePath":""},"SourceStrategy":null,"CustomStrategy":null,"JenkinsPipelineStrategy":null},"Output":{"To":{"kind":"DockerImage","name":"docker.io/tangfeixiong/nc-http-dev:latest"},"PushSecret":{"Name":"localdockerconfig"}},"Resources":{},"PostCommit":{"Command":null,"Args":null,"Script":""},"CompletionDeadlineSeconds":900,"TriggeredBy":[{"Message":"No message","GenericWebHook":{"Revision":{"Git":{"Commit":"master","Author":{"Name":"tangfeixiong","Email":"tangfx128@gmail.com"},"Committer":{"Name":"tangfeixiong","Email":"tangfx128@gmail.com"},"Message":"example"}},"Secret":""},"GitHubWebHook":null,"ImageChangeBuild":null}]},"Status":{"Phase":"New","Cancelled":false,"Reason":"","Message":"","StartTimestamp":null,"CompletionTimestamp":null,"Duration":0,"OutputDockerImageReference":"","Config":null}}
+
+[appliance/openshift/origin, createBuild] 2016/08/14 17:22:12 build.go:599: Build: kind:"Build" apiVersion:"v1" 
+E0814 17:22:12.331359    2309 build.go:619] Could not decode into metadata: invalid character ':' after top-level value
+Return: 405: Method Not Allowed
+
+{
+    "name": "netcat-http",
+    "namespace": "tangfx",
+    "creationTimestamp": "2016-08-14T17:22:12Z",
+    "Spec": {
+        "ServiceAccount": "builder",
+        "Source": {
+            "Binary": null,
+            "Dockerfile": "\"FROM alpine:edge\\nRUN apk add --update netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\\nCOPY entrypoint.sh /\\nENTRYPOINT [\\\"/entrypoint.sh\\\"]\\nCMD [\\\"nc\\\"]\"",
+            "Git": {
+                "URI": "https://github.com/tangfeixiong/docker-nc.git",
+                "Ref": "master",
+                "HTTPProxy": null,
+                "HTTPSProxy": null
+            },
+            "Images": null,
+            "ContextDir": "latest",
+            "SourceSecret": null,
+            "Secrets": null
+        },
+        "Revision": null,
+        "Strategy": {
+            "DockerStrategy": {
+                "From": {
+                    "kind": "DockerImage",
+                    "name": "alpine:edge"
+                },
+                "PullSecret": null,
+                "NoCache": false,
+                "Env": null,
+                "ForcePull": false,
+                "DockerfilePath": ""
+            },
+            "SourceStrategy": null,
+            "CustomStrategy": null,
+            "JenkinsPipelineStrategy": null
+        },
+        "Output": {
+            "To": {
+                "kind": "DockerImage",
+                "name": "docker.io/tangfeixiong/nc-http-dev:latest"
+            },
+            "PushSecret": {
+                "Name": "localdockerconfig"
+            }
+        },
+        "Resources": {},
+        "PostCommit": {
+            "Command": null,
+            "Args": null,
+            "Script": ""
+        },
+        "CompletionDeadlineSeconds": 900,
+        "TriggeredBy": [{
+            "Message": "No message",
+            "GenericWebHook": {
+                "Revision": {
+                    "Git": {
+                        "Commit": "master",
+                        "Author": {
+                            "Name": "tangfeixiong",
+                            "Email": "tangfx128@gmail.com"
+                        },
+                        "Committer": {
+                            "Name": "tangfeixiong",
+                            "Email": "tangfx128@gmail.com"
+                        },
+                        "Message": "example"
+                    }
+                },
+                "Secret": ""
+            },
+            "GitHubWebHook": null,
+            "ImageChangeBuild": null
+        }]
+    },
+    "Status": {
+        "Phase": "New",
+        "Cancelled": false,
+        "Reason": "",
+        "Message": "",
+        "StartTimestamp": null,
+        "CompletionTimestamp": null,
+        "Duration": 0,
+        "OutputDockerImageReference": "",
+        "Config": null
+    }
+}

@@ -3,60 +3,66 @@
   "kind": "Build",
   "metadata": {
     "name": "nc-alpine",
-	"namespace": "tangfeixiong",
+	"namespace": "tangfx",
     "creationTimestamp": null,
     "labels": {
       "ci": "build101"
     }
   },
   "spec": {
-    "ServiceAccount": "",
+    "serviceAccount": "builder",
     "source": {
-      "Binary": null,
+      "binary": null,
+      "contextDir": "edge",
       "dockerfile": "FROM alpine:edge\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]",
       "git": {
 		"uri": "https://github.com/tangfeixiong/docker-nc.git",
 		"ref": "master"
 	  },
-      "Images": null,
-      "contextDir": "edge",
-      "SourceSecret": null,
-      "Secrets": null
+      "images": null,
+      "secrets": null,
+      "sourceSecret": null,
+	  "type": "Dockerfile"
     },
-    "Revision": null,
+    "revision": null,
     "strategy": {
       "dockerStrategy": {
-		"forcePull": false
+		"from": {
+		  "kind": "DockerImage",
+		  "name": "alpine:latest"
+		},
+		"forcePull": false,
+		"noCache": true
 	  },
-      "SourceStrategy": null,
-      "CustomStrategy": null
+      "sourceStrategy": null,
+      "customStrategy": null
     },
     "output": {
       "to": {
 		"kind": "DockerImage",
         "name": "docker.io/tangfeixiong/netcat-alpine:latest"
 	  },
-      "PushSecret": {
-		"name": "docker.io"
+      "pushSecret": {
+		"name": "localdockerconfig"
 	  }
     },
-    "Resources": {},
-    "PostCommit": {
-      "Command": null,
-      "Args": null,
-      "Script": ""
+    "resources": {},
+    "postCommit": {
+      "command": null,
+      "args": null,
+      "script": ""
     },
-    "CompletionDeadlineSeconds": null
+    "completionDeadlineSeconds": null
   },
-  "Status": {
-    "phase": "New",
-    "Cancelled": false,
-    "Reason": "",
-    "Message": "",
-    "StartTimestamp": null,
-    "CompletionTimestamp": null,
-    "Duration": 0,
+  "status": {
+    "phase": "",
+    "cancelled": false,
+    "reason": "",
+    "message": "",
+    "startTimestamp": null,
+    "completionTimestamp": null,
+    "duration": 0,
     "outputDockerImageReference": "",
-    "Config": null
+    "config": null
   }
 }

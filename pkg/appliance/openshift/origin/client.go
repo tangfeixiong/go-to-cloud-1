@@ -2,6 +2,7 @@ package origin
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	_ "io/ioutil"
@@ -17,8 +18,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	buildapi "github.com/openshift/origin/pkg/build/api"
-	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
 	"github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/cli"
 	"github.com/openshift/origin/pkg/cmd/cli/cmd"
@@ -30,8 +29,6 @@ import (
 	_ "github.com/openshift/origin/pkg/cmd/util/tokencmd"
 	newcmd "github.com/openshift/origin/pkg/generate/app/cmd"
 	_ "github.com/openshift/origin/pkg/generate/git"
-	projectapi "github.com/openshift/origin/pkg/project/api"
-	projectapiv1 "github.com/openshift/origin/pkg/project/api/v1"
 	userapi "github.com/openshift/origin/pkg/user/api"
 	userapiv1 "github.com/openshift/origin/pkg/user/api/v1"
 
@@ -45,18 +42,20 @@ import (
 	// clientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
 	// kubecmdconfig "k8s.io/kubernetes/pkg/kubectl/cmd/config"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	"k8s.io/kubernetes/pkg/runtime"
+	//"k8s.io/kubernetes/pkg/runtime"
 	_ "k8s.io/kubernetes/pkg/runtime/serializer/json"
 
-	qyapi "github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/api"
+	//qyapi "github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/api"
 )
 
 var (
-	logger *log.Logger = log.New(os.Stdout, "[tangfx] ", log.LstdFlags|log.Lshortfile)
+	errNotFound       error = errors.New("Not found")
+	errNotImplemented error = errors.New("Not implemented")
+	errUnexpected     error = errors.New("Unexpected")
 
-	factory *osclientcmd.Factory
+	logger *log.Logger = log.New(os.Stdout, "[appliance/openshift/origin] ", log.LstdFlags|log.Lshortfile)
 
-	kubeconfigPath    string = "/data/src/github.com/openshift/origin/openshift.local.config/master/kubeconfig"
+	kubeconfigPath    string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
 	kubeconfigContext string = "openshift-origin-single"
 
 	apiVersion string = "v1"
@@ -67,12 +66,14 @@ var (
 	// token string = "IqEFJ7eK2_Pls4JHItvMPLBqGcuct5ogPN6NrapH20s"
 
 	oconfigPath    string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig"
-	oconfigContext string = "default/172-17-4-50:30448/system:admin"
+	oconfigContext string = "default/172-17-4-50:30443/system:admin"
 
 	kClientConfig, oClientConfig *clientcmd.ClientConfig
 	kClient                      *kclient.Client
 	oClient                      *client.Client
 	kConfig, oConfig             *restclient.Config
+
+	factory *osclientcmd.Factory
 
 	who *userapi.User
 
@@ -83,10 +84,34 @@ var (
 	githubRef          string = "master"
 	githubPath         string = "latest"
 	githubSecret       string = "github-qingyuancloud-tangfx"
-	dockerPullSecret   string = "tangfeixiong"
-	dockerPushSecret   string = "tangfeixiong"
+	dockerPullSecret   string = "localdockerconfig"
+	dockerPushSecret   string = "localdockerconfig"
 	timeout            int64  = 900
 )
+
+func init() {
+	//	flagtypes.GLog(rootCommand.PersistentFlags())
+	if v, ok := os.LookupEnv("K8S_KUBECONFIG"); ok {
+		if v != "" {
+			kubeconfigPath = v
+		}
+	}
+	if v, ok := os.LookupEnv("K8S_KUBECONTEXT"); ok {
+		if v != "" {
+			kubeconfigContext = v
+		}
+	}
+	if v, ok := os.LookupEnv("K8S_KUBECONFIG"); ok {
+		if v != "" {
+			oconfigPath = v
+		}
+	}
+	if v, ok := os.LookupEnv("K8S_KUBECONFIG"); ok {
+		if v != "" {
+			oconfigContext = v
+		}
+	}
+}
 
 type stringValue struct {
 	value string
@@ -142,10 +167,6 @@ var rootCommand = &cobra.Command{
 	Run: func(c *cobra.Command, args []string) {
 	},
 }
-
-//func init() {
-//	flagtypes.GLog(rootCommand.PersistentFlags())
-//}
 
 // User, Group, Identity and UserIdentityMapping
 
@@ -323,560 +344,6 @@ func RetrieveUser(name string) (*userapi.User, error) {
 		logger.Printf("User: %+v\n", result)
 	}
 	return result, nil
-}
-
-// ProjectRequest and Project
-
-func CreateProjectRequest(name, displayName, description string) ([]byte, *projectapi.Project, error) {
-	obj := new(projectapi.ProjectRequest)
-	obj.Kind = "ProjectRequest"
-	obj.APIVersion = projectapiv1.SchemeGroupVersion.Version
-	obj.Name = name
-	if len(displayName) > 0 {
-		obj.DisplayName = displayName
-	}
-	if len(description) > 0 {
-		obj.Description = description
-	}
-	return CreateProjectRequestWith(obj)
-}
-
-func CreateProjectRequestWith(obj *projectapi.ProjectRequest) ([]byte, *projectapi.Project, error) {
-	return createProjectRequest(nil, obj)
-}
-
-func CreateProjectRequestFromArbitray(data []byte) ([]byte, *projectapi.Project, error) {
-	return createProjectRequest(data, nil)
-}
-
-func createProjectRequest(data []byte, obj *projectapi.ProjectRequest) ([]byte, *projectapi.Project, error) {
-	if len(data) == 0 && obj == nil {
-		return nil, nil, errUnexpected
-	}
-	f := NewClientCmdFactory()
-	oc, _, err := f.Clients()
-	if err != nil {
-		glog.Errorf("Could not create openshift client: %s", err)
-		return nil, nil, err
-	}
-	logger.Printf("openshift client: %+v\n", oc)
-
-	if len(data) == 0 && obj != nil {
-		result, err := oc.ProjectRequests().Create(obj)
-		if err != nil {
-			if retry := strings.EqualFold(err.Error(), "encoding is not allowed for this codec: *recognizer.decoder"); !retry {
-				glog.Errorf("Could not access openshift: %s", err)
-				return nil, nil, err
-			}
-			if !strings.EqualFold("no kind is registered for the type api.ProjectRequest", err.Error()) {
-				glog.Errorf("Could not access openshift: %s", err)
-				return nil, nil, err
-			}
-		}
-		if result == nil {
-			glog.V(7).Infoln("Unexpected creation: %+v", obj)
-			return nil, nil, errUnexpected
-		}
-		if result != nil {
-			if strings.EqualFold("Project", result.Kind) && len(result.Name) > 0 {
-				b := new(bytes.Buffer)
-				if err := codec.JSON.Encode(b).One(result); err != nil {
-					glog.Errorf("Could not encode runtime object: %s", err)
-					return nil, result, err
-				}
-				logger.Printf("Project: %+v\n", b.String())
-				return b.Bytes(), result, nil
-			}
-		}
-
-		data = make([]byte, 0)
-		b := bytes.NewBuffer(data)
-		if err := codec.JSON.Encode(b).One(obj); err != nil {
-			glog.Errorf("Could not serialize runtime object: %+v", err)
-			return nil, nil, err
-		}
-	}
-
-	raw, err := oc.RESTClient.Post().Resource("projectRequests").Body(data).DoRaw()
-	if err != nil {
-		glog.Errorf("Could not access openshift: %s", err)
-		return nil, nil, err
-	}
-
-	hco, err := codec.JSON.Decode(raw).One()
-	if err != nil {
-		glog.Errorf("Could not create helm object: %s", err)
-		return raw, nil, err
-	}
-	meta, err := hco.Meta()
-	if err != nil {
-		glog.Errorf("Could not decode into metadata: %s", err)
-		return raw, nil, err
-	}
-	if ok := strings.EqualFold("Project", meta.Kind) && len(meta.Name) > 0; !ok {
-		if strings.EqualFold("Status", meta.Kind) {
-			status := new(unversioned.Status)
-			if err := hco.Object(status); err != nil {
-				glog.Errorf("Could not know metadata: %+v", meta)
-				return raw, nil, err
-			}
-			return raw, nil, fmt.Errorf("Could not create project: %+v", status.Message)
-		}
-		glog.Errorf("Could not know metadata: %+v", string(raw))
-		return raw, nil, errUnexpected
-	}
-	result := new(projectapi.Project)
-	if err := hco.Object(result); err != nil {
-		glog.Errorf("Could not decode into runtime object: %s", err)
-		return raw, nil, err
-	}
-	logger.Printf("Project: %+v\n", string(raw))
-	return raw, result, nil
-}
-
-func CreateProject(name string, finalizers ...string) ([]byte, *projectapi.Project, error) {
-	obj := new(projectapi.Project)
-	obj.Kind = "Project"
-	obj.APIVersion = projectapiv1.SchemeGroupVersion.Version
-	obj.Name = name
-	obj.Spec.Finalizers = []kapi.FinalizerName{projectapi.FinalizerOrigin, kapi.FinalizerKubernetes, qyapi.FinalizerVender}
-	for _, v := range finalizers {
-		obj.Spec.Finalizers = append(obj.Spec.Finalizers, kapi.FinalizerName(v))
-	}
-	return CreateProjectWith(obj)
-}
-
-func CreateProjectWith(obj *projectapi.Project) ([]byte, *projectapi.Project, error) {
-	return createProject(nil, obj)
-}
-
-func CreateProjectFromArbitray(data []byte) ([]byte, *projectapi.Project, error) {
-	return createProject(data, nil)
-}
-
-func createProject(data []byte, obj *projectapi.Project) ([]byte, *projectapi.Project, error) {
-	if len(data) == 0 && obj == nil {
-		return nil, nil, errUnexpected
-	}
-	f := NewClientCmdFactory()
-	oc, _, err := f.Clients()
-	if err != nil {
-		glog.Errorf("Could not create openshift client: %s", err)
-		return nil, nil, err
-	}
-	logger.Printf("openshift client: %+v\n", oc)
-
-	if len(data) == 0 && obj != nil {
-		result, err := oc.Projects().Create(obj)
-		if err != nil {
-			if retry := strings.EqualFold("encoding is not allowed for this codec: *recognizer.decoder", err.Error()) || strings.HasPrefix(err.Error(), "no kind is registered for the type api."); !retry {
-				glog.Errorf("Could not access openshift: %s", err)
-				return nil, nil, err
-			}
-		}
-		if result == nil {
-			glog.V(7).Infoln("Unexpected creation: %+v", obj)
-			return nil, nil, errUnexpected
-		}
-		if result != nil {
-			if strings.EqualFold("Project", result.Kind) && len(result.Name) > 0 {
-				b := new(bytes.Buffer)
-				if err := codec.JSON.Encode(b).One(result); err != nil {
-					glog.Errorf("Could not encode runtime object: %s", err)
-					return nil, result, err
-				}
-				logger.Printf("Project: %+v\n", b.String())
-				return b.Bytes(), result, nil
-			}
-		}
-
-		//data = make([]byte, 0)
-		//b := bytes.NewBuffer(data)
-		b := new(bytes.Buffer)
-		if err := codec.JSON.Encode(b).One(obj); err != nil {
-			glog.Errorf("Could not serialize runtime object: %+v", err)
-			return nil, nil, err
-		}
-		data = b.Bytes()
-	}
-
-	raw, err := oc.RESTClient.Post().Resource("projects").Body(data).DoRaw()
-	if err != nil {
-		glog.Errorf("Could not access openshift: %s", err)
-		return nil, nil, err
-	}
-
-	hco, err := codec.JSON.Decode(raw).One()
-	if err != nil {
-		glog.Errorf("Could not create helm object: %s", err)
-		return raw, nil, err
-	}
-	meta, err := hco.Meta()
-	if err != nil {
-		glog.Errorf("Could not decode into metadata: %s", err)
-		return raw, nil, err
-	}
-	if ok := strings.EqualFold("Project", meta.Kind) && len(meta.Name) > 0; !ok {
-		if strings.EqualFold("Status", meta.Kind) {
-			status := new(unversioned.Status)
-			if err := hco.Object(status); err != nil {
-				glog.Errorf("Could not know metadata: %+v", meta)
-				return raw, nil, err
-			}
-			return raw, nil, fmt.Errorf("Could not create project: %+v", status.Message)
-		}
-		glog.Errorf("Could not know metadata: %+v", string(raw))
-		return raw, nil, errUnexpected
-	}
-	result := new(projectapi.Project)
-	if err := hco.Object(result); err != nil {
-		glog.Errorf("Could not decode into runtime object: %s", err)
-		return raw, nil, err
-	}
-	logger.Printf("Project: %+v\n", string(raw))
-	return raw, result, nil
-}
-
-func RetrieveProjects() error {
-	f := NewClientCmdFactory()
-	oc, _, err := f.Clients()
-	if err != nil {
-		return err
-	}
-	logger.Printf("openshift client: %+v\n", oc)
-
-	result, err := oc.Projects().List(kapi.ListOptions{})
-	if err != nil {
-		return err
-	}
-	logger.Println(result)
-	return nil
-}
-
-func RetrieveProject(name string) ([]byte, *projectapi.Project, error) {
-	if len(name) == 0 {
-		return nil, nil, errNotFound
-	}
-	f := NewClientCmdFactory()
-	oc, _, err := f.Clients()
-	if err != nil {
-		glog.Errorf("Could not create openshift client: %+v", err)
-		return nil, nil, err
-	}
-	logger.Printf("openshift client: %+v\n", oc)
-
-	result, err := oc.Projects().Get(name)
-	if err != nil {
-		glog.Errorf("Could not delete project %s: %+v", name, err)
-		return nil, nil, err
-	}
-	if result == nil {
-		glog.V(7).Infoln("Unexpected retrieve: %s", name)
-		return nil, nil, errUnexpected
-	}
-	if strings.EqualFold("Project", result.Kind) && len(result.Name) > 0 {
-		//b := new(bytes.Buffer)
-		//if err := codec.JSON.Encode(b).One(result); err != nil {
-		//	glog.Errorf("Could not encode runtime object: %s", err)
-		//	return nil, result, err
-		//}
-		//logger.Printf("Build: %+v\n", b.String())
-		kapi.Scheme.AddKnownTypes(projectapiv1.SchemeGroupVersion, &projectapiv1.Project{})
-		data, err := runtime.Encode(kapi.Codecs.LegacyCodec(projectapiv1.SchemeGroupVersion),
-			result)
-		if err != nil {
-			glog.Errorf("Could not serialize runtime object: %+v", err)
-			return nil, result, err
-		}
-		return data, result, nil
-	}
-
-	raw, err := oc.RESTClient.Get().Resource("projects").Name(name).DoRaw()
-	if err != nil {
-		glog.Errorf("Could not access openshift: %s", err)
-		return nil, nil, err
-	}
-	//kapi.Scheme.AddKnownTypes(projectapiv1.SchemeGroupVersion, &projectapiv1.Project{})
-	//obj, err := runtime.Decode(kapi.Codecs.UniversalDeserializer(), raw)
-	//if err != nil {
-	//	glog.Errorf("Could not deserialize raw: %+v", err)
-	//	return raw, nil, err
-	//}
-	hco, err := codec.JSON.Decode(raw).One()
-	if err != nil {
-		glog.Errorf("Could not create helm object: %s", err)
-		return raw, nil, err
-	}
-	meta, err := hco.Meta()
-	if err != nil {
-		glog.Errorf("Could not decode into metadata: %s", err)
-		return raw, nil, err
-	}
-	if ok := strings.EqualFold("Project", meta.Kind) && len(meta.Name) > 0; !ok {
-		if strings.EqualFold("Status", meta.Kind) {
-			status := new(unversioned.Status)
-			if err := hco.Object(status); err != nil {
-				glog.Errorf("Could not know metadata: %+v", meta)
-				return raw, nil, err
-			}
-			glog.Warningf("Could not find runtime object: %+v", status.Message)
-			return raw, nil, fmt.Errorf("Could not find runtime object: %+v", status.Message)
-		}
-		glog.Errorf("Could not know metadata: %+v", string(raw))
-		return raw, nil, errUnexpected
-	}
-	result = new(projectapi.Project)
-	if err := hco.Object(result); err != nil {
-		glog.Errorf("Could not decode raw data: %s", err)
-		return raw, nil, err
-	}
-	logger.Printf("Return runtime object: %s\n", string(raw))
-	return raw, result, nil
-}
-
-func DeleteProject(name string) error {
-	if len(name) == 0 {
-		return errNotFound
-	}
-	f := NewClientCmdFactory()
-	oc, _, err := f.Clients()
-	if err != nil {
-		glog.Errorf("Could not create openshift client: %+v", err)
-		return err
-	}
-	logger.Printf("openshift client: %+v\n", oc)
-
-	if err := oc.Projects().Delete(name); err != nil {
-		glog.Errorf("Could not delete project %s: %+v", name, err)
-		return err
-	}
-	return nil
-}
-
-// gitRef: branch name, tag name, or commit revision
-func CreateBuild(name, projectName string, gitSecret map[string]string, gitURI, gitRef, contextDir string, sourceImages []map[string]interface{}, dockerfile string, buildSecrets []map[string]interface{}, buildStrategy map[string]interface{}) ([]byte, *buildapi.Build, error) {
-	obj := &buildapi.Build{
-		TypeMeta: unversioned.TypeMeta{
-			Kind:       "Build",
-			APIVersion: buildapiv1.SchemeGroupVersion.Version,
-		},
-		ObjectMeta: kapi.ObjectMeta{
-			Name:              name,
-			Namespace:         projectName,
-			CreationTimestamp: unversioned.Now(),
-			Labels:            map[string]string{buildapi.BuildConfigLabel: "tangfeixiong"},
-			Annotations:       map[string]string{buildapi.BuildNumberAnnotation: "1"},
-		},
-	}
-	obj.Spec = buildapi.BuildSpec{
-		TriggeredBy: []buildapi.BuildTriggerCause{
-			{
-				Message: "No message",
-				GenericWebHook: &buildapi.GenericWebHookCause{
-					Revision: &buildapi.SourceRevision{
-						Git: &buildapi.GitSourceRevision{
-							Commit: "master",
-							Author: buildapi.SourceControlUser{
-								Name:  "tangfeixiong",
-								Email: "tangfx128@gmail.com",
-							},
-							Committer: buildapi.SourceControlUser{
-								Name:  "tangfeixiong",
-								Email: "tangfx128@gmail.com",
-							},
-							Message: "example",
-						},
-					},
-					Secret: "",
-				},
-			},
-		},
-	}
-	obj.Spec.CommonSpec = buildapi.CommonSpec{
-		ServiceAccount: builderServiceAccount,
-		Source: buildapi.BuildSource{
-			//Binary : &buildapi.BinaryBuildSource {},
-			Dockerfile: &dockerfile,
-			Git: &buildapi.GitBuildSource{
-				URI: gitURI,
-				Ref: gitRef,
-				//HTTPProxy: nil,
-				//HTTPSProxy: nil,
-			},
-			/*Images : []buildapi.ImageSource {
-			    buildapi.ImageSource {
-			        From : kapi.ObjectReference {
-			            Kind : "DockerImage",
-			            Name : "alpine:edge",
-			        },
-			        Paths : []buildapi.ImageSourcePath {
-			           {
-			               SourcePath : "",
-			               DestinationDir : "",
-			           },
-			        },
-			        PullSecret : &kapi.LocalObjectReference {
-			        },
-			   },
-			},*/
-			ContextDir: contextDir,
-			//SourceSecret : &kapi.LocalObjectReference {
-			//    name : githubSecret,
-			//},
-			//Secrets : []buildapi.SecretBuildSource {
-			//    Secret : &kapi.LocalObjectReference {},
-			//    DestinationDir : "/root/.docker/config.json",
-			//},
-		},
-		//Revision: &buildapi.SourceRevision {},
-		Strategy: buildapi.BuildStrategy{
-			DockerStrategy: &buildapi.DockerBuildStrategy{
-				From: &kapi.ObjectReference{
-					Kind: "DockerImage",
-					Name: "alpine:edge",
-				},
-				//PullSecret: &kapi.LocalObjectReference{
-				//	Name: dockerPullSecret,
-				//},
-				NoCache: false,
-				//Env : []kapi.EnvVar {},
-				ForcePull: false,
-				//DockerfilePath : ".",
-			},
-		},
-		Output: buildapi.BuildOutput{
-			To: &kapi.ObjectReference{
-				Kind: "DockerImage",
-				Name: "docker.io/tangfeixiong/nc-http-dev:latest",
-			},
-			PushSecret: &kapi.LocalObjectReference{
-				Name: dockerPushSecret,
-			},
-		},
-		//Resources : kapi.ResourceRequirements {},
-		//PostCommit : buildapi.BuildPostCommitSpec {
-		//    Command : []string{},
-		//    Args : []string{},
-		//    Script: "",
-		//},
-		CompletionDeadlineSeconds: &timeout,
-	}
-	obj.Status = buildapi.BuildStatus{
-		Phase: buildapi.BuildPhaseNew,
-	}
-
-	return CreateBuildWith(obj)
-}
-
-func CreateBuildWith(obj *buildapi.Build) ([]byte, *buildapi.Build, error) {
-	return createBuild(nil, obj)
-}
-
-func CreateBuildFromArbitray(data []byte) ([]byte, *buildapi.Build, error) {
-	return createBuild(data, nil)
-}
-
-func createBuild(data []byte, obj *buildapi.Build) ([]byte, *buildapi.Build, error) {
-	if len(data) == 0 && obj == nil || obj != nil && len(obj.Namespace) == 0 {
-		return nil, nil, errUnexpected
-	}
-	f := NewClientCmdFactory()
-	oc, _, err := f.Clients()
-	if err != nil {
-		glog.Errorf("Could not create openshift client: %s", err)
-		return nil, nil, err
-	}
-	logger.Printf("openshift client: %+v\n", oc)
-
-	if len(data) == 0 && obj != nil {
-		result, err := oc.Builds(obj.Namespace).Create(obj)
-		if err != nil {
-			if retry := strings.EqualFold(err.Error(), "encoding is not allowed for this codec: *recognizer.decoder") || strings.HasPrefix(err.Error(), "no kind is registered for the type api."); !retry {
-				glog.Errorf("Could not access openshift: %s", err)
-				return nil, nil, err
-			}
-		}
-		if result == nil {
-			glog.V(7).Infoln("Unexpected creation: %+v", obj)
-			return nil, nil, errUnexpected
-		}
-		if result != nil {
-			if strings.EqualFold("Build", result.Kind) && len(result.Name) > 0 {
-				b := new(bytes.Buffer)
-				if err := codec.JSON.Encode(b).One(result); err != nil {
-					glog.Errorf("Could not encode runtime object: %s", err)
-					return nil, result, err
-				}
-				logger.Printf("Build: %+v\n", b.String())
-				return b.Bytes(), result, nil
-			}
-		}
-
-		//data = make([]byte, 0)
-		//b := bytes.NewBuffer(data)
-		//b := new(bytes.Buffer)
-		//if err := codec.JSON.Encode(b).One(obj); err != nil {
-		//	glog.Errorf("Could not serialize runtime object: %+v", err)
-		//	return nil, nil, err
-		//}
-		//data = b.Bytes()
-		kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapi.Build{})
-		if data, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion),
-			obj); err != nil {
-			glog.Errorf("Could not serialize runtime object: %+v", err)
-			return nil, nil, err
-		}
-	}
-
-	if obj == nil {
-		hco, err := codec.JSON.Decode(data).One()
-		if err != nil {
-			glog.Errorf("Could not create helm object: %s", err)
-			return nil, nil, err
-		}
-		obj := new(buildapi.Build)
-		if err := hco.Object(obj); err != nil {
-			glog.Errorf("Could not deserialize into runtime object: %s", err)
-			return nil, nil, err
-		}
-	}
-
-	raw, err := oc.RESTClient.Post().Namespace(obj.Namespace).Resource("builds").Body(data).DoRaw()
-	if err != nil {
-		glog.Errorf("Could not access openshift: %s", err)
-		return nil, nil, err
-	}
-
-	hco, err := codec.JSON.Decode(raw).One()
-	if err != nil {
-		glog.Errorf("Could not create helm object: %s", err)
-		return raw, nil, err
-	}
-	meta, err := hco.Meta()
-	if err != nil {
-		glog.Errorf("Could not decode into metadata: %s", err)
-		return raw, nil, err
-	}
-	if ok := strings.EqualFold("Build", meta.Kind) && len(meta.Name) > 0; !ok {
-		if strings.EqualFold("Status", meta.Kind) {
-			status := new(unversioned.Status)
-			if err := hco.Object(status); err != nil {
-				glog.Errorf("Could not know metadata: %+v", meta)
-				return raw, nil, err
-			}
-			glog.Warningf("Could not create build: %+v", status.Message)
-			return raw, nil, fmt.Errorf("Could not create build: %+v", status.Message)
-		}
-		glog.Errorf("Could not know metadata: %+v", string(raw))
-		return raw, nil, errUnexpected
-	}
-	result := new(buildapi.Build)
-	if err := hco.Object(result); err != nil {
-		glog.Errorf("Could not decode into runtime object: %s", err)
-		return raw, nil, err
-	}
-	logger.Printf("Build: %+v\n", string(raw))
-	return raw, result, nil
 }
 
 func options(c *cobra.Command) {

@@ -1,3 +1,17 @@
+[vagrant@localhost go-to-cloud-1]$ oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get projects
+NAME               DISPLAY NAME   STATUS
+gogogo                            Terminating
+kube-system                       Active
+openshift                         Active
+openshift-infra                   Active
+openshift-origin                  Active
+default                           Active
+
+
+
+
+
+
 github.com/tangfeixiong/go-to-cloud-1/pkg/openshift/client
 # github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api
 /go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api/annotations.pb.go:32: undefined: proto.ProtoPackageIsVersion2

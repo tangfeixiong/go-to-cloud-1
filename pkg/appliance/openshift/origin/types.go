@@ -1,4 +1,4 @@
-package api
+package origin
 
 import (
 	buildapi "github.com/openshift/origin/pkg/build/api"
@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	FinalizerVender kapi.FinalizerName = "qingyuanos.io/harpoon"
+	FinalizerVender string = "qingyuanos.io/paas"
 )
 
 type DockerImageBuild struct {

@@ -19,6 +19,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
+	//"github.com/tangfeixiong/go-to-cloud-1/pkg/client/osoc"
 )
 
 type apiServer struct {
@@ -74,7 +75,8 @@ func (s *apiServer) Run() {
 }
 
 var (
-	_host        = "172.17.4.50:50051"
+	_host        = "0.0.0.0:50051"
+	_server      = "172.17.4.50:50051"
 	_grpc_server *grpc.Server
 )
 
@@ -88,7 +90,6 @@ func startServerGRPC() {
 
 	_grpc_server = grpc.NewServer()
 	osopb3.RegisterSimpleServiceServer(_grpc_server, Usrs)
-	osopb3.RegisterSimpleManageServiceServer(_grpc_server, Usrs)
 
 	fmt.Printf("grpc server is running on %s\n", _host)
 
@@ -108,29 +109,69 @@ func stopServerGRPC() {
 	}
 }
 
-func TestGrpc_ProjectFind(t *testing.T) {
+func TestGRPC_retrieve(t *testing.T) {
 	go startServerGRPC()
-	grpcFindProject()
+
+	if err := grpcDockerBuild_retrieve(); err != nil {
+		time.Sleep(1200)
+		stopServerGRPC()
+
+		t.Fatal(err)
+	}
+
 	time.Sleep(1200)
 	stopServerGRPC()
 }
 
-func grpcFindProject() {
-	conn, err := grpc.Dial(":8086", grpc.WithInsecure())
+func grpcDockerBuild_retrieve() error {
+	conn, err := grpc.Dial(_server, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := osopb3.NewSimpleManageServiceClient(conn)
+
+	c := osopb3.NewSimpleServiceClient(conn)
+	opts := []grpc.CallOption{}
 
 	// Contact the server and print out its response.
-	req := &osopb3.FindProjectRequest{
-		Name: "tangfeixiong",
+	reqProject := &osopb3.ProjectRetrieveRequestData{
+		Name: "gogogo",
+	}
+	respProject, err := c.RetrieveProjectIntoArbitrary(context.Background(), reqProject, opts...)
+	if err != nil {
+		return err
+	}
+	if respProject.Raw != nil && len(respProject.Raw.ObjectBytes) > 0 {
+		log.Printf("Result: %s", string(respProject.Raw.ObjectBytes))
+	} else {
+		log.Printf("Received: %+v", respProject)
 	}
 
-	resp, err := c.FindProject(context.Background(), req)
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+	//c = osopb3.NewSimpleServiceClient(conn)
+	//opts = []grpc.CallOption{}
+
+	reqBuild := &osopb3.DockerBuildRequestData{
+		Name:        "fake",
+		ProjectName: "default",
+		Configuration: &osopb3.DockerBuildConfigRequestData{
+			Name:              "fake",
+			ProjectName:       "default",
+			Triggers:          []*osopb3.OsoBuildTriggerPolicy{},
+			RunPolicy:         "",
+			CommonSpec:        (*osopb3.OsoCommonSpec)(nil),
+			OsoBuildRunPolicy: osopb3.DockerBuildConfigRequestData_Serial,
+			Labels:            map[string]string{},
+			Annotations:       map[string]string{},
+		},
+		TriggeredBy: []*osopb3.OsoBuildTriggerCause{},
+		Labels:      map[string]string{},
+		Annotations: map[string]string{},
 	}
-	log.Printf("Greeting: %+v, %s", resp, string(resp.Odefv1RawData))
+	respBuild, err := c.RetrieveIntoBuildDockerImage(context.Background(), reqBuild, opts...)
+	if err != nil {
+		return err
+	}
+	log.Printf("Received: %+v", respBuild)
+
+	return nil
 }
