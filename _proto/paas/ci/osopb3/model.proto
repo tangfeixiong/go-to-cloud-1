@@ -301,7 +301,17 @@ message OsoBuildStatus {
 	OsoBuildPhase osoBuildPhase = 10;
 }
 
-enum OsoBuildOutputKind {
-	ImageStreamTag = 0;
-	DockerImage = 1;
+enum OsoBuildStrategyObjectReferenceType {
+	Strategy_DockerImage = 0;
+	
+	Strategy_ImageStreamTag = 1;
+	
+	Strategy_ImageStreamImage = 2;
 }
+
+enum OsoBuildOutputObjectReferenceType {
+	Output_DockerImage = 0;
+	
+	Output_ImageStreamTag = 1;
+}
+

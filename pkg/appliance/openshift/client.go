@@ -603,73 +603,75 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistryFrom(name, projectN
 			CreationTimestamp: unversioned.Now(),
 		},
 		Spec: buildapi.BuildSpec{
-			ServiceAccount: builderServiceAccount,
-			Source: buildapi.BuildSource{
-				//Binary : &buildapi.BinaryBuildSource {},
-				Dockerfile: &dockerfile,
-				Git: &buildapi.GitBuildSource{
-					URI: gitURI,
-					Ref: branchTagCommit,
-					//HTTPProxy: nil,
-					//HTTPSProxy: nil,
+			CommonSpec: buildapi.CommonSpec{
+				ServiceAccount: builderServiceAccount,
+				Source: buildapi.BuildSource{
+					//Binary : &buildapi.BinaryBuildSource {},
+					Dockerfile: &dockerfile,
+					Git: &buildapi.GitBuildSource{
+						URI: gitURI,
+						Ref: branchTagCommit,
+						//HTTPProxy: nil,
+						//HTTPSProxy: nil,
+					},
+					/*Images : []buildapi.ImageSource {
+					    buildapi.ImageSource {
+					        From : kapi.ObjectReference {
+					            Kind : "DockerImage",
+					            Name : "alpine:edge",
+					        },
+					        Paths : []buildapi.ImageSourcePath {
+					           {
+					               SourcePath : "",
+					               DestinationDir : "",
+					           },
+					        },
+					        PullSecret : &kapi.LocalObjectReference {
+					        },
+					   },
+					},*/
+					ContextDir: contextDir,
+					//SourceSecret : &kapi.LocalObjectReference {
+					//    name : githubSecret,
+					//},
+					//Secrets : []buildapi.SecretBuildSource {
+					//    Secret : &kapi.LocalObjectReference {},
+					//    DestinationDir : "/root/.docker/config.json",
+					//},
 				},
-				/*Images : []buildapi.ImageSource {
-				    buildapi.ImageSource {
-				        From : kapi.ObjectReference {
-				            Kind : "DockerImage",
-				            Name : "alpine:edge",
-				        },
-				        Paths : []buildapi.ImageSourcePath {
-				           {
-				               SourcePath : "",
-				               DestinationDir : "",
-				           },
-				        },
-				        PullSecret : &kapi.LocalObjectReference {
-				        },
-				   },
+				//Revision: &buildapi.SourceRevision {},
+				/*Strategy: buildapi.BuildStrategy{
+					DockerStrategy: &buildapi.DockerBuildStrategy{
+						From: &kapi.ObjectReference{
+							Kind: "DockerImage",
+							Name: "alpine:edge",
+						},
+						PullSecret: &kapi.LocalObjectReference{
+							Name: dockerPullSecret,
+						},
+						NoCache: false,
+						//Env : []kapi.EnvVar {},
+						ForcePull: false,
+						//DockerfilePath : ".",
+					},
 				},*/
-				ContextDir: contextDir,
-				//SourceSecret : &kapi.LocalObjectReference {
-				//    name : githubSecret,
-				//},
-				//Secrets : []buildapi.SecretBuildSource {
-				//    Secret : &kapi.LocalObjectReference {},
-				//    DestinationDir : "/root/.docker/config.json",
-				//},
-			},
-			//Revision: &buildapi.SourceRevision {},
-			/*Strategy: buildapi.BuildStrategy{
-				DockerStrategy: &buildapi.DockerBuildStrategy{
-					From: &kapi.ObjectReference{
+				Output: buildapi.BuildOutput{
+					To: &kapi.ObjectReference{
 						Kind: "DockerImage",
-						Name: "alpine:edge",
+						Name: "docker.io/tangfeixiong/nc-http-dev:latest",
 					},
-					PullSecret: &kapi.LocalObjectReference{
-						Name: dockerPullSecret,
+					PushSecret: &kapi.LocalObjectReference{
+						Name: dockerPushSecret,
 					},
-					NoCache: false,
-					//Env : []kapi.EnvVar {},
-					ForcePull: false,
-					//DockerfilePath : ".",
 				},
-			},*/
-			Output: buildapi.BuildOutput{
-				To: &kapi.ObjectReference{
-					Kind: "DockerImage",
-					Name: "docker.io/tangfeixiong/nc-http-dev:latest",
-				},
-				PushSecret: &kapi.LocalObjectReference{
-					Name: dockerPushSecret,
-				},
+				//Resources : kapi.ResourceRequirements {},
+				//PostCommit : buildapi.BuildPostCommitSpec {
+				//    Command : []string{},
+				//    Args : []string{},
+				//    Script: "",
+				//},
+				CompletionDeadlineSeconds: &timeout,
 			},
-			//Resources : kapi.ResourceRequirements {},
-			//PostCommit : buildapi.BuildPostCommitSpec {
-			//    Command : []string{},
-			//    Args : []string{},
-			//    Script: "",
-			//},
-			CompletionDeadlineSeconds: &timeout,
 		},
 		Status: buildapi.BuildStatus{
 			Phase: buildapi.BuildPhaseNew,

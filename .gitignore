@@ -1,6 +1,6 @@
 build/docker/apaas
 build/docker/openshift.local.config
-build/docker/ssl
+build/docker/ssl*
 
 *vendor
 _vendor/src/**/.[a-zA-Z]*

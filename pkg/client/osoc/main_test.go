@@ -58,3 +58,21 @@ func stopServerGRPC() {
 		_grpcsvr.Stop()
 	}
 }
+
+func TestData_mock(t *testing.T) {
+	in := internalDockerBuildRequestData()
+
+	t.Log(in)
+
+	util := &DockerBuildRequestDataUtility{}
+	data, err := util.BuilderName("default", "example").
+		Dockerfile("From busybox\nCMD [\"sh\"]").
+		Git("https://github.com/docker-library/busybox", "a0558a9006ce0dd6f6ec5d56cfd3f32ebeeb815f", "uclibc/").
+		DockerBuildStrategy("", "", "", true, false).
+		DockerBuildOutputOption("hub.qingyuanos.com/admin/busybox:latest", "dockercfg").Result()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(data)
+}

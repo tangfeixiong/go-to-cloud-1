@@ -18,12 +18,6 @@ var (
 	factory = &integrationFactory{server: _server}
 )
 
-func TestData_build(t *testing.T) {
-	in := internalDockerBuildRequestData()
-
-	t.Log(in)
-}
-
 func TestProject_retrieve(t *testing.T) {
 	//  cc, err := grpc.Dial(_server, grpc.WithInsecure())
 	//	if err != nil {

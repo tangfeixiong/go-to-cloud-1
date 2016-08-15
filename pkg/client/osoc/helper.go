@@ -1,8 +1,16 @@
 package osoc
 
 import (
+	"encoding/base64"
+	"fmt"
+	"strings"
+
+	k8sapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/resource"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 	kapi "k8s.io/kubernetes/pkg/api/v1"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
+	kclientcmd "k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 )
@@ -66,7 +74,7 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 				},
 				Output: &osopb3.BuildOutput{
 					To: &kapi.ObjectReference{
-						Kind: "DockerImage",
+						Kind: osopb3.OsoBuildOutputObjectReferenceType_Output_DockerImage.String(),
 						Name: _oso_dockerPush,
 					},
 					PushSecret: &kapi.LocalObjectReference{
@@ -90,7 +98,7 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 		},
 		TriggeredBy: []*osopb3.OsoBuildTriggerCause{
 			{
-				Message:          "No Trigger",
+				Message:          "Manually Trigger",
 				GenericWebHook:   (*osopb3.GenericWebHookCause)(nil),
 				GithubWebHook:    (*osopb3.GitHubWebHookCause)(nil),
 				ImageChangeBuild: (*osopb3.ImageChangeCause)(nil),
@@ -99,4 +107,266 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 		Labels:      map[string]string{},
 		Annotations: map[string]string{},
 	}
+}
+
+type DockerBuildRequestDataUtility struct {
+	kcc              kclientcmd.ClientConfig
+	target           *osopb3.DockerBuildRequestData
+	dockerfileUsed   bool
+	gitUsed          bool
+	imgUsed          bool
+	outputConfigured bool
+}
+
+func NewDockerBuildRequestDataUtility(kcc kclientcmd.ClientConfig) *DockerBuildRequestDataUtility {
+	return &DockerBuildRequestDataUtility{
+		kcc:    kcc,
+		target: internalDockerBuildRequestData(),
+	}
+}
+
+func (b *DockerBuildRequestDataUtility) RetrieveDockerSecret(project, repo, username, password, email string) (string, error) {
+	cc, err := b.kcc.ClientConfig()
+	if err != nil {
+		return "", err
+	}
+	client, err := kclient.New(cc)
+	if err != nil {
+		return "", err
+	}
+
+	offset := strings.LastIndex(repo, "/")
+	account := repo
+	if offset > 0 {
+		account = repo[0:offset]
+	}
+	sEnc := base64.StdEncoding.EncodeToString([]byte(account))
+	secret, err := client.Secrets(project).Get(sEnc)
+	if err != nil {
+		return "", err
+	}
+	if secret != nil && string(secret.Type) != string(kapi.SecretTypeDockercfg) {
+		return "", fmt.Errorf("secret is existed as not dockercfg")
+	}
+	sAuth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	if secret != nil && string(secret.Data[kapi.DockerConfigKey]) == sAuth {
+		return sEnc, nil
+	}
+	if secret != nil {
+		secret.Data[kapi.DockerConfigKey] = []byte(sEnc)
+		if _, err := client.Secrets(project).Update(secret); err != nil {
+			return "", err
+		}
+	} else {
+		secret = &k8sapi.Secret{
+			TypeMeta: unversioned.TypeMeta{
+				APIVersion: "v1",
+				Kind:       "Secret",
+			},
+			ObjectMeta: k8sapi.ObjectMeta{
+				Name:      sEnc,
+				Namespace: project,
+				Annotations: map[string]string{
+					"qingyuanos.com/docker-registry": account,
+				},
+			},
+			Data: map[string][]byte{
+				k8sapi.DockerConfigKey: []byte(sAuth),
+			},
+			Type: k8sapi.SecretTypeDockercfg,
+		}
+		if _, err := client.Secrets(project).Create(secret); err != nil {
+			return "", err
+		}
+		sa, err := client.ServiceAccounts(project).Get("builder")
+		if err != nil {
+			return "", err
+		}
+		sa.Secrets = append(sa.Secrets, k8sapi.ObjectReference{Name: sEnc})
+		sa.ImagePullSecrets = append(sa.ImagePullSecrets, k8sapi.LocalObjectReference{Name: sEnc})
+		if _, err := client.ServiceAccounts(project).Update(sa); err != nil {
+			return "", err
+		}
+	}
+	return sEnc, nil
+}
+
+func (b *DockerBuildRequestDataUtility) RetrieveGitSecretBasicAuth(project, repo, username, password string) (string, error) {
+	cc, err := b.kcc.ClientConfig()
+	if err != nil {
+		return "", err
+	}
+	client, err := kclient.New(cc)
+	if err != nil {
+		return "", err
+	}
+
+	offset := strings.LastIndex(repo, "://")
+	account := repo
+	if offset > 0 {
+		offset += 3
+		n := strings.Index(repo[offset:], "/")
+		if n > 0 {
+			offset += n
+			n = strings.Index(repo[offset:], "/")
+			if n > 0 {
+				offset += n
+			}
+		}
+		account = repo[0:offset]
+	}
+	sEnc := base64.StdEncoding.EncodeToString([]byte(account))
+	secret, err := client.Secrets(project).Get(sEnc)
+	if err != nil {
+		return "", err
+	}
+	if string(secret.Type) != string(kapi.SecretTypeOpaque) {
+		return "", fmt.Errorf("secret is existed as not opaque")
+	}
+	sAuth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	if string(secret.Data["BasicAuth"]) != sAuth {
+		secret.Data["BasicAuth"] = []byte(sEnc)
+		if _, err := client.Secrets(project).Update(secret); err != nil {
+			return "", err
+		}
+	}
+	return sEnc, nil
+}
+
+func (b *DockerBuildRequestDataUtility) Result() (*osopb3.DockerBuildRequestData, error) {
+	if b.target == nil {
+		return nil, fmt.Errorf("not initialized")
+	}
+	if b.target.ProjectName == "" || b.target.Name == "" ||
+		b.target.Configuration.ProjectName == "" || b.target.Configuration.Name == "" {
+		return nil, fmt.Errorf("not identified")
+	}
+	if b.target.Configuration.CommonSpec == nil {
+		return nil, fmt.Errorf("not configured")
+	}
+	if b.target.Configuration.CommonSpec.Source == nil {
+		return nil, fmt.Errorf("source not configured")
+	}
+	if false == (b.dockerfileUsed || b.gitUsed || b.imgUsed) {
+		return nil, fmt.Errorf("invalid source")
+	}
+	if false == b.outputConfigured {
+		return nil, fmt.Errorf("output option not provided")
+	}
+
+	return b.target, nil
+}
+
+func (b *DockerBuildRequestDataUtility) BuilderName(project, name string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	b.target.ProjectName = project
+	b.target.Name = name
+	b.target.Configuration.ProjectName = project
+	b.target.Configuration.Name = name
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) Dockerfile(dockerfile string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.dockerfileUsed = (dockerfile != ""); b.dockerfileUsed {
+		b.target.Configuration.CommonSpec.Source.Dockerfile = dockerfile
+		if b.target.Configuration.CommonSpec.Source.Type == osopb3.OsoBuildSourceType_None.String() {
+			b.target.Configuration.CommonSpec.Source.Type = osopb3.OsoBuildSourceType_Dockerfile.String()
+		}
+	} else {
+		b.target.Configuration.CommonSpec.Source.Dockerfile = ""
+		if b.target.Configuration.CommonSpec.Source.Git != nil {
+			b.target.Configuration.CommonSpec.Source.Type = osopb3.OsoBuildSourceType_Git.String()
+		} else if len(b.target.Configuration.CommonSpec.Source.Images) > 0 {
+			b.target.Configuration.CommonSpec.Source.Type = osopb3.OsoBuildSourceType_Image.String()
+		} else {
+			b.target.Configuration.CommonSpec.Source.Type = ""
+		}
+	}
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) Git(uri, ref, path string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.gitUsed = (uri != ""); b.gitUsed {
+		if b.target.Configuration.CommonSpec.Source.Git == nil {
+			b.target.Configuration.CommonSpec.Source.Git = &osopb3.GitBuildSource{}
+		}
+		b.target.Configuration.CommonSpec.Source.Git.Uri = uri
+		b.target.Configuration.CommonSpec.Source.Git.Ref = ""
+		b.target.Configuration.CommonSpec.Source.ContextDir = path
+		if b.target.Configuration.CommonSpec.Source.Type == osopb3.OsoBuildSourceType_None.String() {
+			b.target.Configuration.CommonSpec.Source.Type = osopb3.OsoBuildSourceType_Dockerfile.String()
+		}
+	} else {
+		b.target.Configuration.CommonSpec.Source.Git = nil
+		if len(b.target.Configuration.CommonSpec.Source.Images) > 0 {
+			b.target.Configuration.CommonSpec.Source.Type = osopb3.OsoBuildSourceType_Image.String()
+		} else if b.target.Configuration.CommonSpec.Source.Dockerfile != "" {
+			b.target.Configuration.CommonSpec.Source.Type = osopb3.OsoBuildSourceType_Dockerfile.String()
+		} else {
+			b.target.Configuration.CommonSpec.Source.Type = ""
+		}
+	}
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) DockerBuildStrategy(overrideBaseImage,
+	pullSecret, overrideDockerfilePath string,
+	cacheUsed, forcePull bool) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.target.Configuration.CommonSpec.Strategy == nil {
+		b.target.Configuration.CommonSpec.Strategy = &osopb3.BuildStrategy{}
+	}
+	b.target.Configuration.CommonSpec.Strategy.Type = osopb3.BuildStrategy_Docker.String()
+	b.target.Configuration.CommonSpec.Strategy.DockerStrategy = &osopb3.DockerBuildStrategy{
+		From:           (*kapi.ObjectReference)(nil),
+		PullSecret:     (*kapi.LocalObjectReference)(nil),
+		NoCache:        !cacheUsed,
+		Env:            []*kapi.EnvVar{},
+		ForcePull:      forcePull,
+		DockerfilePath: overrideDockerfilePath,
+	}
+	if pullSecret != "" {
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy.PullSecret = &kapi.LocalObjectReference{
+			Name: pullSecret,
+		}
+	}
+	if overrideBaseImage != "" {
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy.From = &kapi.ObjectReference{
+			Kind: osopb3.OsoBuildStrategyObjectReferenceType_Strategy_DockerImage.String(),
+			Name: overrideBaseImage,
+		}
+	}
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
+	pushSecret string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.target.Configuration.CommonSpec.Output == nil {
+		b.target.Configuration.CommonSpec.Output = &osopb3.BuildOutput{}
+	}
+	if pushSecret != "" {
+		b.target.Configuration.CommonSpec.Output.PushSecret = &kapi.LocalObjectReference{
+			Name: pushSecret,
+		}
+	}
+	if b.outputConfigured = (pushRepo != ""); b.outputConfigured {
+		b.target.Configuration.CommonSpec.Output.To = &kapi.ObjectReference{
+			Kind: osopb3.OsoBuildOutputObjectReferenceType_Output_DockerImage.String(),
+			Name: pushRepo,
+		}
+	}
+	return b
 }

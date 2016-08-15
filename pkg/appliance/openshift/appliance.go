@@ -26,8 +26,8 @@ func init() {
 	//openshift.RegisterSimpleServiceServer(server.ApiServer.GrpcRootServer, oss)
 }
 
-func (oss *ossvc) EnterWorkspace(context.Context,
-    in *osopb3.EnterWorkspaceRequest) (*osopb3.EnterWorkspaceResponse, error) {
+func (oss *ossvc) EnterWorkspace(ctx context.Context,
+	in *osopb3.EnterWorkspaceRequest) (*osopb3.EnterWorkspaceResponse, error) {
 	glog.Info("grpc request")
 	return nil, errNotImplemented
 }
