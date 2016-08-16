@@ -3,6 +3,7 @@ package osoc
 import (
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	k8sapi "k8s.io/kubernetes/pkg/api"
@@ -11,6 +12,7 @@ import (
 	kapi "k8s.io/kubernetes/pkg/api/v1"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	kclientcmd "k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	kclientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 )
@@ -110,7 +112,10 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 }
 
 type DockerBuildRequestDataUtility struct {
-	kcc              kclientcmd.ClientConfig
+	//kcc              kclientcmd.ClientConfig
+	kubeconfigPath   string
+	kubeContext      string
+	apiServer        string
 	target           *osopb3.DockerBuildRequestData
 	dockerfileUsed   bool
 	gitUsed          bool
@@ -118,15 +123,43 @@ type DockerBuildRequestDataUtility struct {
 	outputConfigured bool
 }
 
-func NewDockerBuildRequestDataUtility(kcc kclientcmd.ClientConfig) *DockerBuildRequestDataUtility {
+func NewDockerBuildRequestDataUtility(kubeconfigPath, kubeContext, apiServer string) *DockerBuildRequestDataUtility {
 	return &DockerBuildRequestDataUtility{
-		kcc:    kcc,
-		target: internalDockerBuildRequestData(),
+		//kcc:    kcc,
+		kubeconfigPath: kubeconfigPath,
+		kubeContext:    kubeContext,
+		apiServer:      apiServer,
+		target:         internalDockerBuildRequestData(),
 	}
 }
 
+// k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
+func directKClientConfig(kubeconfigPath, kubeContext, apiServer string) (kclientcmd.ClientConfig, error) {
+	data, err := ioutil.ReadFile(kubeconfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	conf, err := kclientcmd.Load(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return kclientcmd.NewNonInteractiveClientConfig(*conf, kubeContext,
+		&kclientcmd.ConfigOverrides{
+			ClusterInfo: kclientcmdapi.Cluster{
+				Server: apiServer,
+			},
+		},
+		kclientcmd.NewDefaultClientConfigLoadingRules()), nil
+}
+
 func (b *DockerBuildRequestDataUtility) RetrieveDockerSecret(project, repo, username, password, email string) (string, error) {
-	cc, err := b.kcc.ClientConfig()
+	kcc, err := directKClientConfig(b.kubeconfigPath, b.kubeContext, b.apiServer)
+	if err != nil {
+		return "", err
+	}
+	cc, err := kcc.ClientConfig()
 	if err != nil {
 		return "", err
 	}
@@ -192,7 +225,11 @@ func (b *DockerBuildRequestDataUtility) RetrieveDockerSecret(project, repo, user
 }
 
 func (b *DockerBuildRequestDataUtility) RetrieveGitSecretBasicAuth(project, repo, username, password string) (string, error) {
-	cc, err := b.kcc.ClientConfig()
+	kcc, err := directKClientConfig(b.kubeconfigPath, b.kubeContext, b.apiServer)
+	if err != nil {
+		return "", err
+	}
+	cc, err := kcc.ClientConfig()
 	if err != nil {
 		return "", err
 	}
