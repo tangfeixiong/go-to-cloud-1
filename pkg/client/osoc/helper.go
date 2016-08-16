@@ -1,18 +1,18 @@
 package osoc
 
 import (
-	"encoding/base64"
+	//"encoding/base64"
 	"fmt"
-	"io/ioutil"
-	"strings"
+	//"io/ioutil"
+	//"strings"
 
-	k8sapi "k8s.io/kubernetes/pkg/api"
+	//k8sapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/resource"
-	"k8s.io/kubernetes/pkg/api/unversioned"
+	//"k8s.io/kubernetes/pkg/api/unversioned"
 	kapi "k8s.io/kubernetes/pkg/api/v1"
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
-	kclientcmd "k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
-	kclientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
+	//kclient "k8s.io/kubernetes/pkg/client/unversioned"
+	//kclientcmd "k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	//kclientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 )
@@ -134,7 +134,7 @@ func NewDockerBuildRequestDataUtility(kubeconfigPath, kubeContext, apiServer str
 }
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
-func directKClientConfig(kubeconfigPath, kubeContext, apiServer string) (kclientcmd.ClientConfig, error) {
+/*func directKClientConfig(kubeconfigPath, kubeContext, apiServer string) (kclientcmd.ClientConfig, error) {
 	data, err := ioutil.ReadFile(kubeconfigPath)
 	if err != nil {
 		return nil, err
@@ -268,7 +268,7 @@ func (b *DockerBuildRequestDataUtility) RetrieveGitSecretBasicAuth(project, repo
 		}
 	}
 	return sEnc, nil
-}
+}*/
 
 func (b *DockerBuildRequestDataUtility) Result() (*osopb3.DockerBuildRequestData, error) {
 	if b.target == nil {
