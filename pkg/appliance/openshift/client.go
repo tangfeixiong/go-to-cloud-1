@@ -6,6 +6,7 @@ import (
 	_ "errors"
 	"fmt"
 	"log"
+	"os"
 	_ "reflect"
 	"strings"
 
@@ -25,10 +26,12 @@ import (
 	"k8s.io/kubernetes/pkg/client/restclient"
 	"k8s.io/kubernetes/pkg/runtime"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/logger"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/utility"
 )
 
 var (
+	logger *log.Logger = utility.Logger
+
 	serverNormalized string = "https://172.17.4.50:30448"
 	caFile           string = "/data/src/github.com/openshift/origin/openshift.local.config/master/ca.crt"
 	certFile         string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.crt"
@@ -70,6 +73,8 @@ func NewClientConfig() *restclient.Config {
 }
 
 func SignIn(username, password string) (token string, err error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, SignIn] ", log.LstdFlags|log.Lshortfile)
+
 	clientConfig := NewClientConfig()
 	clientConfig.GroupVersion = &oauthapiv1.SchemeGroupVersion
 	clientConfig.Username = username
@@ -77,13 +82,15 @@ func SignIn(username, password string) (token string, err error) {
 	clientConfig.BearerToken = ""
 	token, err = tokencmd.RequestToken(clientConfig, nil, clientConfig.Username, clientConfig.Password)
 	if err != nil {
-		logger.Logger.Printf("Could not get TOKEN: %s\n", err)
+		logger.Printf("Could not get TOKEN: %s\n", err)
 	}
-	logger.Logger.Printf("Current TOKEN: %s\n", token)
+	logger.Printf("Current TOKEN: %s\n", token)
 	return
 }
 
 func SignOut(token string) error {
+	logger = log.New(os.Stdout, "[appliance/openshift, SignOut] ", log.LstdFlags|log.Lshortfile)
+
 	clientConfig := NewClientConfig()
 	clientConfig.GroupVersion = &oauthapiv1.SchemeGroupVersion
 	clientConfig.Username = ""
@@ -91,13 +98,13 @@ func SignOut(token string) error {
 
 	restClient, err := restclient.RESTClientFor(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate REST client: %s\n", err)
+		logger.Printf("Could not generate REST client: %s\n", err)
 		return err
 	}
 
 	osClient := &client.Client{restClient}
 	if err := osClient.OAuthAccessTokens().Delete(token); err != nil {
-		logger.Logger.Printf("Could not access Openshift OAuth service: %s\n", err)
+		logger.Printf("Could not access Openshift OAuth service: %s\n", err)
 		return err
 	}
 	return nil
@@ -119,6 +126,8 @@ type workspace struct {
 }
 
 func EnterWorkspace(username, password string) Workspace {
+	logger = log.New(os.Stdout, "[appliance/openshift, EnterWorkspace] ", log.LstdFlags|log.Lshortfile)
+
 	clientConfig := NewClientConfig()
 	clientConfig.GroupVersion = &oauthapiv1.SchemeGroupVersion
 	clientConfig.Username = username
@@ -126,10 +135,10 @@ func EnterWorkspace(username, password string) Workspace {
 	clientConfig.BearerToken = ""
 	token, err := tokencmd.RequestToken(clientConfig, nil, clientConfig.Username, clientConfig.Password)
 	if err != nil {
-		logger.Logger.Printf("Could not get TOKEN: %s\n", err)
+		logger.Printf("Could not get TOKEN: %s\n", err)
 		return nil
 	}
-	logger.Logger.Printf("Current TOKEN: %s\n", token)
+	logger.Printf("Current TOKEN: %s\n", token)
 	clientConfig.BearerToken = token
 
 	return &workspace{
@@ -138,6 +147,8 @@ func EnterWorkspace(username, password string) Workspace {
 }
 
 func LeaveWorkspace(ws Workspace) error {
+	logger = log.New(os.Stdout, "[appliance/openshift, LeaveWorkspace] ", log.LstdFlags|log.Lshortfile)
+
 	if ws == nil || ws.(*workspace).clientConfig == nil || len(ws.(*workspace).clientConfig.BearerToken) == 0 {
 		return errUnexpected
 	}
@@ -152,13 +163,13 @@ func LeaveWorkspace(ws Workspace) error {
 
 	restClient, err := restclient.RESTClientFor(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate REST client: %s\n", err)
+		logger.Printf("Could not generate REST client: %s\n", err)
 		return err
 	}
 
 	osClient := &client.Client{restClient}
 	if err := osClient.OAuthAccessTokens().Delete(token); err != nil {
-		logger.Logger.Printf("Could not access Openshift OAuth service: %s\n", err)
+		logger.Printf("Could not access Openshift OAuth service: %s\n", err)
 		return err
 	}
 	return nil
@@ -222,12 +233,14 @@ func (app *ProjectAppliance) CreateProject(name, displayname, description string
 }
 
 func (app *ProjectAppliance) CreateProject(pr *projectapi.ProjectRequest) (*projectapi.Project, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .CreateProject] ", log.LstdFlags|log.Lshortfile)
+
     if pr == nil {
         return nil, errUnexpected
     }
 	osClient, err := &client.New(app.clientConfig)
     if err != nil {
-        logger.Logger.Printf("Could not generate Openshift client: %+v", err)
+        logger.Printf("Could not generate Openshift client: %+v", err)
         return nil, err
     }
 	result, err := osClient.ProjectRequests().Create(pr)
@@ -235,54 +248,56 @@ func (app *ProjectAppliance) CreateProject(pr *projectapi.ProjectRequest) (*proj
 		if strings.EqualFold(err.Error(), "encoding is not allowed for this codec: *recognizer.decoder") {
 	        app.RESTClient, err = restclient.RESTClientFor(app.clientConfig)
 	        if err != nil {
-		        logger.Logger.Printf("Could not genterate REST client: %s\n", err)
+		        logger.Printf("Could not genterate REST client: %s\n", err)
 		        return err
 	        }
 			var buf bytes.Buffer
 			if err := codec.JSON.Encode(&buf).One(pr); err != nil {
-				logger.Logger.Printf("Could not set up encoder: %s\n", err)
+				logger.Printf("Could not set up encoder: %s\n", err)
 				return nil, err
 			}
 			b, err = app.RESTClient.Post().Resource("projectRequests").Body(buf.Bytes()).DoRaw()
 			if err != nil {
-				logger.Logger.Printf("Bad request to create project: %s\n", err)
+				logger.Printf("Bad request to create project: %s\n", err)
 				return nil, err
 			}
-	        logger.Logger.Println(string(b))
+	        logger.Println(string(b))
             //notice: if project is already exist, return unversioned.Status
 			//{"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"project \"gogogo\" already exists","reason":"AlreadyExists","details":{"name":"gogogo","kind":"project"},"code":409}
             hobj, err := codec.JSON.decode(b).One()
             if err != nil {
-               logger.Logger.Printf("Could not set up decoder: %s\n", err)
+               logger.Printf("Could not set up decoder: %s\n", err)
 				return nil, err
             }
             meta, err := hobj.Meta()
             if strings.EqualFold(meta, "Status") {
                status := unversioned.Status{}
                if err := hobj.Object(&status); err != nil {
-                   logger.Logger.Printf("Could not decode into k8s object: %s\n", err)
+                   logger.Printf("Could not decode into k8s object: %s\n", err)
                     return nil, err
                }
                return nil, errors.New(status.Message)
             }
             val := projectapi.Project{}
             if err := hobj.Object(&val); err != nil {
-               logger.Logger.Printf("Could not decode into Openshift object: %s\n", err)
+               logger.Printf("Could not decode into Openshift object: %s\n", err)
                return nil, err
             }
             return val, nil
 		} else {
-			logger.Logger.Printf("Could not request to create project: %s\n", err)
+			logger.Printf("Could not request to create project: %s\n", err)
             return nil, err
 		}
 	}
 
-	logger.Logger.Println(result)
+	logger.Println(result)
 	return result, nil
 }
 
 
 func RetrieveProjects() error {
+	logger = log.New(os.Stdout, "[appliance/openshift, RetrieveProjects] ", log.LstdFlags|log.Lshortfile)
+
 	f := NewClientCmdFactory()
 	oc, _, err := f.Clients()
 	if err != nil {
@@ -301,6 +316,8 @@ func RetrieveProjects() error {
 */
 
 func (app *ProjectAppliance) RetrieveProjects() (*projectapi.ProjectList, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .RetrieveProjects] ", log.LstdFlags|log.Lshortfile)
+
 	ws := app.workspace
 	if ws == nil || ws.clientConfig == nil || len(ws.clientConfig.BearerToken) == 0 {
 		return nil, errUnexpected
@@ -315,14 +332,14 @@ func (app *ProjectAppliance) RetrieveProjects() (*projectapi.ProjectList, error)
 
 	restClient, err := restclient.RESTClientFor(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate REST client: %s\n", err)
+		logger.Printf("Could not generate REST client: %s\n", err)
 		return nil, err
 	}
 
 	osClient := &client.Client{restClient}
 	val, err := osClient.Projects().List(kapi.ListOptions{})
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift object: %s\n", err)
+		logger.Printf("Could not access Openshift object: %s\n", err)
 		return nil, err
 	}
 	if val != nil && (len(val.Items) == 0 || len(val.Items[0].Name) > 0 && len(val.Items[0].UID) > 0) {
@@ -332,20 +349,20 @@ func (app *ProjectAppliance) RetrieveProjects() (*projectapi.ProjectList, error)
 
 	result, err := restClient.Get().Resource("projects").VersionedParams(&kapi.ListOptions{}, kapi.ParameterCodec).DoRaw()
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift: %s\n", err)
+		logger.Printf("Could not access Openshift: %s\n", err)
 		return nil, err
 	}
 
 	hobj, err := codec.JSON.Decode(result).One()
 	if err != nil {
 		log.Printf("raw: %+v\n", string(result))
-		logger.Logger.Printf("Could not generate codec: %s\n", err)
+		logger.Printf("Could not generate codec: %s\n", err)
 		return nil, err
 	}
 
 	var obj projectapi.ProjectList
 	if err := hobj.Object(&obj); err != nil {
-		logger.Logger.Printf("Could not decode into openshift object: %s\n", err)
+		logger.Printf("Could not decode into openshift object: %s\n", err)
 		return nil, err
 	}
 
@@ -360,7 +377,7 @@ func (app *ProjectAppliance) RetrieveProjects() (*projectapi.ProjectList, error)
 
 		var buf bytes.Buffer
 		if err := codec.JSON.Encode(&buf).One(v); err != nil {
-			logger.Logger.Printf("Could not encode openshift object: %s\n", err)
+			logger.Printf("Could not encode openshift object: %s\n", err)
 			continue
 		}
 		kobj = v
@@ -373,17 +390,19 @@ func (app *ProjectAppliance) RetrieveProjects() (*projectapi.ProjectList, error)
 }
 
 func (app *ProjectAppliance) RetrieveProjectWithJSON(json []byte) (*projectapi.Project, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, RetrieveProjectWithJSON] ", log.LstdFlags|log.Lshortfile)
+
 	if len(json) == 0 {
 		return nil, errUnexpected
 	}
 	hobj, err := codec.JSON.Decode(json).One()
 	if err != nil {
-		logger.Logger.Printf("Could not set up codec: %+v", err)
+		logger.Printf("Could not set up codec: %+v", err)
 		return nil, err
 	}
 	obj := &projectapi.Project{}
 	if err := hobj.Object(obj); err != nil {
-		logger.Logger.Printf("Could not decode into openshift object: %+v", err)
+		logger.Printf("Could not decode into openshift object: %+v", err)
 		return nil, err
 	}
 	obj.Kind = "Project"
@@ -399,6 +418,8 @@ func (app *ProjectAppliance) RetrieveProjectFrom(obj *projectapi.Project) (*proj
 }
 
 func (app *ProjectAppliance) RetrieveProject(name string) (*projectapi.Project, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .RetrieveProject] ", log.LstdFlags|log.Lshortfile)
+
 	ws := app.workspace
 	if ws == nil || ws.clientConfig == nil || len(ws.clientConfig.BearerToken) == 0 {
 		return nil, errUnexpected
@@ -413,14 +434,14 @@ func (app *ProjectAppliance) RetrieveProject(name string) (*projectapi.Project, 
 
 	restClient, err := restclient.RESTClientFor(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate REST client: %s\n", err)
+		logger.Printf("Could not generate REST client: %s\n", err)
 		return nil, err
 	}
 
 	osClient := &client.Client{restClient}
 	val, err := osClient.Projects().Get(name)
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift object: %s\n", err)
+		logger.Printf("Could not access Openshift object: %s\n", err)
 		return nil, err
 	}
 	if val != nil && len(val.Name) > 0 && len(val.UID) > 0 {
@@ -430,20 +451,20 @@ func (app *ProjectAppliance) RetrieveProject(name string) (*projectapi.Project, 
 
 	result, err := restClient.Get().Resource("projects").Name(name).DoRaw()
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift: %s\n", err)
+		logger.Printf("Could not access Openshift: %s\n", err)
 		return nil, err
 	}
 
 	hobj, err := codec.JSON.Decode(result).One()
 	if err != nil {
 		log.Printf("raw: %+v\n", string(result))
-		logger.Logger.Printf("Could not generate codec: %s\n", err)
+		logger.Printf("Could not generate codec: %s\n", err)
 		return nil, err
 	}
 
 	val = new(projectapi.Project)
 	if err := hobj.Object(val); err != nil {
-		logger.Logger.Printf("Could not decode into openshift object: %s\n", err)
+		logger.Printf("Could not decode into openshift object: %s\n", err)
 		return nil, err
 	}
 	val.Kind = "Project"
@@ -454,6 +475,8 @@ func (app *ProjectAppliance) RetrieveProject(name string) (*projectapi.Project, 
 /*
 
 func RetrieveProject(name string) ([]byte, *projectapi.Project, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, RetrieveProject] ", log.LstdFlags|log.Lshortfile)
+
 	if len(name) == 0 {
 		return nil, nil, errNotFound
 	}
@@ -538,17 +561,19 @@ func RetrieveProject(name string) ([]byte, *projectapi.Project, error) {
 
 /*
 func (app *ProjectAppliance) DeleteProject(name string) error {
+	logger = log.New(os.Stdout, "[appliance/openshift, .DeleteProject] ", log.LstdFlags|log.Lshortfile)
+
 	if len(name) == 0 {
 		return errUnexpected
 	}
 	osClient, err := client.New(app.clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate OpenShift client: %s\n", s)
+		logger.Printf("Could not generate OpenShift client: %s\n", s)
 		return err
 	}
 
 	if err := osClient.Projects().Delete(name); err != nil {
-		logger.Logger.Printf("Could not access OpenShift: %s\n", s)
+		logger.Printf("Could not access OpenShift: %s\n", s)
 		return err
 	}
 	return nil
@@ -572,17 +597,19 @@ func (app *DockerImageAppliance) Workspace() Workspace {
 }
 
 func (app *DockerImageAppliance) BuildDockerImageIntoRegistryWithJSON(json []byte) ([]byte, *buildapi.Build, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, BuildDockerImageIntoRegistryWithJSON] ", log.LstdFlags|log.Lshortfile)
+
 	if len(json) == 0 {
 		return nil, nil, errUnexpected
 	}
 	hobj, err := codec.JSON.Decode(json).One()
 	if err != nil {
-		logger.Logger.Printf("Could not set up codec: %+v", err)
+		logger.Printf("Could not set up codec: %+v", err)
 		return nil, nil, err
 	}
 	obj := &buildapi.Build{}
 	if err := hobj.Object(obj); err != nil {
-		logger.Logger.Printf("Could not decode into openshift object: %+v", err)
+		logger.Printf("Could not decode into openshift object: %+v", err)
 		return nil, nil, err
 	}
 	obj.Kind = "Build"
@@ -592,6 +619,8 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistryWithJSON(json []byt
 }
 
 func (app *DockerImageAppliance) BuildDockerImageIntoRegistryFrom(name, projectName string, gitSecret map[string]string, gitURI, branchTagCommit, contextDir string, sourceImages []map[string]interface{}, dockerfile string, buildSecrets []map[string]interface{}, buildStrategy map[string]interface{}) ([]byte, *buildapi.Build, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .BuildDockerImageIntoRegistryFrom] ", log.LstdFlags|log.Lshortfile)
+
 	obj := &buildapi.Build{
 		TypeMeta: unversioned.TypeMeta{
 			Kind:       "Build",
@@ -680,13 +709,15 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistryFrom(name, projectN
 
 	buf := bytes.Buffer{}
 	if err := codec.JSON.Encode(&buf).One(obj); err != nil {
-		logger.Logger.Printf("Could not encode openshift object: %+v", err)
+		logger.Printf("Could not encode openshift object: %+v", err)
 		return nil, nil, err
 	}
 	return app.BuildDockerImageIntoRegistry(buf.Bytes(), obj)
 }
 
 func (app *DockerImageAppliance) BuildDockerImageIntoRegistry(raw []byte, build *buildapi.Build) ([]byte, *buildapi.Build, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .BuildDockerImageIntoRegistry] ", log.LstdFlags|log.Lshortfile)
+
 	ws := app.workspace
 	if ws == nil || ws.clientConfig == nil || len(ws.clientConfig.BearerToken) == 0 {
 		return nil, nil, errUnexpected
@@ -701,7 +732,7 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistry(raw []byte, build 
 
 	osClient, err := client.New(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate OpenShift client: %s\n", err)
+		logger.Printf("Could not generate OpenShift client: %s\n", err)
 		return nil, nil, err
 	}
 
@@ -709,12 +740,12 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistry(raw []byte, build 
 		if build == nil || len(build.Name) == 0 || len(build.UID) == 0 {
 			hobj, err := codec.JSON.Decode(raw).One()
 			if err != nil {
-				logger.Logger.Printf("Could not set up helm classic codec: %s\n", err)
+				logger.Printf("Could not set up helm classic codec: %s\n", err)
 				return nil, nil, err
 			}
 			build = new(buildapi.Build)
 			if err := hobj.Object(build); err != nil {
-				logger.Logger.Printf("Could not decode into openshift object: %+v", err)
+				logger.Printf("Could not decode into openshift object: %+v", err)
 				return nil, nil, err
 			}
 			return app.buildDockerImageIntoRegistry(raw, build)
@@ -724,14 +755,14 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistry(raw []byte, build 
 	val, err := osClient.Builds(build.Namespace).Create(build)
 	if err != nil {
 		if !strings.EqualFold(err.Error(), "encoding is not allowed for this codec: *recognizer.decoder") {
-			logger.Logger.Printf("Could not build Docker image into registry: %s\n", err)
+			logger.Printf("Could not build Docker image into registry: %s\n", err)
 			return nil, nil, err
 		}
 	}
 	if val != nil && len(val.Name) > 0 && len(val.UID) > 0 {
 		buf := bytes.Buffer{}
 		if err := codec.JSON.Encode(&buf).One(val); err != nil {
-			logger.Logger.Printf("Could not encode openshift object: %s\n", err)
+			logger.Printf("Could not encode openshift object: %s\n", err)
 			return nil, nil, err
 		}
 		return buf.Bytes(), val, nil
@@ -740,7 +771,7 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistry(raw []byte, build 
 	if len(raw) == 0 {
 		buf := bytes.Buffer{}
 		if err := codec.JSON.Encode(&buf).One(build); err != nil {
-			logger.Logger.Printf("Could not encode openshift object: %+v", err)
+			logger.Printf("Could not encode openshift object: %+v", err)
 			return nil, nil, err
 		}
 		raw = buf.Bytes()
@@ -753,6 +784,8 @@ func (app *DockerImageAppliance) BuildDockerImageIntoRegistry(raw []byte, build 
 }
 
 func (app *DockerImageAppliance) buildDockerImageIntoRegistry(raw []byte, build *buildapi.Build) ([]byte, *buildapi.Build, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .buildDockerImageIntoRegistry] ", log.LstdFlags|log.Lshortfile)
+
 	ws := app.workspace
 	if ws.RESTClient == nil {
 		if ws == nil || ws.clientConfig == nil || len(ws.clientConfig.BearerToken) == 0 {
@@ -768,32 +801,32 @@ func (app *DockerImageAppliance) buildDockerImageIntoRegistry(raw []byte, build 
 
 		var err error
 		if ws.RESTClient, err = restclient.RESTClientFor(clientConfig); err != nil {
-			logger.Logger.Printf("Could not generate REST client: %s\n", err)
+			logger.Printf("Could not generate REST client: %s\n", err)
 			return nil, nil, err
 		}
 	}
 	val, err := ws.RESTClient.Post().Namespace(build.Namespace).Resource("builds").Body(raw).DoRaw()
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift: %s\n", err)
+		logger.Printf("Could not access Openshift: %s\n", err)
 		return nil, nil, err
 	}
 
 	hobj, err := codec.JSON.Decode(val).One()
 	if err != nil {
-		logger.Logger.Printf("Could not set up helm codec: %s\n", err)
+		logger.Printf("Could not set up helm codec: %s\n", err)
 		return val, nil, err
 	}
 
 	meta, err := hobj.Meta()
 	if err != nil {
-		logger.Logger.Printf("Could not set up helm codec: %s\n", err)
+		logger.Printf("Could not set up helm codec: %s\n", err)
 		return val, nil, err
 	}
 	if strings.EqualFold(meta.Kind, "Status") {
 		log.Printf("Return: %s", string(val))
 		var status unversioned.Status
 		if err := hobj.Object(&status); err != nil {
-			logger.Logger.Printf("Could not encode into openshift object: %+v", err)
+			logger.Printf("Could not encode into openshift object: %+v", err)
 			return val, nil, err
 		}
 		return nil, nil, errors.New(status.Message)
@@ -801,7 +834,7 @@ func (app *DockerImageAppliance) buildDockerImageIntoRegistry(raw []byte, build 
 
 	//var build buildapi.Build
 	if err := hobj.Object(build); err != nil {
-		logger.Logger.Printf("Could not encode into openshift object: %+v", err)
+		logger.Printf("Could not encode into openshift object: %+v", err)
 		return val, nil, err
 	}
 	build.Kind = "Build"
@@ -810,6 +843,8 @@ func (app *DockerImageAppliance) buildDockerImageIntoRegistry(raw []byte, build 
 }
 
 func (app *DockerImageAppliance) RetrieveDockerImageBuilders(namespace string) ([]byte, *buildapi.BuildList, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .RetrieveDockerImageBuilders] ", log.LstdFlags|log.Lshortfile)
+
 	if len(namespace) == 0 {
 		return nil, nil, errUnexpected
 	}
@@ -827,19 +862,19 @@ func (app *DockerImageAppliance) RetrieveDockerImageBuilders(namespace string) (
 
 	osClient, err := client.New(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate OpenShift client: %s\n", err)
+		logger.Printf("Could not generate OpenShift client: %s\n", err)
 		return nil, nil, err
 	}
 
 	result, err := osClient.Builds(namespace).List(kapi.ListOptions{})
 	if err != nil {
-		logger.Logger.Printf("Could not access openshift object: %s\n", err)
+		logger.Printf("Could not access openshift object: %s\n", err)
 		return nil, nil, err
 	}
 	if result != nil && (len(result.Items) == 0 || len(result.Items[0].Name) > 0 && len(result.Items[0].UID) > 0) {
 		buf := bytes.Buffer{}
 		if err := codec.JSON.Encode(&buf).One(result); err != nil {
-			logger.Logger.Printf("Could not encode openshift object: %s\n", err)
+			logger.Printf("Could not encode openshift object: %s\n", err)
 			return nil, nil, err
 		}
 		return buf.Bytes(), result, nil
@@ -848,19 +883,19 @@ func (app *DockerImageAppliance) RetrieveDockerImageBuilders(namespace string) (
 	ws.RESTClient = osClient.RESTClient
 	val, err := ws.RESTClient.Get().Namespace(namespace).Resource("builds").VersionedParams(&kapi.ListOptions{}, kapi.ParameterCodec).DoRaw()
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift: %s\n", err)
+		logger.Printf("Could not access Openshift: %s\n", err)
 		return nil, nil, err
 	}
 
 	hobj, err := codec.JSON.Decode(val).One()
 	if err != nil {
-		logger.Logger.Printf("Could not set up helm codec: %s\n", err)
+		logger.Printf("Could not set up helm codec: %s\n", err)
 		return val, nil, err
 	}
 
 	obj := new(buildapi.BuildList)
 	if err := hobj.Object(obj); err != nil {
-		logger.Logger.Printf("Could not encode openshift object: %s\n", err)
+		logger.Printf("Could not encode openshift object: %s\n", err)
 		return val, nil, err
 	}
 	obj.Kind = "BuildList"
@@ -874,6 +909,8 @@ func (app *DockerImageAppliance) RetrieveDockerImageBuilders(namespace string) (
 }
 
 func (app *DockerImageAppliance) RetrieveDockerImageBuilder(namespace, name string) ([]byte, *buildapi.Build, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift, .RetrieveDockerImageBuilder] ", log.LstdFlags|log.Lshortfile)
+
 	if len(namespace) == 0 || len(name) == 0 {
 		return nil, nil, errUnexpected
 	}
@@ -891,19 +928,19 @@ func (app *DockerImageAppliance) RetrieveDockerImageBuilder(namespace, name stri
 
 	osClient, err := client.New(clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate OpenShift client: %s\n", err)
+		logger.Printf("Could not generate OpenShift client: %s\n", err)
 		return nil, nil, err
 	}
 
 	build, err := osClient.Builds(namespace).Get(name)
 	if err != nil {
-		logger.Logger.Printf("Could not access openshift object: %s\n", err)
+		logger.Printf("Could not access openshift object: %s\n", err)
 		return nil, nil, err
 	}
 	if build != nil && len(build.Name) > 0 && len(build.UID) > 0 {
 		buf := &bytes.Buffer{}
 		if err := codec.JSON.Encode(buf).One(build); err != nil {
-			logger.Logger.Printf("Could not encode openshift object: %s\n", err)
+			logger.Printf("Could not encode openshift object: %s\n", err)
 			return nil, nil, err
 		}
 		return buf.Bytes(), build, nil
@@ -912,18 +949,18 @@ func (app *DockerImageAppliance) RetrieveDockerImageBuilder(namespace, name stri
 	ws.RESTClient = osClient.RESTClient
 	val, err := ws.RESTClient.Get().Namespace(namespace).Resource("builds").Body(name).DoRaw()
 	if err != nil {
-		logger.Logger.Printf("Could not access Openshift: %s\n", err)
+		logger.Printf("Could not access Openshift: %s\n", err)
 		return nil, nil, err
 	}
 	hobj, err := codec.JSON.Decode(val).One()
 	if err != nil {
-		logger.Logger.Printf("Could not set up helm codec: %s\n", err)
+		logger.Printf("Could not set up helm codec: %s\n", err)
 		return val, nil, err
 	}
 	//var build buildapi.Build
 	build = new(buildapi.Build)
 	if err := hobj.Object(build); err != nil {
-		logger.Logger.Printf("Could not encode openshift object: %s\n", err)
+		logger.Printf("Could not encode openshift object: %s\n", err)
 		return val, nil, err
 	}
 	build.Kind = "Build"
@@ -941,17 +978,19 @@ func (app *DockerImageBuildAppliance) RebuildDockerImageIntoRegistry(namespace, 
 }
 
 func (app *DockerImageBuildAppliance) DeleteProject(namespace, name string) error {
+	logger = log.New(os.Stdout, "[appliance/openshift, .DeleteProject] ", log.LstdFlags|log.Lshortfile)
+
 	if len(namespace) == 0 || len(name) == 0 {
 		return errUnexpected
 	}
 	osClient, err := client.New(app.clientConfig)
 	if err != nil {
-		logger.Logger.Printf("Could not generate OpenShift client: %s\n", s)
+		logger.Printf("Could not generate OpenShift client: %s\n", s)
 		return err
 	}
 
 	if err := osClient.Builds(namespace).Delete(name); err != nil {
-		logger.Logger.Printf("Could not access OpenShift: %s\n", s)
+		logger.Printf("Could not access OpenShift: %s\n", s)
 		return err
 	}
 	return nil

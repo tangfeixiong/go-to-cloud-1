@@ -1,14 +1,12 @@
 {
   "apiVersion": "v1",
   "kind": "Build",
-  "metadata": {
     "name": "osobuilds",
 	"namespace": "tangfx",
     "creationTimestamp": null,
     "labels": {
       "ci": "build101"
-    }
-  },
+    },
   "spec": {
     "serviceAccount": "builder",
     "source": {
@@ -53,7 +51,8 @@
       "args": null,
       "script": ""
     },
-    "completionDeadlineSeconds": null
+    "completionDeadlineSeconds": null,
+	"TriggeredBy": null
   },
   "status": {
     "phase": "New",

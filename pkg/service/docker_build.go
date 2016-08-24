@@ -1,9 +1,11 @@
 package service
 
 import (
-	"log"
-	"os"
+	//"bytes"
+	//"log"
+	//"os"
 
+	//"github.com/helm/helm-classic/codec"
 	buildapi "github.com/openshift/origin/pkg/build/api/v1"
 
 	"golang.org/x/net/context"
@@ -23,9 +25,7 @@ var (
 	_timeout               int64  = 900
 )
 
-func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
-	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-
+func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.BuildConfig, *buildapi.Build) {
 	common := buildapi.CommonSpec{
 		ServiceAccount: _builderServiceAccount,
 		Source: buildapi.BuildSource{
@@ -416,14 +416,26 @@ func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
 			}
 		}
 	}
+	return bldconf, bld
+}
 
-	raw, obj, err := origin.CreateBuildWithV1(bld)
+func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
+	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	logger.SetPrefix("[pkg/service, .CreateIntoBuildDockerImage] ")
 
+	var raw []byte
+	var obj *buildapi.Build
+	var err error
+
+	_, obj = convertIntoBuildObject(req)
+
+	//raw, obj, err = origin.CreateBuildWithV1(obj)
+	raw, obj, err = origin.DirectlyRunOriginDockerBuilder(obj)
 	if err != nil {
 		return (*osopb3.DockerBuildResponseData)(nil), err
 	}
-	if raw == nil || len(raw) == 0 || obj == nil {
-		logger.Println("no data and object retrieved")
+	if len(raw) == 0 || obj == nil {
+		logger.Println("no data object retrieved")
 		return &osopb3.DockerBuildResponseData{nil, nil}, nil
 	}
 
@@ -458,8 +470,7 @@ func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
 
 func (u *UserResource) RetrieveIntoBuildDockerImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-
-	logger = log.New(os.Stdout, "[RetrieveProjectIntoArbitrary] ", log.LstdFlags|log.Lshortfile)
+	logger.SetPrefix("[pkg/service, .RetrieveProjectIntoArbitrary] ")
 
 	if req.Name == "" {
 		return (*osopb3.DockerBuildResponseData)(nil), errUnexpected

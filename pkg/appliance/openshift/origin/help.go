@@ -53,38 +53,38 @@ You can use '%[1]s status' to check the progress.`
 	newBuildExample = `
   # Create a build config based on the source code in the current git repository (with a public
   # remote) and a Docker image
-  $ %[1]s new-build . --docker-image=repo/langimage
+  %[1]s new-build . --docker-image=repo/langimage
 
   # Create a NodeJS build config based on the provided [image]~[source code] combination
-  $ %[1]s new-build openshift/nodejs-010-centos7~https://github.com/openshift/nodejs-ex.git
+  %[1]s new-build openshift/nodejs-010-centos7~https://github.com/openshift/nodejs-ex.git
 
   # Create a build config from a remote repository using its beta2 branch
-  $ %[1]s new-build https://github.com/openshift/ruby-hello-world#beta2
+  %[1]s new-build https://github.com/openshift/ruby-hello-world#beta2
 
   # Create a build config using a Dockerfile specified as an argument
-  $ %[1]s new-build -D $'FROM centos:7\nRUN yum install -y httpd'
+  %[1]s new-build -D $'FROM centos:7\nRUN yum install -y httpd'
 
   # Create a build config from a remote repository and add custom environment variables
-  $ %[1]s new-build https://github.com/openshift/ruby-hello-world RACK_ENV=development
+  %[1]s new-build https://github.com/openshift/ruby-hello-world RACK_ENV=development
 
   # Create a build config from a remote repository and inject the npmrc into a build
-  $ %[1]s new-build https://github.com/openshift/ruby-hello-world --build-secret npmrc:.npmrc
+  %[1]s new-build https://github.com/openshift/ruby-hello-world --build-secret npmrc:.npmrc
 
   # Create a build config that gets its input from a remote repository and another Docker image
-  $ %[1]s new-build https://github.com/openshift/ruby-hello-world --source-image=openshift/jenkins-1-centos7 --source-image-path=/var/lib/jenkins:tmp`
+  %[1]s new-build https://github.com/openshift/ruby-hello-world --source-image=openshift/jenkins-1-centos7 --source-image-path=/var/lib/jenkins:tmp`
 
 	newBuildNoInput = `You must specify one or more images, image streams, or source code locations to create a build.
 
 To build from an existing image stream tag or Docker image, provide the name of the image and
 the source code location:
 
-  $ %[1]s new-build openshift/nodejs-010-centos7~https://github.com/openshift/nodejs-ex.git
+  %[1]s new-build openshift/nodejs-010-centos7~https://github.com/openshift/nodejs-ex.git
 
 If you only specify the source repository location (local or remote), the command will look at
 the repo to determine the type, and then look for a matching image on your server or on the
 default Docker registry.
 
-  $ %[1]s new-build https://github.com/openshift/nodejs-ex.git
+  %[1]s new-build https://github.com/openshift/nodejs-ex.git
 
 will look for an image called "nodejs" in your current project, the 'openshift' project, or
 on the Docker Hub.
@@ -106,22 +106,38 @@ base image changes will use the source specified on the build config.
 `
 
 	startBuildExample = `  # Starts build from build config "hello-world"
-  $ %[1]s start-build hello-world
+  %[1]s start-build hello-world
 
   # Starts build from a previous build "hello-world-1"
-  $ %[1]s start-build --from-build=hello-world-1
+  %[1]s start-build --from-build=hello-world-1
 
   # Use the contents of a directory as build input
-  $ %[1]s start-build hello-world --from-dir=src/
+  %[1]s start-build hello-world --from-dir=src/
 
   # Send the contents of a Git repository to the server from tag 'v2'
-  $ %[1]s start-build hello-world --from-repo=../hello-world --commit=v2
+  %[1]s start-build hello-world --from-repo=../hello-world --commit=v2
 
   # Start a new build for build config "hello-world" and watch the logs until the build
   # completes or fails.
-  $ %[1]s start-build hello-world --follow
+  %[1]s start-build hello-world --follow
 
   # Start a new build for build config "hello-world" and wait until the build completes. It
   # exits with a non-zero return code if the build fails.
-  $ %[1]s start-build hello-world --wait`
+  %[1]s start-build hello-world --wait`
+
+	StatusRecommendedName = "status"
+)
+
+var (
+	_output_version string   = "v1"
+	_output         string   = "json"
+	_template       string   = ""
+	_sort_by        string   = ""
+	_label_columns  []string = []string{}
+	_no_headers     bool     = true
+	_wide           bool     = false
+	_show_all       bool     = false
+	_show_labels    bool     = true
+	_is_watch       bool     = false
+	_dry_run        bool     = false
 )

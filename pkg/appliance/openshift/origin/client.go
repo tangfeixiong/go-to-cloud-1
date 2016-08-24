@@ -3,6 +3,9 @@ package origin
 import (
 	"bytes"
 	"errors"
+	"sync"
+	"time"
+	//"flag"
 	"fmt"
 	"io"
 	_ "io/ioutil"
@@ -18,42 +21,46 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	buildapi "github.com/openshift/origin/pkg/build/api"
+	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
 	"github.com/openshift/origin/pkg/client"
-	"github.com/openshift/origin/pkg/cmd/cli"
+	//"github.com/openshift/origin/pkg/cmd/cli"
 	"github.com/openshift/origin/pkg/cmd/cli/cmd"
 	"github.com/openshift/origin/pkg/cmd/cli/config"
 	//"github.com/openshift/origin/pkg/cmd/flagtypes"
 	"github.com/openshift/origin/pkg/cmd/templates"
-	cmdutil "github.com/openshift/origin/pkg/cmd/util"
+	//cmdutil "github.com/openshift/origin/pkg/cmd/util"
 	osclientcmd "github.com/openshift/origin/pkg/cmd/util/clientcmd"
-	_ "github.com/openshift/origin/pkg/cmd/util/tokencmd"
-	newcmd "github.com/openshift/origin/pkg/generate/app/cmd"
-	_ "github.com/openshift/origin/pkg/generate/git"
+	// "github.com/openshift/origin/pkg/cmd/util/tokencmd"
+	//"github.com/openshift/origin/pkg/generate/git"
 	userapi "github.com/openshift/origin/pkg/user/api"
 	userapiv1 "github.com/openshift/origin/pkg/user/api/v1"
 
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/unversioned"
-	// kapierrors "k8s.io/kubernetes/pkg/api/errors"
+	kapiv1 "k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	// clientauth "k8s.io/kubernetes/pkg/client/unversioned/auth"
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 	// clientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
 	// kubecmdconfig "k8s.io/kubernetes/pkg/kubectl/cmd/config"
-	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	//"k8s.io/kubernetes/pkg/runtime"
-	_ "k8s.io/kubernetes/pkg/runtime/serializer/json"
+	//"k8s.io/kubernetes/pkg/runtime/serializer/json"
 
-	//qyapi "github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/api"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/build-builder"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/utility"
 )
 
 var (
+	rootCommand *cobra.Command = utility.RootCommand
+
+	logger *log.Logger = utility.Logger
+
 	errNotFound       error = errors.New("Not found")
 	errNotImplemented error = errors.New("Not implemented")
 	errUnexpected     error = errors.New("Unexpected")
-
-	logger *log.Logger = log.New(os.Stdout, "[appliance/openshift/origin] ", log.LstdFlags|log.Lshortfile)
 
 	kubeconfigPath    string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
 	kubeconfigContext string = "openshift-origin-single"
@@ -91,26 +98,216 @@ var (
 
 func init() {
 	//	flagtypes.GLog(rootCommand.PersistentFlags())
-	if v, ok := os.LookupEnv("K8S_KUBECONFIG"); ok {
+	if v, ok := os.LookupEnv("KUBE_CONFIG"); ok {
 		if v != "" {
 			kubeconfigPath = v
 		}
 	}
-	if v, ok := os.LookupEnv("K8S_KUBECONTEXT"); ok {
+	if v, ok := os.LookupEnv("KUBE_CONTEXT"); ok {
 		if v != "" {
 			kubeconfigContext = v
 		}
 	}
-	if v, ok := os.LookupEnv("K8S_KUBECONFIG"); ok {
+	if v, ok := os.LookupEnv("OSO_CONFIG"); ok {
 		if v != "" {
 			oconfigPath = v
 		}
 	}
-	if v, ok := os.LookupEnv("K8S_KUBECONFIG"); ok {
+	if v, ok := os.LookupEnv("OSO_CONTEXT"); ok {
 		if v != "" {
 			oconfigContext = v
 		}
 	}
+}
+
+func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1.Build, error) {
+	logger.SetPrefix("[appliance/openshift/origin, DirectlyRunOriginDockerBuilder] ")
+
+	var raw []byte
+	var hco *codec.Object
+	var err error
+
+	obj := &buildapi.Build{}
+	buf := &bytes.Buffer{}
+	if err = codec.JSON.Encode(buf).One(data.TypeMeta); err != nil {
+		logger.Printf("Could not validate type meta: %+v\n", err)
+		return raw, nil, err
+	}
+	glog.V(10).Infoln(string(buf.Bytes()))
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate type meta: %+v\n", err)
+		return raw, nil, err
+	}
+	obj.TypeMeta = unversioned.TypeMeta{}
+	if err = hco.Object(&obj.TypeMeta); err != nil {
+		logger.Printf("Could not validate type meta: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(data.ObjectMeta); err != nil {
+		logger.Printf("Could not validate object meta: %+v\n", err)
+		return raw, nil, err
+	}
+	glog.V(10).Infoln(string(buf.Bytes()))
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate object meta: %+v\n", err)
+		return raw, nil, err
+	}
+	obj.ObjectMeta = kapi.ObjectMeta{}
+	if err = hco.Object(&obj.ObjectMeta); err != nil {
+		logger.Printf("Could not validate object meta: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(data.Spec); err != nil {
+		logger.Printf("Could not validate build spec: %+v\n", err)
+		return raw, nil, err
+	}
+	glog.V(10).Infoln(string(buf.Bytes()))
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate build spec: %+v\n", err)
+		return raw, nil, err
+	}
+	obj.Spec = buildapi.BuildSpec{}
+	if err = hco.Object(&obj.Spec); err != nil {
+		logger.Printf("Could not validate build spec: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(data.Status); err != nil {
+		logger.Printf("Could not validate build status: %+v\n", err)
+		return raw, nil, err
+	}
+	glog.V(10).Infoln(string(buf.Bytes()))
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate build status: %+v\n", err)
+		return raw, nil, err
+	}
+	obj.Status = buildapi.BuildStatus{}
+	if err = hco.Object(&obj.Status); err != nil {
+		logger.Printf("Could not validate build status: %+v\n", err)
+		return raw, nil, err
+	}
+
+	b := new(bytes.Buffer)
+	ccf := util.NewClientCmdFactory()
+
+	obj, err = builder.RunDockerBuild(b, obj, ccf)
+	if err != nil {
+		logger.Printf("Could not docker build: %+v\n", err)
+		return raw, nil, err
+	}
+
+	//c := make(chan error, 1)
+	go func() {
+		var timeout bool
+		var offset int = 0
+		var m *sync.Mutex = &sync.Mutex{}
+		go func() {
+			select {
+			//case e := <- c:
+
+			case <-time.After(time.Duration(900) * time.Second):
+				m.Lock()
+				defer m.Unlock()
+				timeout = true
+			}
+		}()
+		for false == timeout {
+			l := b.Len()
+			if l > offset {
+				fmt.Print(string(b.Next(l - offset)))
+				offset = l
+			}
+		}
+	}()
+
+	time.Sleep(time.Duration(500))
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(obj.TypeMeta); err != nil {
+		logger.Printf("Could not validate type meta: %+v\n", err)
+		return raw, nil, err
+	}
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate type meta: %+v\n", err)
+		return raw, nil, err
+	}
+	data.TypeMeta = unversioned.TypeMeta{}
+	if err = hco.Object(&data.TypeMeta); err != nil {
+		logger.Printf("Could not validate type meta: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(obj.ObjectMeta); err != nil {
+		logger.Printf("Could not validate object meta: %+v\n", err)
+		return raw, nil, err
+	}
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate object meta: %+v\n", err)
+		return raw, nil, err
+	}
+	data.ObjectMeta = kapiv1.ObjectMeta{}
+	if err = hco.Object(&data.ObjectMeta); err != nil {
+		logger.Printf("Could not validate object meta: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(obj.Spec); err != nil {
+		logger.Printf("Could not validate build spec: %+v\n", err)
+		return raw, nil, err
+	}
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate build spec: %+v\n", err)
+		return raw, nil, err
+	}
+	data.Spec = buildapiv1.BuildSpec{}
+	if err = hco.Object(&data.Spec); err != nil {
+		logger.Printf("Could not validate build spec: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(obj.Status); err != nil {
+		logger.Printf("Could not validate build status: %+v\n", err)
+		return raw, nil, err
+	}
+	hco, err = codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		logger.Printf("Could not validate build status: %+v\n", err)
+		return raw, nil, err
+	}
+	data.Status = buildapiv1.BuildStatus{}
+	if err = hco.Object(&data.Status); err != nil {
+		logger.Printf("Could not validate build status: %+v\n", err)
+		return raw, nil, err
+	}
+
+	buf.Reset()
+	if err = codec.JSON.Encode(buf).One(data); err != nil {
+		logger.Printf("Could not validate object: %+v\n", err)
+		return raw, nil, err
+	}
+	raw = buf.Bytes()
+
+	if b.Len() > 0 {
+		//data.Status.Phase = buildapiv1.BuildPhaseRunning
+		data.Status.Message += b.String()
+	}
+
+	return raw, data, nil
 }
 
 type stringValue struct {
@@ -126,6 +323,21 @@ func (val stringValue) Set(v string) error {
 }
 func (val stringValue) Type() string {
 	return "string"
+}
+
+type stringSliceValue struct {
+	value []string
+}
+
+func (val stringSliceValue) String() string {
+	return strings.Join(val.value, ",")
+}
+func (val stringSliceValue) Set(v string) error {
+	val.value = strings.Split(v, ",")
+	return nil
+}
+func (val stringSliceValue) Type() string {
+	return "[]string"
 }
 
 type intValue struct {
@@ -160,14 +372,6 @@ func (val boolValue) Type() string {
 	return "bool"
 }
 
-var rootCommand = &cobra.Command{
-	Use:   "oc",
-	Short: "ociacibuilds",
-	Long:  "The openshift image build server.",
-	Run: func(c *cobra.Command, args []string) {
-	},
-}
-
 // User, Group, Identity and UserIdentityMapping
 
 func WhoAmI() (*userapi.User, error) {
@@ -200,6 +404,8 @@ func CreateUserFromArbitrary(data []byte) ([]byte, *userapi.User, error) {
 }
 
 func createUser(data []byte, user *userapi.User) ([]byte, *userapi.User, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift/origin, createUser] ", log.LstdFlags|log.Lshortfile)
+
 	if len(data) == 0 && user == nil {
 		return nil, nil, errUnexpected
 	}
@@ -281,6 +487,8 @@ func createUser(data []byte, user *userapi.User) ([]byte, *userapi.User, error) 
 }
 
 func RetrieveUsers() error {
+	logger = log.New(os.Stdout, "[appliance/openshift/origin, RetrieveUsers] ", log.LstdFlags|log.Lshortfile)
+
 	f := NewClientCmdFactory()
 	oc, _, err := f.Clients()
 	if err != nil {
@@ -298,6 +506,8 @@ func RetrieveUsers() error {
 }
 
 func RetrieveUser(name string) (*userapi.User, error) {
+	logger = log.New(os.Stdout, "[appliance/openshift/origin, RetrieveUser] ", log.LstdFlags|log.Lshortfile)
+
 	f := NewClientCmdFactory()
 	oc, _, err := f.Clients()
 	if err != nil {
@@ -346,73 +556,9 @@ func RetrieveUser(name string) (*userapi.User, error) {
 	return result, nil
 }
 
-func options(c *cobra.Command) {
-	if val := c.Flags().Lookup("server"); val != nil {
-		val.Value.Set("https://172.17.4.50:30448")
-	} else {
-		val = c.Flags().VarPF(stringValue{"https://172.17.4.50:30448"}, "server", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] flag server: %+v\n", val)
-	}
-	c.Flags().Lookup("server").NoOptDefVal = "https://172.17.4.50:30448"
-
-	if val := c.Flags().Lookup("client-certificate"); val != nil {
-		val.Value.Set(oclientcrt)
-	} else {
-		val = c.Flags().VarPF(stringValue{oclientcrt}, "client-certificate", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] flag server: %+v\n", val)
-	}
-	c.Flags().Lookup("client-certificate").NoOptDefVal = oclientcrt
-	if val := c.Flags().Lookup("client-key"); val != nil {
-		val.Value.Set(oclientkey)
-	} else {
-		val = c.Flags().VarPF(stringValue{oclientkey}, "client-key", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] client-key: %+v\n", val)
-	}
-	c.Flags().Lookup("client-key").NoOptDefVal = oclientkey
-
-	if val := c.Flags().Lookup("api-version"); val != nil {
-		val.Value.Set(apiVersion)
-	} else {
-		val = c.Flags().VarPF(stringValue{apiVersion}, "api-version", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] api version: %+v\n", val)
-	}
-	c.Flags().Lookup("api-version").NoOptDefVal = apiVersion
-
-	if val := c.Flags().Lookup("api-version"); val != nil {
-		val.Value.Set(apiVersion)
-	} else {
-		val = c.Flags().VarPF(stringValue{apiVersion}, "api-version", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] api version: %+v\n", val)
-	}
-	c.Flags().Lookup("api-version").NoOptDefVal = apiVersion
-
-	if val := c.Flags().Lookup("certificate-authority"); val != nil {
-		val.Value.Set(oca)
-	} else {
-		val = c.Flags().VarPF(stringValue{oca}, "certificate-authority", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] ca: %+v\n", val)
-	}
-	c.Flags().Lookup("certificate-authority").NoOptDefVal = oca
-
-	if val := c.Flags().Lookup("insecure-skip-tls-verify"); val != nil {
-		val.Value.Set("false")
-	} else {
-		val = c.Flags().VarPF(boolValue{false}, "insecure-skip-tls-verify", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] insecure tls: %+v\n", val)
-	}
-	c.Flags().Lookup("insecure-skip-tls-verify").NoOptDefVal = "false"
-
-	if val := c.Flags().Lookup("config"); val != nil {
-		val.Value.Set(oconfigPath)
-	} else {
-		val = c.Flags().VarPF(stringValue{oconfigPath}, "config", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] config: %+v\n", val)
-	}
-	c.Flags().Lookup("config").NoOptDefVal = oconfigPath
-
-}
-
 func DoBasicAuth() error {
+	logger = log.New(os.Stdout, "[appliance/openshift/origin, DoBasicAuth] ", log.LstdFlags|log.Lshortfile)
+
 	clientConfig := &restclient.Config{}
 	serverNormalized, err := config.NormalizeServerURL("https://172.17.4.50:30448")
 	if err != nil {
@@ -457,45 +603,6 @@ func DoBasicAuth() error {
 	logger.Printf("Result: %+v\n", me)
 
 	return nil
-}
-
-func overrideRootCommand() {
-
-	flags := pflag.NewFlagSet("", pflag.ContinueOnError)
-	//f := osclientcmd.New(flags)
-	cmds := cli.NewCommandCLI("oc", "oc", os.Stdin, os.Stdout, os.Stderr)
-	cmds.Aliases = []string{"oc"}
-	cmds.Use = "oc"
-	cmds.Short = "openshift client"
-	flags.VisitAll(func(flag *pflag.Flag) {
-		if f := cmds.PersistentFlags().Lookup(flag.Name); f == nil {
-			glog.V(5).Infof("flag: %v", flag.Name)
-			cmds.PersistentFlags().AddFlag(flag)
-		} else {
-			glog.V(5).Infof("already registered flag %s", flag.Name)
-		}
-	})
-	//cmds.PersistentFlags().Var(flags.Lookup("config").Value, "config", "Specify a kubeconfig file to define the configuration")
-	if val := cmds.PersistentFlags().Lookup("config"); val != nil {
-		fmt.Println("configed")
-		val.Value.Set(oconfigPath)
-	} else {
-		fmt.Println("setting")
-		val = cmds.PersistentFlags().VarPF(stringValue{oconfigPath}, "config", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] config: %+v\n", val)
-	}
-	if val := cmds.PersistentFlags().Lookup("loglevel"); val != nil {
-		fmt.Println("configed")
-		val.Value.Set("10")
-	} else {
-		fmt.Println("setting")
-		val = cmds.PersistentFlags().VarPF(intValue{5}, "loglevel", "", "")
-		fmt.Fprintf(os.Stdout, "[tangfx] loglevel: %+v\n", val)
-	}
-	templates.ActsAsRootCommand(cmds, []string{"option"})
-	cmds.AddCommand(cmd.NewCmdOptions(os.Stdout))
-
-	rootCommand = cmds
 }
 
 func Whole() (*userapi.UserList, error) {
@@ -562,12 +669,14 @@ func fakeWhoAmI() (*userapi.User, error) {
 }
 
 func LoginWithBasicAuth(username, password string) error {
+	logger = log.New(os.Stdout, "[appliance/openshift/origin, LoginWithBasicAuth] ", log.LstdFlags|log.Lshortfile)
+
 	//pf := rootCommand.PersistentFlags()
 	//pf.StringVarP(&addr, "listen", "l", ":44134", "The address:port to listen on")
 	//pf.StringVarP(&namespace, "namespace", "n", "", "The namespace Tiller calls home")
 	f := factory
 	c := cmd.NewCmdLogin("oc", f, os.Stdin, os.Stdout)
-	options(c)
+	overrideOptions(c)
 
 	if val := c.Flags().Lookup("username"); val != nil {
 		val.Value.Set(username)
@@ -606,6 +715,8 @@ func LoginWithBasicAuth(username, password string) error {
 }
 
 func ProjectWithSimple(name string, in io.Reader, out, errOut io.Writer) {
+	logger = log.New(os.Stdout, "[appliance/openshift/origin, ProjectWithSimple] ", log.LstdFlags|log.Lshortfile)
+
 	f := osclientcmd.NewFactory(withOClientConfig())
 	fullName := "oc"
 	c := cmd.NewCmdRequestProject(fullName, "new-project", fullName+" login", fullName+" project", f, out)
@@ -615,104 +726,167 @@ func ProjectWithSimple(name string, in io.Reader, out, errOut io.Writer) {
 	}
 }
 
-func BuildWithConfig(name string, in io.Reader, out, errOut io.Writer) {
-	f := osclientcmd.NewFactory(withOClientConfig())
-	c := NewCmdStartBuild(name, f, in, out)
-	c.SetArgs([]string{name})
-	if err := c.Execute(); err != nil {
-		logger.Printf("Could not start build with config: %v\n", err)
+func overrideStringFlag(c *cobra.Command, name, value, shorthand, usage, noOptDefVal string) {
+	logger.SetPrefix("[appliance/origin, overrideStringFlag] ")
+
+	v := c.Flags().Lookup(name)
+	if v != nil {
+		v.Value.Set(value)
+	} else {
+		v = c.Flags().VarPF(stringValue{value}, name, shorthand, usage)
 	}
+	if noOptDefVal != "" {
+		v.NoOptDefVal = noOptDefVal
+	}
+	logger.Printf("override flag %s: %+v\n", name, v)
 }
 
-// NewCmdNewBuild implements the OpenShift cli new-build command
-func NewCmdNewBuild(fullName string, f *osclientcmd.Factory, in io.Reader, out io.Writer) *cobra.Command {
-	config := newcmd.NewAppConfig()
-	config.ExpectToBuild = true
-	config.AddEnvironmentToBuild = true
-	options := &cmd.NewBuildOptions{Config: config}
+func overrideStringSliceFlag(c *cobra.Command, name string, value []string, shorthand, usage string, noOptDefVal []string) {
+	logger.SetPrefix("[appliance/origin, overrideStringSliceFlag] ")
 
-	cmd := &cobra.Command{
-		Use:        "new-build (IMAGE | IMAGESTREAM | PATH | URL ...)",
-		Short:      "Create a new build configuration",
-		Long:       fmt.Sprintf(newBuildLong, fullName),
-		Example:    fmt.Sprintf(newBuildExample, fullName),
-		SuggestFor: []string{"build", "builds"},
-		Run: func(c *cobra.Command, args []string) {
-			kcmdutil.CheckErr(options.Complete(fullName, f, c, args, out, in))
-			err := options.Run()
-			if err == cmdutil.ErrExit {
-				os.Exit(1)
-			}
-			kcmdutil.CheckErr(err)
-		},
+	s := strings.Join(value, ",")
+	v := c.Flags().Lookup(name)
+	if v != nil {
+		v.Value.Set(s)
+	} else {
+		v = c.Flags().VarPF(stringSliceValue{value}, name, shorthand, usage)
 	}
-
-	cmd.Flags().StringSliceVar(&config.SourceRepositories, "code", config.SourceRepositories, "Source code in the build configuration.")
-	cmd.Flags().StringSliceVarP(&config.ImageStreams, "image", "", config.ImageStreams, "Name of an image stream to to use as a builder. (deprecated)")
-	cmd.Flags().MarkDeprecated("image", "use --image-stream instead")
-	cmd.Flags().StringSliceVarP(&config.ImageStreams, "image-stream", "i", config.ImageStreams, "Name of an image stream to to use as a builder.")
-	cmd.Flags().StringSliceVar(&config.DockerImages, "docker-image", config.DockerImages, "Name of a Docker image to use as a builder.")
-	cmd.Flags().StringSliceVar(&config.Secrets, "build-secret", config.Secrets, "Secret and destination to use as an input for the build.")
-	cmd.Flags().StringVar(&config.Name, "name", "", "Set name to use for generated build artifacts.")
-	cmd.Flags().StringVar(&config.To, "to", "", "Push built images to this image stream tag (or Docker image repository if --to-docker is set).")
-	cmd.Flags().BoolVar(&config.OutputDocker, "to-docker", false, "Have the build output push to a Docker repository.")
-	cmd.Flags().StringSliceVarP(&config.Environment, "env", "e", config.Environment, "Specify key value pairs of environment variables to set into resulting image.")
-	cmd.Flags().StringVar(&config.Strategy, "strategy", "", "Specify the build strategy to use if you don't want to detect (docker|source).")
-	cmd.Flags().StringVarP(&config.Dockerfile, "dockerfile", "D", "", "Specify the contents of a Dockerfile to build directly, implies --strategy=docker. Pass '-' to read from STDIN.")
-	cmd.Flags().BoolVar(&config.BinaryBuild, "binary", false, "Instead of expecting a source URL, set the build to expect binary contents. Will disable triggers.")
-	cmd.Flags().StringP("labels", "l", "", "Label to set in all generated resources.")
-	cmd.Flags().BoolVar(&config.AllowMissingImages, "allow-missing-images", false, "If true, indicates that referenced Docker images that cannot be found locally or in a registry should still be used.")
-	cmd.Flags().BoolVar(&config.AllowMissingImageStreamTags, "allow-missing-imagestream-tags", false, "If true, indicates that image stream tags that don't exist should still be used.")
-	cmd.Flags().StringVar(&config.ContextDir, "context-dir", "", "Context directory to be used for the build.")
-	cmd.Flags().BoolVar(&config.DryRun, "dry-run", false, "If true, do not actually create resources.")
-	cmd.Flags().BoolVar(&config.NoOutput, "no-output", false, "If true, the build output will not be pushed anywhere.")
-	cmd.Flags().StringVar(&config.SourceImage, "source-image", "", "Specify an image to use as source for the build.  You must also specify --source-image-path.")
-	cmd.Flags().StringVar(&config.SourceImagePath, "source-image-path", "", "Specify the file or directory to copy from the source image and its destination in the build directory. Format: [source]:[destination-dir].")
-	kcmdutil.AddPrinterFlags(cmd)
-
-	return cmd
+	if len(noOptDefVal) > 0 {
+		v.NoOptDefVal = strings.Join(noOptDefVal, ",")
+	}
+	logger.Printf("override flag %s: %+v\n", name, v)
 }
 
-func NewCmdStartBuild(fullName string, f *osclientcmd.Factory, in io.Reader, out io.Writer) *cobra.Command {
-	o := &cmd.StartBuildOptions{
-		LogLevel:        "5",
-		Follow:          true,
-		WaitForComplete: false,
+func overrideBoolFlag(c *cobra.Command, name string, value bool, shorthand, usage string, noOptDefVal bool) {
+	logger.SetPrefix("[appliance/origin, overrideBoolFlag] ")
+
+	v := c.Flags().Lookup(name)
+	if v != nil {
+		v.Value.Set(strconv.FormatBool(value))
+	} else {
+		v = c.Flags().VarPF(boolValue{value}, name, shorthand, usage)
 	}
-
-	cmd := &cobra.Command{
-		Use:        "start-build (BUILDCONFIG | --from-build=BUILD)",
-		Short:      "Start a new build",
-		Long:       startBuildLong,
-		Example:    fmt.Sprintf(startBuildExample, fullName),
-		SuggestFor: []string{"build", "builds"},
-		Run: func(cmd *cobra.Command, args []string) {
-			kcmdutil.CheckErr(o.Complete(f, in, out, cmd, args))
-			kcmdutil.CheckErr(o.Run())
-		},
+	if noOptDefVal {
+		v.NoOptDefVal = strconv.FormatBool(noOptDefVal)
 	}
-	cmd.Flags().StringVar(&o.LogLevel, "build-loglevel", o.LogLevel, "Specify the log level for the build log output")
-	cmd.Flags().Lookup("build-loglevel").NoOptDefVal = "5"
-	cmd.Flags().StringSliceVarP(&o.Env, "env", "e", o.Env, "Specify key value pairs of environment variables to set for the build container.")
+	logger.Printf("override flag %s: %+v\n", name, v)
+}
 
-	cmd.Flags().StringVar(&o.FromBuild, "from-build", o.FromBuild, "Specify the name of a build which should be re-run")
+func overrideIntFlag(c *cobra.Command, name string, value int, shorthand, usage string, noOptDefVal int) {
+	logger.SetPrefix("[appliance/origin, overrideIntFlag] ")
 
-	cmd.Flags().BoolVar(&o.Follow, "follow", o.Follow, "Start a build and watch its logs until it completes or fails")
-	cmd.Flags().Lookup("follow").NoOptDefVal = "true"
-	cmd.Flags().BoolVar(&o.WaitForComplete, "wait", o.WaitForComplete, "Wait for a build to complete and exit with a non-zero return code if the build fails")
+	v := c.Flags().Lookup(name)
+	if v != nil {
+		v.Value.Set(strconv.Itoa(value))
+	} else {
+		v = c.Flags().VarPF(intValue{value}, name, shorthand, usage)
+	}
+	if noOptDefVal != 0 {
+		v.NoOptDefVal = strconv.Itoa(noOptDefVal)
+	}
+	logger.Printf("override flag %s: %+v\n", name, v)
+}
 
-	cmd.Flags().StringVar(&o.FromFile, "from-file", o.FromFile, "A file to use as the binary input for the build; example a pom.xml or Dockerfile. Will be the only file in the build source.")
-	cmd.Flags().StringVar(&o.FromDir, "from-dir", o.FromDir, "A directory to archive and use as the binary input for a build.")
-	cmd.Flags().StringVar(&o.FromRepo, "from-repo", o.FromRepo, "The path to a local source code repository to use as the binary input for a build.")
-	cmd.Flags().StringVar(&o.Commit, "commit", o.Commit, "Specify the source code commit identifier the build should use; requires a build based on a Git repository")
+func overrideOptions(c *cobra.Command) {
+	if val := c.Flags().Lookup("server"); val != nil {
+		val.Value.Set("https://172.17.4.50:30448")
+	} else {
+		val = c.Flags().VarPF(stringValue{"https://172.17.4.50:30448"}, "server", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] flag server: %+v\n", val)
+	}
+	c.Flags().Lookup("server").NoOptDefVal = "https://172.17.4.50:30448"
 
-	cmd.Flags().StringVar(&o.ListWebhooks, "list-webhooks", o.ListWebhooks, "List the webhooks for the specified build config or build; accepts 'all', 'generic', or 'github'")
-	cmd.Flags().StringVar(&o.FromWebhook, "from-webhook", o.FromWebhook, "Specify a webhook URL for an existing build config to trigger")
+	if val := c.Flags().Lookup("client-certificate"); val != nil {
+		val.Value.Set(oclientcrt)
+	} else {
+		val = c.Flags().VarPF(stringValue{oclientcrt}, "client-certificate", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] flag server: %+v\n", val)
+	}
+	c.Flags().Lookup("client-certificate").NoOptDefVal = oclientcrt
+	if val := c.Flags().Lookup("client-key"); val != nil {
+		val.Value.Set(oclientkey)
+	} else {
+		val = c.Flags().VarPF(stringValue{oclientkey}, "client-key", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] client-key: %+v\n", val)
+	}
+	c.Flags().Lookup("client-key").NoOptDefVal = oclientkey
 
-	cmd.Flags().StringVar(&o.GitPostReceive, "git-post-receive", o.GitPostReceive, "The contents of the post-receive hook to trigger a build")
-	cmd.Flags().StringVar(&o.GitRepository, "git-repository", o.GitRepository, "The path to the git repository for post-receive; defaults to the current directory")
+	if val := c.Flags().Lookup("api-version"); val != nil {
+		val.Value.Set(apiVersion)
+	} else {
+		val = c.Flags().VarPF(stringValue{apiVersion}, "api-version", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] api version: %+v\n", val)
+	}
+	c.Flags().Lookup("api-version").NoOptDefVal = apiVersion
 
-	// cmdutil.AddOutputFlagsForMutation(cmd)
-	return cmd
+	if val := c.Flags().Lookup("api-version"); val != nil {
+		val.Value.Set(apiVersion)
+	} else {
+		val = c.Flags().VarPF(stringValue{apiVersion}, "api-version", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] api version: %+v\n", val)
+	}
+	c.Flags().Lookup("api-version").NoOptDefVal = apiVersion
 
+	if val := c.Flags().Lookup("certificate-authority"); val != nil {
+		val.Value.Set(oca)
+	} else {
+		val = c.Flags().VarPF(stringValue{oca}, "certificate-authority", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] ca: %+v\n", val)
+	}
+	c.Flags().Lookup("certificate-authority").NoOptDefVal = oca
+
+	if val := c.Flags().Lookup("insecure-skip-tls-verify"); val != nil {
+		val.Value.Set("false")
+	} else {
+		val = c.Flags().VarPF(boolValue{false}, "insecure-skip-tls-verify", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] insecure tls: %+v\n", val)
+	}
+	c.Flags().Lookup("insecure-skip-tls-verify").NoOptDefVal = "false"
+
+	if val := c.Flags().Lookup("config"); val != nil {
+		val.Value.Set(oconfigPath)
+	} else {
+		val = c.Flags().VarPF(stringValue{oconfigPath}, "config", "", "")
+		fmt.Fprintf(os.Stdout, "[tangfx] config: %+v\n", val)
+	}
+	c.Flags().Lookup("config").NoOptDefVal = oconfigPath
+}
+
+func overrideRootCommandArgs() {
+	logger.SetOutput(os.Stdout)
+	logger.SetPrefix("[appliance/openshift/origin, overrideRootCommandArgs] ")
+
+	flags := pflag.NewFlagSet("", pflag.ContinueOnError)
+	//f := osclientcmd.New(flags)
+	//rootCommand := cli.NewCommandCLI("oc", "oc", os.Stdin, os.Stdout, os.Stderr)
+	//rootCommand.Aliases = []string{"oc"}
+	//rootCommand.Use = "oc"
+	//rootCommand.Short = "openshift origin client"
+	flags.VisitAll(func(flag *pflag.Flag) {
+		if f := rootCommand.PersistentFlags().Lookup(flag.Name); f == nil {
+			glog.V(5).Infof("flag: %v", flag.Name)
+			rootCommand.PersistentFlags().AddFlag(flag)
+		} else {
+			glog.V(5).Infof("already registered flag %s", flag.Name)
+		}
+	})
+	//rootCommand.PersistentFlags().Var(flags.Lookup("config").Value, "config", "Specify a kubeconfig file to define the configuration")
+	if val := rootCommand.PersistentFlags().Lookup("config"); val != nil {
+		fmt.Println("configed")
+		val.Value.Set(oconfigPath)
+	} else {
+		fmt.Println("setting")
+		val = rootCommand.PersistentFlags().VarPF(stringValue{oconfigPath}, "config", "", "")
+		logger.Printf("config: %+v\n", val)
+	}
+	if val := rootCommand.PersistentFlags().Lookup("loglevel"); val != nil {
+		fmt.Println("configed")
+		val.Value.Set("10")
+	} else {
+		fmt.Println("setting")
+		val = rootCommand.PersistentFlags().VarPF(intValue{5}, "loglevel", "", "")
+		logger.Printf("loglevel: %+v\n", val)
+	}
+	templates.ActsAsRootCommand(rootCommand, []string{"option"})
+	rootCommand.AddCommand(cmd.NewCmdOptions(os.Stdout))
 }

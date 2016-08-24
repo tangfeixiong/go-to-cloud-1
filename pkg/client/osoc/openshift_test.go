@@ -1,10 +1,11 @@
 package osoc
 
 import (
+	"bytes"
 	//"log"
 	"testing"
 
-	//"github.com/helm/helm-classic/codec"
+	"github.com/helm/helm-classic/codec"
 	//buildapi "github.com/openshift/origin/pkg/build/api/v1"
 	//projectapi "github.com/openshift/origin/pkg/project/api/v1"
 
@@ -100,4 +101,17 @@ func TestDockerBuild_retrieve(t *testing.T) {
 	} else {
 		t.Logf("Received: %+v", respBuild)
 	}
+}
+
+func TestDirect_origindockerbuild(t *testing.T) {
+	reqBuild := origindockerbuild()
+	respBuild, err := factory.CreateDockerBuildIntoImage(reqBuild)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := &bytes.Buffer{}
+	if err := codec.JSON.Encode(b).One(respBuild); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("Received: \n%+v", b.String())
 }

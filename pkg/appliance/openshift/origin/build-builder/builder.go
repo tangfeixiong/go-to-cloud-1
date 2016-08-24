@@ -1,31 +1,42 @@
 package builder
 
 import (
-	"encoding/json"
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/golang/glog"
+	"github.com/helm/helm-classic/codec"
 
 	kapi "k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/api/errors"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	"k8s.io/kubernetes/pkg/runtime"
-	"k8s.io/kubernetes/pkg/util/crypto"
 
 	s2iapi "github.com/openshift/source-to-image/pkg/api"
 
 	"github.com/openshift/origin/pkg/build/api"
+	"github.com/openshift/origin/pkg/build/api/validation"
 	bld "github.com/openshift/origin/pkg/build/builder"
 	"github.com/openshift/origin/pkg/build/builder/cmd/scmauth"
 	"github.com/openshift/origin/pkg/client"
+	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
 	dockerutil "github.com/openshift/origin/pkg/cmd/util/docker"
 	"github.com/openshift/origin/pkg/generate/git"
 	"github.com/openshift/origin/pkg/version"
+)
+
+var (
+	_masterVersion string = "v1.3.0-alpha.1-83-g16d6863"
+	//_masterVersion string = "v1.3.0-alpha.0-52-gbc1ddaa"
+	_build_name    string
+	_build_project string
 )
 
 type builder interface {
@@ -33,6 +44,7 @@ type builder interface {
 }
 
 type builderConfig struct {
+	out             io.Writer
 	build           *api.Build
 	sourceSecretDir string
 	dockerClient    *docker.Client
@@ -40,108 +52,30 @@ type builderConfig struct {
 	buildsClient    client.BuildInterface
 }
 
-func newBuilderFromDockerfileWithJSON(buildStr string) (*builderConfig, error) {
+func newBuilderConfigFromEnvironment(out io.Writer) (*builderConfig, error) {
 	cfg := &builderConfig{}
 	var err error
 
-	// build (BUILD)
-	//buildStr := os.Getenv("BUILD")
-	glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
-	cfg.build = &api.Build{}
-
-	if err = runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
-		return nil, fmt.Errorf("unable to parse build: %v", err)
-	}
-	if cfg.build.Spec.Source.Dockerfile == nil {
-		glog.V(9).Infoln("decode from encoding/json")
-		if err = json.Unmarshal([]byte(buildStr), cfg.build); err != nil {
-			glog.V(9).Infof("decode error: %s", err)
-			return nil, err
-		}
-	}
-	glog.V(7).Infof("tangfx > build: %+v, source: %+v, dockerfile: %s", cfg.build, cfg.build.Spec.Source, *cfg.build.Spec.Source.Dockerfile)
-
-	//masterVersion := os.Getenv(api.OriginVersion)
-	masterVersion := "v1.3.0-alpha.0-52-gbc1ddaa"
-	thisVersion := version.Get().String()
-	if len(masterVersion) != 0 && masterVersion != thisVersion {
-		glog.Warningf("Master version %q does not match Builder image version %q", masterVersion, thisVersion)
-	} else {
-		glog.V(2).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
-	}
-
-	// dockerClient and dockerEndpoint (DOCKER_HOST)
-	// usually not set, defaults to docker socket
-	cfg.dockerClient, cfg.dockerEndpoint, err = dockerutil.NewHelper().GetClient()
-	if err != nil {
-		return nil, fmt.Errorf("error obtaining docker client: %v", err)
-	}
-
-	// buildsClient (KUBERNETES_SERVICE_HOST, KUBERNETES_SERVICE_PORT)
-	clientConfig, err := restclient.InClusterConfig()
-	if err != nil {
-		//return nil, fmt.Errorf("failed to get client config: %v", err)
-		clientConfig, _ = InClusterConfig()
-	}
-	osClient, err := client.New(clientConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error obtaining OpenShift client: %v", err)
-	}
-	cfg.buildsClient = osClient.Builds(cfg.build.Namespace)
-
-	return cfg, nil
-}
-
-// InClusterConfig returns a config object which uses the service account
-// kubernetes gives to pods. It's intended for clients that expect to be
-// running inside a pod running on kuberenetes. It will return an error if
-// called from a process not running in a kubernetes environment.
-func InClusterConfig() (*restclient.Config, error) {
-	//host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
-	host, port := "172.17.4.50", "443"
-	if len(host) == 0 || len(port) == 0 {
-		return nil, fmt.Errorf("unable to load in-cluster configuration, KUBERNETES_SERVICE_HOST and KUBERNETES_SERVICE_PORT must be defined")
-	}
-
-	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/" + kapi.ServiceAccountTokenKey)
-	if err != nil {
-		//	return nil, err
-		glog.Errorf("token: %s", err)
-	}
-	tlsClientConfig := restclient.TLSClientConfig{}
-	rootCAFile := "/var/run/secrets/kubernetes.io/serviceaccount/" + kapi.ServiceAccountRootCAKey
-	if _, err := crypto.CertPoolFromFile(rootCAFile); err != nil {
-		glog.Errorf("Expected to load root CA config from %s, but got err: %v", rootCAFile, err)
-	} else {
-		tlsClientConfig.CAFile = rootCAFile
-	}
-
-	return &restclient.Config{
-		// TODO: switch to using cluster DNS.
-		Host:            "https://" + net.JoinHostPort(host, port),
-		BearerToken:     string(token),
-		TLSClientConfig: tlsClientConfig,
-	}, nil
-}
-
-func newBuilderConfigFromEnvironment() (*builderConfig, error) {
-	cfg := &builderConfig{}
-	var err error
+	cfg.out = out
 
 	// build (BUILD)
 	buildStr := os.Getenv("BUILD")
 	glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
 	cfg.build = &api.Build{}
-	if err = runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
+	if err := runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
 		return nil, fmt.Errorf("unable to parse build: %v", err)
 	}
+	if errs := validation.ValidateBuild(cfg.build); len(errs) > 0 {
+		return nil, errors.NewInvalid(unversioned.GroupKind{Kind: "Build"}, cfg.build.Name, errs)
+	}
+	glog.V(4).Infof("Build: %#v", cfg.build)
 
 	masterVersion := os.Getenv(api.OriginVersion)
 	thisVersion := version.Get().String()
 	if len(masterVersion) != 0 && masterVersion != thisVersion {
-		glog.Warningf("Master version %q does not match Builder image version %q", masterVersion, thisVersion)
+		glog.V(3).Infof("warning: OpenShift server version %q differs from this image %q\n", masterVersion, thisVersion)
 	} else {
-		glog.V(2).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
+		glog.V(4).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
 	}
 
 	// sourceSecretsDir (SOURCE_SECRET_PATH)
@@ -151,17 +85,17 @@ func newBuilderConfigFromEnvironment() (*builderConfig, error) {
 	// usually not set, defaults to docker socket
 	cfg.dockerClient, cfg.dockerEndpoint, err = dockerutil.NewHelper().GetClient()
 	if err != nil {
-		return nil, fmt.Errorf("error obtaining docker client: %v", err)
+		return nil, fmt.Errorf("no Docker configuration defined: %v", err)
 	}
 
 	// buildsClient (KUBERNETES_SERVICE_HOST, KUBERNETES_SERVICE_PORT)
 	clientConfig, err := restclient.InClusterConfig()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get client config: %v", err)
+		return nil, fmt.Errorf("cannot connect to the server: %v", err)
 	}
 	osClient, err := client.New(clientConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error obtaining OpenShift client: %v", err)
+		return nil, fmt.Errorf("failed to get client: %v", err)
 	}
 	cfg.buildsClient = osClient.Builds(cfg.build.Namespace)
 
@@ -169,10 +103,8 @@ func newBuilderConfigFromEnvironment() (*builderConfig, error) {
 }
 
 func (c *builderConfig) setupGitEnvironment() ([]string, error) {
-
-	gitSource := c.build.Spec.Source.Git
-
 	// For now, we only handle git. If not specified, we're done
+	gitSource := c.build.Spec.Source.Git
 	if gitSource == nil {
 		return []string{}, nil
 	}
@@ -218,7 +150,6 @@ func (c *builderConfig) setupGitEnvironment() ([]string, error) {
 
 // execute is responsible for running a build
 func (c *builderConfig) execute(b builder) error {
-
 	gitEnv, err := c.setupGitEnvironment()
 	if err != nil {
 		return err
@@ -229,16 +160,14 @@ func (c *builderConfig) execute(b builder) error {
 	if err != nil {
 		return fmt.Errorf("failed to retrieve cgroup limits: %v", err)
 	}
-	glog.V(2).Infof("Running build with cgroup limits: %#v", *cgLimits)
-	glog.Infof("git: %+v, %+v, cgroup: %+v", gitEnv, gitClient, cgLimits)
+	glog.V(4).Infof("Running build with cgroup limits: %#v", *cgLimits)
 
 	if err := b.Build(c.dockerClient, c.dockerEndpoint, c.buildsClient, c.build, gitClient, cgLimits); err != nil {
 		return fmt.Errorf("build error: %v", err)
 	}
 
-	glog.Infof("Build: %+v", c.build)
 	if c.build.Spec.Output.To == nil || len(c.build.Spec.Output.To.Name) == 0 {
-		glog.Warning("Build does not have an Output defined, no output image was pushed to a registry.")
+		fmt.Fprintf(c.out, "Build complete, no image push requested\n")
 	}
 
 	return nil
@@ -273,7 +202,19 @@ type dockerBuilder struct{}
 
 // Build starts a Docker build.
 func (dockerBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *api.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error {
-	glog.Info("Go to docker build ...")
+	if build.Name == "" {
+		glog.Warningln("Lost build name and project during deserialization")
+		build.Name = _build_name
+		build.Namespace = _build_project
+	}
+	if build.Spec.Output.To != nil &&
+		build.Spec.Output.To.Kind == "DockerImage" &&
+		build.Spec.Output.To.Name != "" &&
+		build.Status.OutputDockerImageReference != build.Spec.Output.To.Name {
+		glog.Warningf("Force output docker image (%s) with predefined value (%s)",
+			build.Status.OutputDockerImageReference, build.Spec.Output.To.Name)
+		build.Status.OutputDockerImageReference = build.Spec.Output.To.Name
+	}
 	return bld.NewDockerBuilder(dockerClient, buildsClient, build, gitClient, cgLimits).Build()
 }
 
@@ -284,48 +225,98 @@ func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient
 	return bld.NewS2IBuilder(dockerClient, sock, buildsClient, build, gitClient, cgLimits).Build()
 }
 
-func runBuildDifferently(builder builder) {
-	wd, err := os.Getwd()
+func runBuild(out io.Writer, builder builder) error {
+	cfg, err := newBuilderConfigFromEnvironment(out)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	//f := wd + "/examples/build101.json"
-	f := wd + "/examples/github101.json"
-	glog.V(9).Infof("path: %s", f)
-	b, err := ioutil.ReadFile(f)
-	if err != nil {
-		panic(err)
-	}
-	cfg, err := newBuilderFromDockerfileWithJSON(string(b))
-
-	//cfg, err := newBuilderConfigFromEnvironment()
-	if err != nil {
-		glog.Fatalf("Cannot setup builder configuration: %v", err)
-	}
-	err = cfg.execute(builder)
-	if err != nil {
-		glog.Fatalf("Error: %v", err)
-	}
-}
-
-func runBuild(builder builder) {
-	cfg, err := newBuilderConfigFromEnvironment()
-	if err != nil {
-		glog.Fatalf("Cannot setup builder configuration: %v", err)
-	}
-	err = cfg.execute(builder)
-	if err != nil {
-		glog.Fatalf("Error: %v", err)
-	}
+	return cfg.execute(builder)
 }
 
 // RunDockerBuild creates a docker builder and runs its build
-func RunDockerBuild() {
-	//runBuild(dockerBuilder{})
-	runBuildDifferently(dockerBuilder{})
+func RunDockerBuild(out io.Writer, data *api.Build, ccfactory *clientcmd.Factory) (*api.Build, error) {
+	//return runBuild(out, dockerBuilder{})
+
+	cfg := &builderConfig{}
+	var err error
+
+	cfg.out = out
+
+	// build (BUILD)
+	buildStr := os.Getenv("BUILD")
+	//glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
+	cfg.build = &api.Build{}
+
+	b := &bytes.Buffer{}
+	//if b, err = runtime.Encode(kapi.Codecs.LegacyCodec(api.SchemeGroupVersion), data); err != nil {
+	//	glog.Errorf("Could not feed data: %+v", err)
+	//	return nil, fmt.Errorf("unable to parse build: %v", err)
+	//}
+	if err := codec.JSON.Encode(b).One(data); err != nil {
+		glog.Errorf("Could not feed data: %+v", err)
+		return nil, fmt.Errorf("Could not feed data: %v", err)
+	}
+	buildStr = b.String()
+	glog.Infof("build object: %s", buildStr)
+	if err := runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
+		glog.Errorf("Could not validate raw bytes: %s", err)
+		return nil, fmt.Errorf("unable to parse build: %v", err)
+	}
+	if cfg.build.Name == "" || cfg.build.Namespace == "" ||
+		cfg.build.Spec.Output.To == nil ||
+		(cfg.build.Spec.Output.To.Kind == "DockerImage" &&
+			cfg.build.Spec.Output.To.Name == "") {
+		glog.Infoln("Missing key fields: name or project or output to ...")
+		return nil, fmt.Errorf("Missing key fields")
+	}
+	_build_name = cfg.build.Name
+	_build_project = cfg.build.Namespace
+
+	if errs := validation.ValidateBuild(cfg.build); len(errs) > 0 {
+		glog.Infof("Could not validate object fields: %+v", errs)
+		return nil, errors.NewInvalid(unversioned.GroupKind{Kind: "Build"}, cfg.build.Name, errs)
+	}
+	glog.V(4).Infof("Build: %#v", cfg.build)
+
+	masterVersion := os.Getenv(api.OriginVersion)
+	if masterVersion == "" {
+		masterVersion = _masterVersion
+	}
+	thisVersion := version.Get().String()
+	if len(masterVersion) != 0 && masterVersion != thisVersion {
+		glog.Warningf("Master version %q does not match Builder image version %q", masterVersion, thisVersion)
+	} else {
+		glog.V(2).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
+	}
+
+	// sourceSecretsDir (SOURCE_SECRET_PATH)
+	cfg.sourceSecretDir = os.Getenv("SOURCE_SECRET_PATH")
+
+	// dockerClient and dockerEndpoint (DOCKER_HOST)
+	// usually not set, defaults to docker socket
+	cfg.dockerClient, cfg.dockerEndpoint, err = dockerutil.NewHelper().GetClient()
+	if err != nil {
+		glog.Infof("Could not setup docker client: %+v", err)
+		return nil, fmt.Errorf("error obtaining docker client: %v", err)
+	}
+
+	// buildsClient (KUBERNETES_SERVICE_HOST, KUBERNETES_SERVICE_PORT)
+	//clientConfig, err := restclient.InClusterConfig()
+	//if err != nil {
+	//	return nil, fmt.Errorf("failed to get client config: %v", err)
+	//}
+	//osClient, err := client.New(clientConfig)
+	osClient, _, err := ccfactory.Clients()
+	if err != nil {
+		glog.Infof("Could not setup openshift client: %+v", err)
+		return nil, fmt.Errorf("error obtaining OpenShift client: %v", err)
+	}
+	cfg.buildsClient = osClient.Builds(cfg.build.Namespace)
+
+	return data, cfg.execute(dockerBuilder{})
 }
 
-// RunSTIBuild creates a STI builder and runs its build
-func RunSTIBuild() {
-	runBuild(s2iBuilder{})
+// RunS2IBuild creates a S2I builder and runs its build
+func RunS2IBuild(out io.Writer) error {
+	return runBuild(out, s2iBuilder{})
 }

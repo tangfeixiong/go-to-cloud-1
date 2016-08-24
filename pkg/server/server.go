@@ -6,12 +6,12 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/signal"
+	//"os/signal"
 	"path"
 	"strings"
-	"sync"
-	"syscall"
-	"time"
+	//"sync"
+	//"syscall"
+	//"time"
 
 	"github.com/emicklei/go-restful"
 	"github.com/gengo/grpc-gateway/runtime"
@@ -24,24 +24,24 @@ import (
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/service"
 )
 
-type APIContextServer struct {
+type AppContext struct {
 	grpcServer  *grpc.Server
 	grpcGateway *service.UserResource
 	webService  *restful.WebService
 }
 
 var (
-	APIServer  *APIContextServer
+	AppServer  *AppContext
 	swaggerDir = "docs/apidocs.json"
 )
 
 func init() {
-	APIServer = new(APIContextServer)
-	//APIServer.grpcServer = grpc.NewServer()
-	//APIServer.webService = new(restful.WebService)
+	AppServer = new(AppContext)
+	//AppServer.grpcServer = grpc.NewServer()
+	//AppServer.webService = new(restful.WebService)
 }
 
-func (s *APIContextServer) GRPCServer(server *grpc.Server) *APIContextServer {
+func (s *AppContext) GRPCServer(server *grpc.Server) *AppContext {
 	if server == nil {
 		log.Fatal(fmt.Errorf("gRPC server not found: %v", s))
 	}
@@ -51,14 +51,14 @@ func (s *APIContextServer) GRPCServer(server *grpc.Server) *APIContextServer {
 	return s
 }
 
-func (s *APIContextServer) WebService(service *restful.WebService) *APIContextServer {
+func (s *AppContext) WebService(service *restful.WebService) *AppContext {
 	s.webService = service
 	return s
 }
 
 func runGrpcServer() error {
 	host := ":50051"
-	if v, ok := os.LookupEnv("APAAS_HOST"); ok && v != "" {
+	if v, ok := os.LookupEnv("PORT"); ok && v != "" {
 		host = v
 	}
 	lstn, err := net.Listen("tcp", host)
@@ -67,7 +67,7 @@ func runGrpcServer() error {
 		return err
 	}
 
-	fmt.Printf("grpc server is running on %s\n", host)
+	fmt.Printf("Starting grpc server on %s\n", host)
 
 	//s := grpc.NewServer()
 	//examples.RegisterEchoServiceServer(s, newEchoServer())
@@ -79,7 +79,7 @@ func runGrpcServer() error {
 
 	//s.Serve(l)
 
-	if err := APIServer.grpcServer.Serve(lstn); err != nil {
+	if err := AppServer.grpcServer.Serve(lstn); err != nil {
 		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
 		return err
 	}
@@ -161,56 +161,59 @@ func runGrpcGateway(address string, opts ...runtime.ServeMuxOption) error {
 	service.Usrs.HttpMuxs = []*http.ServeMux{mux}
 	service.Usrs.GatewayMux = gw.(*runtime.ServeMux)
 
+	fmt.Printf("Starting grpc gateway on %s\n", address)
+
 	return http.ListenAndServe(address, allowCORS(mux))
 }
 
 func Run() {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	errCh := make(chan error, 2)
-	go func() {
-		if err := runGrpcServer(); err != nil {
-			errCh <- fmt.Errorf("cannot run gRPC service: %v", err)
-			//APIServer.grpcServer.Stop()
-			APIServer.grpcServer = nil
-		}
-	}()
-
-	go func() {
-		time.Sleep(1000 * time.Millisecond)
-		if APIServer.grpcServer == nil {
-			wg.Done()
-			return
-		}
-		APIServer.grpcGateway = service.Usrs
-		if err := runGrpcGateway(":8087"); err != nil {
-			errCh <- fmt.Errorf("cannot run gateway service: %v", err)
-			wg.Done()
-		}
-	}()
-
-	ch := make(chan int, 1)
-	go func() {
-		wg.Wait()
-		if err := service.Run(); err != nil {
-			fmt.Printf("Could not start REST service: %s\n", err)
-			ch <- 1
-		} else {
-			ch <- 0
-		}
-	}()
-
-	select {
-	case err := <-errCh:
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	case status := <-ch:
-		os.Exit(status)
-	default:
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
-
-		// Block until a signal is received.
-		<-c
+	if err := runGrpcServer(); err != nil {
+		log.Fatal(err)
 	}
+	/*var wg sync.WaitGroup
+		wg.Add(1)
+		errCh := make(chan error, 2)
+		go func() {
+			if err := runGrpcServer(); err != nil {
+				errCh <- fmt.Errorf("cannot run gRPC service: %v", err)
+	            if AppServer.grpcServer != nil {
+				    AppServer.grpcServer.Stop()
+	            }
+			}
+		}()
+
+		go func() {
+			time.Sleep(1000 * time.Millisecond)
+			if AppServer.grpcServer == nil {
+				wg.Done()
+				return
+			}
+			AppServer.grpcGateway = service.Usrs
+			if err := runGrpcGateway(":50052"); err != nil {
+				errCh <- fmt.Errorf("cannot run gateway service: %v", err)
+				wg.Done()
+			}
+		}()
+
+		go func() {
+			wg.Wait()
+			if err := service.Run(); err != nil {
+				fmt.Printf("Could not start REST service: %s\n", err)
+				ch <- 1
+			} else {
+				ch <- 0
+			}
+		}()
+
+		select {
+		case err := <-errCh:
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		default:
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
+
+			// Block until a signal is received.
+			<-c
+		}*/
 }

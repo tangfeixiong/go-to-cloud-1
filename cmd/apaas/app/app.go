@@ -15,18 +15,18 @@ import (
 )
 
 func init() {
-	_ = server.APIServer.GRPCServer(rootServer)
+	_ = server.AppServer.GRPCServer(rootServer)
 }
 
 func Start(basename string) error {
 	pf := rootCommand.PersistentFlags()
-	pf.StringVarP(&addr, "listen", "l", ":44134", "The address:port to listen on")
+	pf.StringVarP(&addr, "listen", "l", ":50051", "The address:port to listen on")
 	pf.StringVarP(&namespace, "namespace", "n", "", "The namespace Tiller calls home")
 
 	flagtypes.GLog(pf)
-	rootCommand.Use = "ociacibuilds"
+	rootCommand.Use = "apaas"
 	rootCommand.Short = "Docker image and ACI image build server"
-	rootCommand.Long = `Build Docker image via OpenShift and Kubernetes`
+	rootCommand.Long = `Docker build images via OpenShift and Kubernetes`
 	rootCommand.Run = func(c *cobra.Command, args []string) {
 		server.Run()
 	}

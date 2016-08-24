@@ -20,7 +20,7 @@ spec:
     
 --- 
 apiVersion: v1
-kind: Deployment
+kind: ReplicationController
 metadata:
   annotations:
     qinguanos.com/harpoon: '{"version": "v1alpha", "lib": ["grpc", "protobuf", "kubernetes", "openshift origin"]}'

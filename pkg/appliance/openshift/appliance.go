@@ -15,18 +15,16 @@ var (
 	errNotFound       error = errors.New("not found")
 	errNotImplemented error = errors.New("not implemented")
 	errUnexpected     error = errors.New("unexpected")
-
-	oss = &ossvc{}
 )
 
-type ossvc struct {
+type Appliance struct {
 }
 
-func init() {
-	//openshift.RegisterSimpleServiceServer(server.ApiServer.GrpcRootServer, oss)
+func NewAppliance() *Appliance {
+	return &Appliance{}
 }
 
-func (oss *ossvc) EnterWorkspace(ctx context.Context,
+func (a *Appliance) EnterWorkspace(ctx context.Context,
 	in *osopb3.EnterWorkspaceRequest) (*osopb3.EnterWorkspaceResponse, error) {
 	glog.Info("grpc request")
 	return nil, errNotImplemented

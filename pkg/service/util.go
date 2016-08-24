@@ -11,5 +11,5 @@ var (
 	errNotImplemented error = errors.New("Not implemented")
 	errUnexpected     error = errors.New("Unexpected")
 
-	logger *log.Logger = log.New(os.Stdout, "[service package] ", log.LstdFlags|log.Lshortfile)
+	logger *log.Logger = log.New(os.Stdout, "[pkg/service] ", log.LstdFlags|log.Lshortfile)
 )
