@@ -76,7 +76,7 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 				},
 				Output: &osopb3.BuildOutput{
 					To: &kapi.ObjectReference{
-						Kind: osopb3.OsoBuildOutputObjectReferenceType_Output_DockerImage.String(),
+						Kind: "DockerImage",
 						Name: _oso_dockerPush,
 					},
 					PushSecret: &kapi.LocalObjectReference{
@@ -123,7 +123,13 @@ type DockerBuildRequestDataUtility struct {
 	outputConfigured bool
 }
 
-func NewDockerBuildRequestDataUtility(kubeconfigPath, kubeContext, apiServer string) *DockerBuildRequestDataUtility {
+func NewDockerBuildRequestDataUtility() *DockerBuildRequestDataUtility {
+	return &DockerBuildRequestDataUtility{
+		target: internalDockerBuildRequestData(),
+	}
+}
+
+/*func NewDockerBuildRequestDataUtility(kubeconfigPath, kubeContext, apiServer string) *DockerBuildRequestDataUtility {
 	return &DockerBuildRequestDataUtility{
 		//kcc:    kcc,
 		kubeconfigPath: kubeconfigPath,
@@ -131,7 +137,7 @@ func NewDockerBuildRequestDataUtility(kubeconfigPath, kubeContext, apiServer str
 		apiServer:      apiServer,
 		target:         internalDockerBuildRequestData(),
 	}
-}
+}*/
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 /*func directKClientConfig(kubeconfigPath, kubeContext, apiServer string) (kclientcmd.ClientConfig, error) {
@@ -378,8 +384,9 @@ func (b *DockerBuildRequestDataUtility) DockerBuildStrategy(overrideBaseImage,
 		}
 	}
 	if overrideBaseImage != "" {
+		st := osopb3.OsoBuildStrategyObjectReferenceType_Strategy_DockerImage.String()
 		b.target.Configuration.CommonSpec.Strategy.DockerStrategy.From = &kapi.ObjectReference{
-			Kind: osopb3.OsoBuildStrategyObjectReferenceType_Strategy_DockerImage.String(),
+			Kind: st[len("Strategy_"):],
 			Name: overrideBaseImage,
 		}
 	}
@@ -400,8 +407,9 @@ func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
 		}
 	}
 	if b.outputConfigured = (pushRepo != ""); b.outputConfigured {
+		ot := osopb3.OsoBuildOutputObjectReferenceType_Output_DockerImage.String()
 		b.target.Configuration.CommonSpec.Output.To = &kapi.ObjectReference{
-			Kind: osopb3.OsoBuildOutputObjectReferenceType_Output_DockerImage.String(),
+			Kind: ot[len("Output_"):],
 			Name: pushRepo,
 		}
 	}

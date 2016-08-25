@@ -25,6 +25,14 @@ var (
 	_timeout               int64  = 900
 )
 
+func toOriginBuildOutputType(t string) string {
+	return t[len("output_"):]
+}
+
+func toOriginBuildStrategyType(t string) string {
+	return t[len("strategy_"):]
+}
+
 func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.BuildConfig, *buildapi.Build) {
 	common := buildapi.CommonSpec{
 		ServiceAccount: _builderServiceAccount,
