@@ -24,7 +24,10 @@ spec:
         version: '0.1'
     spec:
       containers:
-      - env:
+      - args:
+        - /bin/apaas
+        - --loglevel=2
+        env:
         # - name: KUBE_CONFIG
         #   value: /root/.kube/config
         # - name: KUBE_CONTEXT
@@ -35,11 +38,13 @@ spec:
         #   value: /openshift.local.config/master/admin.kubeconfig
         # - name: OSO_CONTEXT
         #   value: default/20-0-0-64:8443/system:admin
-        # - name: PORT
+        # - name: APAAS_GRPC_PORT
         #   value: :50051
+        # - name: GNATSD_ADDRESSES
+        #   value: 10.3.0.39:4222
         - name: PRIVATE_REGISTRY_SECRETS 
           value: qingyuanos.local=qingyuanosregistrysecret,qingyuancloud.local=qingyuanosregistrysecret
-        image: tangfeixiong/gotopaas
+        image: tangfeixiong/gotopaas:0.1-0828T0958  #hub.qingyuanos.com/admin/apaas:0.1-0829T0247-774057b
         imagePullPolicy: IfNotPresent
         name: apaas
         ports:

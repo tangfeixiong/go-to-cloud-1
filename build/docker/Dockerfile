@@ -15,7 +15,6 @@ ADD ./ssl/ /root/.kube/
 ADD ./openshift.local.config/kubeconfig /root/.kube/config
 ADD ./openshift.local.config/admin.kubeconfig /openshift.local.config/master/admin.kubeconfig
 
-ENV PORT :50051
 ENV KUBE_CONFIG /root/.kube/config
 # ENV KUBE_CONTEXT kube
 ENV KUBE_CONTEXT openshift-origin-single
@@ -24,6 +23,8 @@ ENV OSO_CONFIG /openshift.local.config/master/admin.kubeconfig
 ENV OSO_CONTEXT tangfx/172-17-4-50:30443/system:admin
 # ENV ORIGIN_VERSION v1.3.0-alpha.3
 ENV ORIGIN_VERSION v1.3.0-alpha.1
+ENV APAAS_GRPC_PORT :50051
+ENV GNATSD_ADDRESSES 10.3.0.39:4222
 
 VOLUME ["/root/.kube", "/openshift.local.config"]
 

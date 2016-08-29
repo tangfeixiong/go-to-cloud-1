@@ -3,20 +3,26 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+#TAG=0.1-$(date +%m%dT%H%M)-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')
+TAG=0.1-$(date +%m%dT%H%M)-$(git rev-parse --short=7 HEAD)
+if [[ $# > 0 ]]; then
+	TAG=$1
+fi
+
 BUILD_ROOT=$(dirname "${BASH_SOURCE[0]}")
 
 if [[ ! -f ${BUILD_ROOT}/docker/apaas ]]; then
 	if [[ -d "/work" ]]; then
-		GOPATH=/work go build -a -v -o ${BUILD_ROOT}/docker/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
+		GOPATH=/work CGO_ENABLED=0 go build -a -v -installsuffix CGO -o ${BUILD_ROOT}/docker/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
 	else 
-	    go build -a -v -o $BUILD_ROOT/docker/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
+	    CGO_ENABLED=0 go build -a -v -installsuffix CGO -o $BUILD_ROOT/docker/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
 	fi
 fi
 
 DOCKER_BUILD_CONTEXT=$(mktemp -d)
-DOCKER_IMAGE="hub.qingyuanos.com/admin/apaas"
+DOCKER_IMAGE="hub.qingyuanos.com/admin/apaas:${TAG}"
 
-cp -r build/docker/* $DOCKER_BUILD_CONTEXT
+cp -r ${BUILD_ROOT}/docker/* $DOCKER_BUILD_CONTEXT
 
 cat <<DF >${DOCKER_BUILD_CONTEXT}/Dockerfile
 FROM gliderlabs/alpine
@@ -29,20 +35,21 @@ RUN apk add --update bash ca-certificates git libc6-compat && rm -rf /var/cache/
 ADD apaas /bin/
 ADD ./openshift.local.config/ /openshift.local.config/
 ADD ./ssl/ /root/.kube/
-ADD ./ssl/kubeconfig /root/.kube/config
+RUN cp /root/.kube/kubeconfig /root/.kube/config
 
-ENV PORT :50051
 ENV KUBE_CONFIG /root/.kube/config
 ENV KUBE_CONTEXT kube
 ENV OSO_CONFIG /openshift.local.config/master/admin.kubeconfig
 ENV OSO_CONTEXT default/20-0-0-64:8443/system:admin
 ENV ORIGIN_VERSION v1.3.0-alpha.3
+ENV APAAS_GRPC_PORT :50051
+ENV GNATSD_ADDRESSES 10.3.0.39:4222
 
 VOLUME ["/root/.kube", "/openshift.local.config"]
 
 EXPOSE 50051
 
-CMD ["/bin/apaas"]
+CMD ["/bin/apaas", "--loglevel=5"]
 DF
 
 docker build -t ${DOCKER_IMAGE} ${DOCKER_BUILD_CONTEXT}

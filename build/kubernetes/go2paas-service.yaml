@@ -6,8 +6,9 @@ metadata:
   annotations:
     qinguanos.com/harpoon: '{"version": "v1alpha", "lib": ["grpc", "protobuf", "kubernetes", "openshift origin"]}'
   labels:
+    app: apaas
     heritage: qingyuanos.io
-    app: qingyuan-paas
+    name: apaas
   name: apaas
   # namespace: qingyuancloud
 spec:

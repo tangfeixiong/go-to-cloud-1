@@ -58,7 +58,7 @@ func (s *AppContext) WebService(service *restful.WebService) *AppContext {
 
 func runGrpcServer() error {
 	host := ":50051"
-	if v, ok := os.LookupEnv("PORT"); ok && v != "" {
+	if v, ok := os.LookupEnv("APAAS_GRPC_PORT"); ok && v != "" {
 		host = v
 	}
 	lstn, err := net.Listen("tcp", host)
