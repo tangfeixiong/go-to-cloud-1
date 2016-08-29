@@ -1,15 +1,12 @@
-package service
+package origin
 
 import (
 	"errors"
-	"log"
-	"os"
 )
 
 var (
+	errBadRequest     error = errors.New("Bad request")
 	errNotFound       error = errors.New("Not found")
 	errNotImplemented error = errors.New("Not implemented")
 	errUnexpected     error = errors.New("Unexpected")
-
-	logger *log.Logger = log.New(os.Stdout, "[pkg/service] ", log.LstdFlags|log.Lshortfile)
 )

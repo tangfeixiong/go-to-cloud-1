@@ -276,7 +276,11 @@ func (b *DockerBuildRequestDataUtility) RetrieveGitSecretBasicAuth(project, repo
 	return sEnc, nil
 }*/
 
-func (b *DockerBuildRequestDataUtility) Result() (*osopb3.DockerBuildRequestData, error) {
+func (b *DockerBuildRequestDataUtility) RequestDataForGET(project, name string) *osopb3.DockerBuildRequestData {
+	return b.Builder(project, name).target
+}
+
+func (b *DockerBuildRequestDataUtility) RequestDataForPOST() (*osopb3.DockerBuildRequestData, error) {
 	if b.target == nil {
 		return nil, fmt.Errorf("not initialized")
 	}
@@ -300,15 +304,26 @@ func (b *DockerBuildRequestDataUtility) Result() (*osopb3.DockerBuildRequestData
 	return b.target, nil
 }
 
-func (b *DockerBuildRequestDataUtility) BuilderName(project, name string) *DockerBuildRequestDataUtility {
+func (b *DockerBuildRequestDataUtility) BuildName(project, name string) *DockerBuildRequestDataUtility {
 	if b.target == nil {
 		b.target = internalDockerBuildRequestData()
 	}
 	b.target.ProjectName = project
 	b.target.Name = name
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) BuildConfigName(project, name string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
 	b.target.Configuration.ProjectName = project
 	b.target.Configuration.Name = name
 	return b
+}
+
+func (b *DockerBuildRequestDataUtility) Builder(project, name string) *DockerBuildRequestDataUtility {
+	return b.BuildName(project, name).BuildConfigName(project, name)
 }
 
 func (b *DockerBuildRequestDataUtility) Dockerfile(dockerfile string) *DockerBuildRequestDataUtility {

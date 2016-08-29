@@ -116,12 +116,11 @@ func TestMain(m *testing.M) {
 	os.Exit(ret)
 }
 
-func TestWith_gRPC(t *testing.T) {
+func TestDockerBuildRetrieve_gRPC(t *testing.T) {
 	go startServerGRPC()
 
 	var err error
-	//err = grpcDockerBuild_retrieve()
-	err = grpc_Direct_origindockerbuild()
+	err = dockerbuildretrieve_gRPC()
 	if err != nil {
 		time.Sleep(600)
 		stopServerGRPC()
@@ -133,7 +132,7 @@ func TestWith_gRPC(t *testing.T) {
 	stopServerGRPC()
 }
 
-func grpcDockerBuild_retrieve() error {
+func dockerbuildretrieve_gRPC() error {
 	conn, err := grpc.Dial(_server, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -145,7 +144,7 @@ func grpcDockerBuild_retrieve() error {
 
 	// Contact the server and print out its response.
 	reqProject := &osopb3.ProjectRetrieveRequestData{
-		Name: "gogogo",
+		Name: "tangfx",
 	}
 	respProject, err := c.RetrieveProjectIntoArbitrary(context.Background(), reqProject, opts...)
 	if err != nil {
@@ -161,21 +160,21 @@ func grpcDockerBuild_retrieve() error {
 	//opts = []grpc.CallOption{}
 
 	reqBuild := &osopb3.DockerBuildRequestData{
-		Name:        "fake",
-		ProjectName: "default",
+		Name:        "nchellohttp",
+		ProjectName: "tangfx",
 		Configuration: &osopb3.DockerBuildConfigRequestData{
-			Name:              "fake",
-			ProjectName:       "default",
-			Triggers:          []*osopb3.OsoBuildTriggerPolicy{},
+			Name:        "nchellohttp",
+			ProjectName: "tangfx",
+			/*Triggers:          []*osopb3.OsoBuildTriggerPolicy{},
 			RunPolicy:         "",
 			CommonSpec:        (*osopb3.OsoCommonSpec)(nil),
 			OsoBuildRunPolicy: osopb3.DockerBuildConfigRequestData_Serial,
 			Labels:            map[string]string{},
-			Annotations:       map[string]string{},
+			Annotations:       map[string]string{},*/
 		},
-		TriggeredBy: []*osopb3.OsoBuildTriggerCause{},
+		/*TriggeredBy: []*osopb3.OsoBuildTriggerCause{},
 		Labels:      map[string]string{},
-		Annotations: map[string]string{},
+		Annotations: map[string]string{},*/
 	}
 	respBuild, err := c.RetrieveIntoBuildDockerImage(context.Background(), reqBuild, opts...)
 	if err != nil {
@@ -187,7 +186,7 @@ func grpcDockerBuild_retrieve() error {
 }
 
 func TestDirect_origindockerbuild(t *testing.T) {
-	reqBuild := origindockerbuild()
+	reqBuild := origindockerbuild_data()
 	respBuild, err := Usrs.CreateIntoBuildDockerImage(context.Background(), reqBuild)
 	if err != nil {
 		t.Fatal(err)
@@ -199,7 +198,23 @@ func TestDirect_origindockerbuild(t *testing.T) {
 	t.Logf("Received: \n%+v", b.String())
 }
 
-func grpc_Direct_origindockerbuild() error {
+func TestOriginDockerBuild_gRPC(t *testing.T) {
+	go startServerGRPC()
+
+	var err error
+	err = origindockerbuild_grpc()
+	if err != nil {
+		time.Sleep(600)
+		stopServerGRPC()
+
+		t.Fatal(err)
+	}
+
+	time.Sleep(600)
+	stopServerGRPC()
+}
+
+func origindockerbuild_grpc() error {
 	conn, err := grpc.Dial(_server, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
@@ -209,7 +224,7 @@ func grpc_Direct_origindockerbuild() error {
 	c := osopb3.NewSimpleServiceClient(conn)
 	opts := []grpc.CallOption{}
 
-	reqBuild := origindockerbuild()
+	reqBuild := origindockerbuild_data()
 	respBuild, err := c.CreateIntoBuildDockerImage(context.Background(), reqBuild, opts...)
 	if err != nil {
 		return err
@@ -222,7 +237,7 @@ func grpc_Direct_origindockerbuild() error {
 	return nil
 }
 
-func origindockerbuild() *osopb3.DockerBuildRequestData {
+func origindockerbuild_data() *osopb3.DockerBuildRequestData {
 	reqBuild := &osopb3.DockerBuildRequestData{
 		Name:        "osobuilds",
 		ProjectName: "tangfx",

@@ -1,7 +1,7 @@
 package osoc
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 	"os"
 
@@ -64,8 +64,7 @@ func CreateProject(client osopb3.SimpleServiceClient,
 func RetrieveProjectByName(client osopb3.SimpleServiceClient,
 	ctx context.Context,
 	in *osopb3.ProjectRetrieveRequestData) (out *osopb3.ProjectResponseDataArbitrary, err error) {
-
-	logger = log.New(os.Stdout, "[client/osoc, RetrieveProjectByName] ", log.LstdFlags|log.Lshortfile)
+	logger.SetPrefix("[client/osoc, RetrieveProjectByName] ")
 
 	opts := []grpc.CallOption{}
 	if ctx != nil {
@@ -110,11 +109,10 @@ func (itft *integrationFactory) RetrieveProjectByName(in *osopb3.ProjectRetrieve
 	return RetrieveProjectByName(client, context.Background(), in)
 }
 
-func CreateDockerBuildIntoImage(c osopb3.SimpleServiceClient,
+func CreateDockerBuilderIntoImage(c osopb3.SimpleServiceClient,
 	ctx context.Context,
 	in *osopb3.DockerBuildRequestData) (out *osopb3.DockerBuildResponseData, err error) {
-
-	logger = log.New(os.Stdout, "[client/osoc, CreateDockerBuildIntoImage] ", log.LstdFlags|log.Lshortfile)
+	logger.SetPrefix("[client/osoc, CreateDockerBuilderIntoImage] ")
 
 	opts := []grpc.CallOption{}
 	if ctx != nil {
@@ -135,17 +133,16 @@ func CreateDockerBuildIntoImage(c osopb3.SimpleServiceClient,
 	return out, nil
 }
 
-func RetrieveDockerBuildIntoImage(client osopb3.SimpleServiceClient,
+func TrackDockerBuilderIntoImage(c osopb3.SimpleServiceClient,
 	ctx context.Context,
 	in *osopb3.DockerBuildRequestData) (out *osopb3.DockerBuildResponseData, err error) {
-
-	logger = log.New(os.Stdout, "[client/osoc, RetrieveDockerBuildIntoImage] ", log.LstdFlags|log.Lshortfile)
+	logger.SetPrefix("[client/osoc, TrackDockerBuilderIntoImage] ")
 
 	opts := []grpc.CallOption{}
 	if ctx != nil {
-		out, err = client.RetrieveIntoBuildDockerImage(ctx, in, opts...)
+		out, err = c.RetrieveIntoBuildDockerImage(ctx, in, opts...)
 	} else {
-		out, err = client.RetrieveIntoBuildDockerImage(context.Background(), in, opts...)
+		out, err = c.RetrieveIntoBuildDockerImage(context.Background(), in, opts...)
 	}
 	if err != nil {
 		logger.Printf("Could not receive result: %v\n", err)
@@ -158,64 +155,28 @@ func RetrieveDockerBuildIntoImage(client osopb3.SimpleServiceClient,
 		logger.Printf("Received: %s\n%s\n", out.Raw.ObjectGVK, string(out.Raw.ObjectJSON))
 	}
 	return out, nil
-
 }
 
-func (itft *integrationFactory) CreateDockerBuildIntoImage(in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-
-	logger = log.New(os.Stdout, "[client/osoc, .CreateDockerBuildIntoImage] ", log.LstdFlags|log.Lshortfile)
-
-	conn, err := grpc.Dial(itft.server, grpc.WithInsecure())
-	if err != nil {
-		logger.Printf("Did not connect: %v\n", err)
-		return nil, err
-	}
-	defer conn.Close()
-	c := osopb3.NewSimpleServiceClient(conn)
-
-	p, err := RetrieveProjectByName(c, context.Background(),
-		&osopb3.ProjectRetrieveRequestData{Name: in.ProjectName})
-	if err != nil {
-		return nil, err
-	}
-	if p != nil && p.ResultingCode != osopb3.K8SNamespacePhase_Active {
-		return nil, fmt.Errorf("Project not ready: %v", p)
-	}
-
-	if p == nil {
-		p, err = CreateProject(c, context.Background(),
-			&osopb3.ProjectCreationRequestData{Name: in.ProjectName})
-		if err != nil {
-			return nil, err
-		}
-		if p == nil || p.ResultingCode != osopb3.K8SNamespacePhase_Active {
-			return nil, fmt.Errorf("Project cloud not create: %v", p)
-		}
-	}
-	//	if p.Raw != nil && len(out.Raw.ObjectBytes) > 0 {
-	//		helmobj, err := codec.JSON.Decode(p.Raw.ObjectBytes).One()
-	//		if err != nil {
-	//			logger.Printf("could not create decoder into object: %s", err)
-	//		}
-	//		logger.Printf("decoder: %v", helmobj)
-	//		osoProject := new(projectapiv1.Project)
-	//		if err := helmobj.Object(osoProject); err != nil {
-	//			logger.Printf("could not decode into object: %s", err)
-	//		}
-	//	}
-
-	return CreateDockerBuildIntoImage(c, context.Background(), in)
-}
-
-func (itft *integrationFactory) RetrieveDockerBuildIntoImage(in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-
+func (itft *integrationFactory) CreateDockerBuilderIntoImage(in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	logger.SetPrefix("[client/osoc, .CreateDockerBuilderIntoImage] ")
 	cc, err := grpc.Dial(itft.server, grpc.WithInsecure())
 	if err != nil {
 		logger.Printf("Did not connect: %v\n", err)
 		return nil, err
 	}
 	defer cc.Close()
-	client := osopb3.NewSimpleServiceClient(cc)
 
-	return RetrieveDockerBuildIntoImage(client, context.Background(), in)
+	return CreateDockerBuilderIntoImage(osopb3.NewSimpleServiceClient(cc), context.Background(), in)
+}
+
+func (itft *integrationFactory) TrackDockerBuilderIntoImage(in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	logger.SetPrefix("[client/osoc, .TrackDockerBuilderIntoImage] ")
+	cc, err := grpc.Dial(itft.server, grpc.WithInsecure())
+	if err != nil {
+		logger.Printf("Did not connect: %v\n", err)
+		return nil, err
+	}
+	defer cc.Close()
+
+	return TrackDockerBuilderIntoImage(osopb3.NewSimpleServiceClient(cc), context.Background(), in)
 }

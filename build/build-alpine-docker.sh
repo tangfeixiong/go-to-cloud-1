@@ -29,6 +29,7 @@ RUN apk add --update bash ca-certificates git libc6-compat && rm -rf /var/cache/
 ADD apaas /bin/
 ADD ./openshift.local.config/ /openshift.local.config/
 ADD ./ssl/ /root/.kube/
+ADD ./ssl/kubeconfig /root/.kube/config
 
 ENV PORT :50051
 ENV KUBE_CONFIG /root/.kube/config

@@ -2,7 +2,6 @@ package origin
 
 import (
 	"bytes"
-	"errors"
 	"sync"
 	"time"
 	//"flag"
@@ -14,25 +13,24 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudfoundry/yagnats"
 	"github.com/golang/glog"
-
 	"github.com/helm/helm-classic/codec"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
-	"github.com/openshift/origin/pkg/client"
-	//"github.com/openshift/origin/pkg/cmd/cli"
+	oclient "github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/cli/cmd"
 	"github.com/openshift/origin/pkg/cmd/cli/config"
 	//"github.com/openshift/origin/pkg/cmd/flagtypes"
 	"github.com/openshift/origin/pkg/cmd/templates"
-	//cmdutil "github.com/openshift/origin/pkg/cmd/util"
-	osclientcmd "github.com/openshift/origin/pkg/cmd/util/clientcmd"
+	oclientcmd "github.com/openshift/origin/pkg/cmd/util/clientcmd"
 	// "github.com/openshift/origin/pkg/cmd/util/tokencmd"
 	//"github.com/openshift/origin/pkg/generate/git"
+	//"github.com/openshift/origin/pkg/cmd/cli"
+	projectapi "github.com/openshift/origin/pkg/project/api/v1"
 	userapi "github.com/openshift/origin/pkg/user/api"
 	userapiv1 "github.com/openshift/origin/pkg/user/api/v1"
 
@@ -56,12 +54,6 @@ import (
 var (
 	rootCommand *cobra.Command = utility.RootCommand
 
-	logger *log.Logger = utility.Logger
-
-	errNotFound       error = errors.New("Not found")
-	errNotImplemented error = errors.New("Not implemented")
-	errUnexpected     error = errors.New("Unexpected")
-
 	kubeconfigPath    string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
 	kubeconfigContext string = "openshift-origin-single"
 
@@ -77,10 +69,10 @@ var (
 
 	kClientConfig, oClientConfig *clientcmd.ClientConfig
 	kClient                      *kclient.Client
-	oClient                      *client.Client
+	oClient                      *oclient.Client
 	kConfig, oConfig             *restclient.Config
 
-	factory *osclientcmd.Factory
+	factory *oclientcmd.Factory
 
 	who *userapi.User
 
@@ -93,7 +85,11 @@ var (
 	githubSecret       string = "github-qingyuancloud-tangfx"
 	dockerPullSecret   string = "localdockerconfig"
 	dockerPushSecret   string = "localdockerconfig"
-	timeout            int64  = 900
+	timeout            int64  = 1200
+
+	_nats_addrs    []string = []string{"10.3.0.39:4222"}
+	_nats_user     string   = "derek"
+	_nats_password string   = "T0pS3cr3t"
 )
 
 func init() {
@@ -118,6 +114,96 @@ func init() {
 			oconfigContext = v
 		}
 	}
+}
+
+type PaaS struct {
+	ccf *oclientcmd.Factory
+	oc  *oclient.Client
+	err error
+}
+
+func (p *PaaS) Factory() *oclientcmd.Factory {
+	return p.ccf
+}
+
+func (p *PaaS) OC() *oclient.Client {
+	return p.oc
+}
+
+func (p *PaaS) config() {
+	p.ccf = util.NewClientCmdFactory()
+	p.oc, _, p.err = p.ccf.Clients()
+}
+
+func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build,
+	conf *buildapiv1.BuildConfig) ([]byte, *buildapiv1.Build, *buildapiv1.BuildConfig, error) {
+	logger.SetPrefix("[appliance/openshift/origin, PaaS.CreateNewBuild] ")
+	p.config()
+	if p.err != nil {
+		logger.Printf("Could not config openshift origin: %+v\n", p.err)
+	}
+	var ok bool
+	var err error
+	ok, err = findProject(p.oc, obj.Namespace)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if !ok {
+		tgt := &projectapi.Project{
+			TypeMeta: unversioned.TypeMeta{
+				Kind:       "Project",
+				APIVersion: projectapi.SchemeGroupVersion.Version,
+			},
+			ObjectMeta: kapiv1.ObjectMeta{
+				Name: obj.Namespace,
+			},
+			Spec: projectapi.ProjectSpec{
+				Finalizers: []kapiv1.FinalizerName{projectapi.FinalizerOrigin,
+					kapiv1.FinalizerKubernetes},
+			},
+		}
+		_, _, err = createIntoProject(p.oc, nil, tgt)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	ok, err = findBuildConfig(p.oc, conf.Namespace, conf.Name)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	var bc *buildapiv1.BuildConfig
+	if !ok {
+		_, bc, err = createIntoBuildConfig(p.oc, nil, conf)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	if obj.Annotations == nil {
+		obj.Annotations = make(map[string]string)
+	}
+	obj.Annotations[buildapi.BuildConfigAnnotation] = conf.Name //"openshift.io/build-config.name"
+	obj.Annotations[buildapi.BuildNumberAnnotation] = "1"       //"openshift.io/build.number"
+	if obj.Labels == nil {
+		obj.Labels = make(map[string]string)
+	}
+	obj.Labels[buildapi.BuildConfigAnnotation] = conf.Name
+	obj.Labels[buildapi.BuildRunPolicyLabel] = "Serial" //"openshift.io/build.start-policy"
+	obj.Status.Config = &kapiv1.ObjectReference{
+		Kind:      conf.Kind,
+		Name:      conf.Name,
+		Namespace: conf.Namespace,
+	}
+	var raw []byte
+	var result *buildapiv1.Build
+	raw, result, err = createIntoBuild(p.oc, nil, obj)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return raw, result, bc, nil
+}
+
+func (p *PaaS) WatchNewBuild(data []byte) ([]byte, *userapi.User, error) {
+	return createUser(data, nil)
 }
 
 func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1.Build, error) {
@@ -196,6 +282,15 @@ func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1
 		return raw, nil, err
 	}
 
+	clientnats := yagnats.NewClient()
+	if err := clientnats.Connect(&yagnats.ConnectionInfo{
+		Addr:     _nats_addrs[0],
+		Username: _nats_user,
+		Password: _nats_password,
+	}); err != nil {
+		return nil, nil, err
+	}
+
 	b := new(bytes.Buffer)
 	ccf := util.NewClientCmdFactory()
 
@@ -214,22 +309,23 @@ func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1
 			select {
 			//case e := <- c:
 
-			case <-time.After(time.Duration(900) * time.Second):
+			case <-time.After(time.Duration(1800) * time.Second):
 				m.Lock()
 				defer m.Unlock()
 				timeout = true
 			}
 		}()
+		subject := obj.Namespace + "/" + obj.Name
 		for false == timeout {
+			time.Sleep(1000 * time.Millisecond)
 			l := b.Len()
 			if l > offset {
-				fmt.Print(string(b.Next(l - offset)))
+				//fmt.Print(string(b.Next(l - offset)))
+				clientnats.Publish(subject, b.Next(l-offset))
 				offset = l
 			}
 		}
 	}()
-
-	time.Sleep(time.Duration(500))
 
 	buf.Reset()
 	if err = codec.JSON.Encode(buf).One(obj.TypeMeta); err != nil {
@@ -392,15 +488,7 @@ func CreateUser(name, fullName string, identities, groups []string) ([]byte, *us
 	if len(groups) > 0 {
 		user.Groups = groups
 	}
-	return CreateUserWith(user)
-}
-
-func CreateUserWith(user *userapi.User) ([]byte, *userapi.User, error) {
 	return createUser(nil, user)
-}
-
-func CreateUserFromArbitrary(data []byte) ([]byte, *userapi.User, error) {
-	return createUser(data, nil)
 }
 
 func createUser(data []byte, user *userapi.User) ([]byte, *userapi.User, error) {
@@ -593,7 +681,7 @@ func DoBasicAuth() error {
 		return err
 	}
 
-	osClient := &client.Client{clientK8s}
+	osClient := &oclient.Client{clientK8s}
 
 	me, err := osClient.Projects().List(kapi.ListOptions{})
 	if err != nil {
@@ -613,7 +701,7 @@ func Whole() (*userapi.UserList, error) {
 	var whole *userapi.UserList
 	var err error
 	rootCommand.Run = func(c *cobra.Command, args []string) {
-		f := osclientcmd.New(pf)
+		f := oclientcmd.New(pf)
 		oc, _, err := f.Clients()
 		if err != nil {
 			whole = nil
@@ -649,7 +737,7 @@ func fakeWhoAmI() (*userapi.User, error) {
 	var me *userapi.User = nil
 	var err error = nil
 	rootCommand.Run = func(c *cobra.Command, args []string) {
-		f := osclientcmd.New(pf)
+		f := oclientcmd.New(pf)
 		oc, _, err := f.Clients()
 		if err != nil {
 			me = nil
@@ -717,7 +805,7 @@ func LoginWithBasicAuth(username, password string) error {
 func ProjectWithSimple(name string, in io.Reader, out, errOut io.Writer) {
 	logger = log.New(os.Stdout, "[appliance/openshift/origin, ProjectWithSimple] ", log.LstdFlags|log.Lshortfile)
 
-	f := osclientcmd.NewFactory(withOClientConfig())
+	f := oclientcmd.NewFactory(withOClientConfig())
 	fullName := "oc"
 	c := cmd.NewCmdRequestProject(fullName, "new-project", fullName+" login", fullName+" project", f, out)
 	c.SetArgs([]string{name})
@@ -857,7 +945,7 @@ func overrideRootCommandArgs() {
 	logger.SetPrefix("[appliance/openshift/origin, overrideRootCommandArgs] ")
 
 	flags := pflag.NewFlagSet("", pflag.ContinueOnError)
-	//f := osclientcmd.New(flags)
+	//f := oclientcmd.New(flags)
 	//rootCommand := cli.NewCommandCLI("oc", "oc", os.Stdin, os.Stdout, os.Stderr)
 	//rootCommand.Aliases = []string{"oc"}
 	//rootCommand.Use = "oc"

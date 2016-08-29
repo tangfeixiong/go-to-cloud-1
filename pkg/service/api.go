@@ -11,6 +11,8 @@ import (
 	"github.com/gengo/grpc-gateway/runtime"
 
 	"golang.org/x/net/context"
+
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/dispatcher"
 )
 
 type user struct {
@@ -32,6 +34,8 @@ type UserResource struct {
 	ContextBase context.Context
 	HttpMuxs    []*http.ServeMux
 	GatewayMux  *runtime.ServeMux
+
+	Schedulers map[string]dispatcher.Scheduler
 }
 
 var (
@@ -46,6 +50,10 @@ func init() {
 }
 
 func (u *UserResource) Register(ws *restful.WebService, container *restful.Container) {
+
+	u.Schedulers = make(map[string]dispatcher.Scheduler)
+	u.Schedulers["DockerBuilder"] = dispatcher.NewQueueScheduler(50)
+	u.Schedulers["DockerBuilder"].Start()
 
 	/*
 	   Services of building Dockerfile and image, ACI

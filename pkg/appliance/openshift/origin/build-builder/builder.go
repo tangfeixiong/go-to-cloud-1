@@ -150,6 +150,7 @@ func (c *builderConfig) setupGitEnvironment() ([]string, error) {
 
 // execute is responsible for running a build
 func (c *builderConfig) execute(b builder) error {
+	fmt.Fprintf(c.out, "Setup git environment\n")
 	gitEnv, err := c.setupGitEnvironment()
 	if err != nil {
 		return err
@@ -162,6 +163,7 @@ func (c *builderConfig) execute(b builder) error {
 	}
 	glog.V(4).Infof("Running build with cgroup limits: %#v", *cgLimits)
 
+	fmt.Fprintf(c.out, "Start docker build with cgroup configured: %+v\n", *cgLimits)
 	if err := b.Build(c.dockerClient, c.dockerEndpoint, c.buildsClient, c.build, gitClient, cgLimits); err != nil {
 		return fmt.Errorf("build error: %v", err)
 	}
@@ -169,6 +171,7 @@ func (c *builderConfig) execute(b builder) error {
 	if c.build.Spec.Output.To == nil || len(c.build.Spec.Output.To.Name) == 0 {
 		fmt.Fprintf(c.out, "Build complete, no image push requested\n")
 	}
+	fmt.Fprintf(c.out, "Build complete, image pushed\n")
 
 	return nil
 }

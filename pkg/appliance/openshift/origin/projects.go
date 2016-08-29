@@ -10,6 +10,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/helm/helm-classic/codec"
 
+	oclient "github.com/openshift/origin/pkg/client"
 	projectapi "github.com/openshift/origin/pkg/project/api"
 	projectapiv1 "github.com/openshift/origin/pkg/project/api/v1"
 
@@ -17,9 +18,121 @@ import (
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	kapiv1 "k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/runtime"
+
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
 )
 
-// ProjectRequest and Project
+// Project and ProjectRequest
+//
+func CreateIntoProject(obj *projectapiv1.Project) ([]byte, *projectapiv1.Project, error) {
+	return createIntoProject(nil, nil, obj)
+}
+
+func createIntoProject(oc *oclient.Client, data []byte, obj *projectapiv1.Project) ([]byte, *projectapiv1.Project, error) {
+	logger.SetPrefix("[appliance/openshift/origin, createIntoProject] ")
+	if oc == nil {
+		f := util.NewClientCmdFactory()
+		var err error
+		oc, _, err = f.Clients()
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	if len(data) == 0 {
+		b := &bytes.Buffer{}
+		if err := codec.JSON.Encode(b).One(obj); err != nil {
+			logger.Printf("Could not serialize: %s\n", err)
+			return nil, nil, err
+		}
+		data = b.Bytes()
+	}
+	raw, err := oc.RESTClient.Verb("POST").Resource("projects").Body(data).DoRaw()
+	if err != nil {
+		glog.Errorf("Could not access openshift: %s", err)
+		return nil, nil, err
+	}
+
+	hco, err := codec.JSON.Decode(raw).One()
+	if err != nil {
+		logger.Printf("Could not create helm object: %s\n", err)
+		return raw, nil, err
+	}
+	meta := new(unversioned.TypeMeta)
+	if err := hco.Object(meta); err != nil {
+		logger.Printf("Could not decode into metadata: %s\n", err)
+		return raw, nil, err
+	}
+	if !strings.EqualFold("Project", meta.Kind) {
+		if strings.EqualFold("Status", meta.Kind) {
+			status := new(unversioned.Status)
+			if err := hco.Object(status); err != nil {
+				glog.Errorf("Could not inspect metadata: %+v", meta)
+				return raw, nil, err
+			}
+			return raw, nil, fmt.Errorf("Status inspected: %+v", status.Message)
+		}
+		glog.Errorf("Unexpected result: %+v", string(raw))
+		return raw, nil, errUnexpected
+	}
+	result := new(projectapiv1.Project)
+	if err := hco.Object(result); err != nil {
+		glog.Errorf("Could not decode into runtime object: %s", err)
+		return raw, nil, err
+	}
+	return raw, result, nil
+}
+
+func retrieveIntoProject(oc *oclient.Client, name string) ([]byte, *projectapiv1.Project, error) {
+	logger.SetPrefix("[appliance/openshift/origin, retrieveIntoProject] ")
+	if oc == nil {
+		f := util.NewClientCmdFactory()
+		var err error
+		oc, _, err = f.Clients()
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	raw, err := oc.RESTClient.Verb("GET").Resource("projects").Name(name).DoRaw()
+	if err != nil {
+		return nil, nil, err
+	}
+	hco, err := codec.JSON.Decode(raw).One()
+	if err != nil {
+		return nil, nil, err
+	}
+	meta := new(unversioned.TypeMeta)
+	if err := hco.Object(meta); err != nil {
+		return nil, nil, err
+	}
+	if !strings.EqualFold("Project", meta.Kind) {
+		if strings.EqualFold("Status", meta.Kind) {
+			status := new(unversioned.Status)
+			if err := hco.Object(status); err != nil {
+				glog.Warningf("Stop inspection as unknown metadata: %+v", meta)
+				return nil, nil, nil
+			}
+			logger.Printf("Status inspected: %+v", status.Message)
+			return nil, nil, nil
+		}
+		logger.Printf("Unexpected result: %+v", string(raw))
+		return nil, nil, errUnexpected
+	}
+	result := new(projectapiv1.Project)
+	if err := hco.Object(result); err != nil {
+		logger.Printf("Could not deserialize: %+v", err)
+		return nil, nil, err
+	}
+	glog.V(10).Infof("result: %+v\n", string(raw))
+	return raw, result, nil
+}
+
+func findProject(oc *oclient.Client, name string) (bool, error) {
+	_, obj, err := retrieveIntoProject(oc, name)
+	if err != nil {
+		return false, err
+	}
+	return obj != nil, nil
+}
 
 func CreateProjectRequest(name, displayName, description string) ([]byte, *projectapi.Project, error) {
 	obj := new(projectapi.ProjectRequest)
@@ -152,10 +265,6 @@ func CreateProject(name string, finalizers ...string) ([]byte, *projectapi.Proje
 
 func CreateProjectWith(obj *projectapi.Project) ([]byte, *projectapi.Project, error) {
 	return createProject(nil, obj)
-}
-
-func CreateProjectFromArbitray(data []byte) ([]byte, *projectapi.Project, error) {
-	return createProject(data, nil)
 }
 
 func createProject(data []byte, obj *projectapi.Project) ([]byte, *projectapi.Project, error) {

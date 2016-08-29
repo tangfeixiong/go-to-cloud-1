@@ -7,18 +7,20 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"testing"
+	"time"
 
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	"k8s.io/kubernetes/pkg/runtime"
 
+	"github.com/cloudfoundry/yagnats"
 	"github.com/helm/helm-classic/codec"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
 
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
 )
 
@@ -44,7 +46,29 @@ var (
 	exampleBuild string = "/examples/github101.json"
 	buildName    string = "osobuilds"
 	buildProject string = "tangfx"
+
+	_nats_addrs    []string = []string{"10.3.0.39:4222"}
+	_nats_user     string   = "derek"
+	_nats_password string   = "T0pS3cr3t"
 )
+
+func TestMain(m *testing.M) {
+	flag.Parse()
+	f := flag.Lookup("v")
+	if f != nil {
+		f.Value.Set("2")
+	}
+
+	//	if _, _, err := origin.CreateDockerBuildV1Example(fakeBuild, fakeProject,
+	//		nil, fakeGitURI, fakeGitRef, fakeContextDir,
+	//		nil, fakeDockerfile, nil, nil); err != nil {
+	//		fmt.Printf("Failed: %s", err)
+	//	}
+
+	ret := m.Run()
+
+	os.Exit(ret)
+}
 
 func TestOriginDockerBuilder(t *testing.T) {
 	_ = flag.Int("loglevel", 5, "loglevel binding with glog v")
@@ -162,31 +186,69 @@ func TestOriginDockerBuilder(t *testing.T) {
 	}
 	fmt.Printf("build status: %+v\n", obj.Status)
 
+	clientnats := yagnats.NewClient()
+	if err := clientnats.Connect(&yagnats.ConnectionInfo{
+		Addr:     _nats_addrs[0],
+		Username: _nats_user,
+		Password: _nats_password,
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	mb := new(bytes.Buffer)
+
 	ccf := util.NewClientCmdFactory()
-	obj, err = RunDockerBuild(os.Stdout, obj, ccf)
+	obj, err = RunDockerBuild(mb, obj, ccf)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(obj)
 
+	chjob := make(chan bool, 1)
+	subject := obj.Namespace + "/" + obj.Name
+	go func() {
+		var timeout bool
+		var offset int = 0
+		var m *sync.Mutex = &sync.Mutex{}
+		go func() {
+			select {
+			case <-time.After(time.Duration(1800) * time.Second):
+				m.Lock()
+				defer m.Unlock()
+				chjob <- false
+				timeout = true
+			}
+		}()
+		var md yagnats.Message
+		var id int64
+		var err error
+		id, err = clientnats.Subscribe(subject, func(msg *yagnats.Message) {
+			md = *msg
+			fmt.Printf("Got message: %d, %s\n", id, msg.Payload)
+		})
+		if err != nil {
+			chjob <- false
+			return
+		}
+		for false == timeout {
+			time.Sleep(1000 * time.Millisecond)
+			l := mb.Len()
+			if l > offset {
+				//fmt.Print(string(mb.Next(l - offset)))
+				clientnats.Publish(subject, mb.Next(l-offset))
+				offset = l
+			}
+		}
+	}()
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
 
 	// Block until a signal is received.
-	<-c
-
-}
-
-func fakeDockerBuild() {
-	flag.Parse()
-	f := flag.Lookup("v")
-	if f != nil {
-		f.Value.Set("10")
-	}
-
-	if _, _, err := origin.CreateDockerBuildV1Example(fakeBuild, fakeProject,
-		nil, fakeGitURI, fakeGitRef, fakeContextDir,
-		nil, fakeDockerfile, nil, nil); err != nil {
-		fmt.Printf("Failed: %s", err)
+	select {
+	case <-c:
+		fmt.Println("terminated")
+	case result := <-chjob:
+		fmt.Println("job end in %+v", result)
 	}
 }

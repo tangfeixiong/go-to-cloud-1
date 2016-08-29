@@ -1,3 +1,271 @@
+[vagrant@localhost go-to-cloud-1]$ kubectl describe pods osobuilds-build --namespace=tangfx
+Name:		osobuilds-build
+Namespace:	tangfx
+Node:		172.17.4.50/172.17.4.50
+Start Time:	Fri, 26 Aug 2016 23:58:31 +0000
+Labels:		openshift.io/build.name=osobuilds
+Status:		Pending
+IP:		
+Controllers:	<none>
+Containers:
+  docker-build:
+    Container ID:	
+    Image:		openshift/origin-docker-builder:v1.3.0-alpha.1
+    Image ID:		
+    Port:		
+    Args:
+      --loglevel=5
+    State:		Waiting
+      Reason:		ContainerCreating
+    Ready:		False
+    Restart Count:	0
+    Volume Mounts:
+      /var/run/docker.sock from docker-socket (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from builder-token-6g6ew (ro)
+      /var/run/secrets/openshift.io/pull from localdockerconfig-pull (ro)
+      /var/run/secrets/openshift.io/push from localdockerconfig-push (ro)
+    Environment Variables:
+      BUILD:	{"kind":"Build","apiVersion":"v1","metadata":{"name":"osobuilds","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/osobuilds","uid":"fd4979af-6be8-11e6-b870-6e6e02edd780","resourceVersion":"750","creationTimestamp":"2016-08-26T23:58:30Z","labels":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.number":"1"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"#netcat hello world http server\nFROM alpine/edge\nMAINTAINER tangfeixiong \u003ctangfx128@gmail.com\u003e\nRUN apk add --update bash ca-certificates libc6-compat netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nRUN echo \"\u003chtml\u003e\u003chead\u003e\u003ctitle\u003ewelcome\u003c/title\u003e\u003c/head\u003e\u003cbody\u003e\u003ch1\u003ehello world\u003c/h1\u003e\u003c/body\u003e\u003c/html\u003e\" \u003e\u003e /tmp/index.html\nEXPOSE 80\nCMD while true; do nc -l 80 \u003c /tmp/index.html; done","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git"},"contextDir":"/latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"gliderlabs/alpine"},"pullSecret":{"name":"localdockerconfig"}}},"output":{"to":{"kind":"DockerImage","name":"172.17.4.50:30005/tangfx/osobuilds:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"completionDeadlineSeconds":900,"triggeredBy":[]},"status":{"phase":"New","outputDockerImageReference":"172.17.4.50:30005/tangfx/osobuilds:latest","config":{"kind":"BuildConfig","namespace":"tangfx","name":"osobuilds"}}}
+
+      BUILD_LOGLEVEL:		5
+      SOURCE_REPOSITORY:	https://github.com/tangfeixiong/docker-nc.git
+      SOURCE_URI:		https://github.com/tangfeixiong/docker-nc.git
+      SOURCE_CONTEXT_DIR:	/latest
+      ORIGIN_VERSION:		v1.3.0-alpha.1-39-gde8130a-dirty
+      PUSH_DOCKERCFG_PATH:	/var/run/secrets/openshift.io/push
+      PULL_DOCKERCFG_PATH:	/var/run/secrets/openshift.io/pull
+Conditions:
+  Type		Status
+  Initialized 	True 
+  Ready 	False 
+  PodScheduled 	True 
+Volumes:
+  docker-socket:
+    Type:	HostPath (bare host directory volume)
+    Path:	/var/run/docker.sock
+  localdockerconfig-push:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	localdockerconfig
+  localdockerconfig-pull:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	localdockerconfig
+  builder-token-6g6ew:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	builder-token-6g6ew
+QoS Class:	BestEffort
+Events:
+  FirstSeen	LastSeen	Count	From			SubobjectPath	Type		Reason		Message
+  ---------	--------	-----	----			-------------	--------	------		-------
+  1m		1m		1	{default-scheduler }			Normal		Scheduled	Successfully assigned osobuilds-build to 172.17.4.50
+
+
+
+[vagrant@localhost go-to-cloud-1]$ kubectl describe pods osobuilds-build --namespace=tangfx
+Name:		osobuilds-build
+Namespace:	tangfx
+Node:		172.17.4.50/172.17.4.50
+Start Time:	Sat, 27 Aug 2016 00:08:41 +0000
+Labels:		openshift.io/build.name=osobuilds
+Status:		Failed
+IP:		
+Controllers:	<none>
+Containers:
+  docker-build:
+    Container ID:	docker://c2236117dd271202c803427d44058508c06e221323a9bd4dd9944a7f9a1b711d
+    Image:		openshift/origin-docker-builder:v1.3.0-alpha.1
+    Image ID:		docker://51ecec804276d57e75c6b482bd7be55b3e00702354ecdbcdf2b3d8513fff9738
+    Port:		
+    Args:
+      --loglevel=5
+    State:		Terminated
+      Reason:		Error
+      Exit Code:	137
+      Started:		Sat, 27 Aug 2016 00:08:44 +0000
+      Finished:		Sat, 27 Aug 2016 00:15:54 +0000
+    Ready:		False
+    Restart Count:	0
+    Volume Mounts:
+      /var/run/docker.sock from docker-socket (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from builder-token-6g6ew (ro)
+      /var/run/secrets/openshift.io/push from localdockerconfig-push (ro)
+    Environment Variables:
+      BUILD:	{"kind":"Build","apiVersion":"v1","metadata":{"name":"osobuilds","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/osobuilds","uid":"6921fc1f-6bea-11e6-b870-6e6e02edd780","resourceVersion":"753","creationTimestamp":"2016-08-27T00:08:41Z","labels":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.number":"1"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"#netcat hello world http server\nFROM alpine/edge\nMAINTAINER tangfeixiong \u003ctangfx128@gmail.com\u003e\nRUN apk add --update bash ca-certificates libc6-compat netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nRUN echo \"\u003chtml\u003e\u003chead\u003e\u003ctitle\u003ewelcome\u003c/title\u003e\u003c/head\u003e\u003cbody\u003e\u003ch1\u003ehello world\u003c/h1\u003e\u003c/body\u003e\u003c/html\u003e\" \u003e\u003e /tmp/index.html\nEXPOSE 80\nCMD while true; do nc -l 80 \u003c /tmp/index.html; done","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git"},"contextDir":"/latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"gliderlabs/alpine"}}},"output":{"to":{"kind":"DockerImage","name":"172.17.4.50:30005/tangfx/osobuilds:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"completionDeadlineSeconds":900,"triggeredBy":[]},"status":{"phase":"New","outputDockerImageReference":"172.17.4.50:30005/tangfx/osobuilds:latest","config":{"kind":"BuildConfig","namespace":"tangfx","name":"osobuilds"}}}
+
+      BUILD_LOGLEVEL:		5
+      SOURCE_REPOSITORY:	https://github.com/tangfeixiong/docker-nc.git
+      SOURCE_URI:		https://github.com/tangfeixiong/docker-nc.git
+      SOURCE_CONTEXT_DIR:	/latest
+      ORIGIN_VERSION:		v1.3.0-alpha.1-39-gde8130a-dirty
+      PUSH_DOCKERCFG_PATH:	/var/run/secrets/openshift.io/push
+Conditions:
+  Type		Status
+  Initialized 	True 
+  Ready 	False 
+  PodScheduled 	True 
+Volumes:
+  docker-socket:
+    Type:	HostPath (bare host directory volume)
+    Path:	/var/run/docker.sock
+  localdockerconfig-push:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	localdockerconfig
+  builder-token-6g6ew:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	builder-token-6g6ew
+QoS Class:	BestEffort
+Events:
+  FirstSeen	LastSeen	Count	From			SubobjectPath			Type		Reason		Message
+  ---------	--------	-----	----			-------------			--------	------		-------
+  9m		9m		1	{default-scheduler }					Normal		Scheduled	Successfully assigned osobuilds-build to 172.17.4.50
+  9m		9m		1	{kubelet 172.17.4.50}	spec.containers{docker-build}	Normal		Pulled		Container image "openshift/origin-docker-builder:v1.3.0-alpha.1" already present on machine
+  9m		9m		1	{kubelet 172.17.4.50}	spec.containers{docker-build}	Normal		Created		Created container with docker id c2236117dd27
+  9m		9m		1	{kubelet 172.17.4.50}	spec.containers{docker-build}	Normal		Started		Started container with docker id c2236117dd27
+
+
+
+[vagrant@localhost go-to-cloud-1]$ kubectl logs osobuilds-build --namespace=tangfx
+I0827 00:08:47.055825       1 builder.go:53] $BUILD env var is {"kind":"Build","apiVersion":"v1","metadata":{"name":"osobuilds","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/osobuilds","uid":"6921fc1f-6bea-11e6-b870-6e6e02edd780","resourceVersion":"753","creationTimestamp":"2016-08-27T00:08:41Z","labels":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.number":"1"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"#netcat hello world http server\nFROM alpine/edge\nMAINTAINER tangfeixiong \u003ctangfx128@gmail.com\u003e\nRUN apk add --update bash ca-certificates libc6-compat netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nRUN echo \"\u003chtml\u003e\u003chead\u003e\u003ctitle\u003ewelcome\u003c/title\u003e\u003c/head\u003e\u003cbody\u003e\u003ch1\u003ehello world\u003c/h1\u003e\u003c/body\u003e\u003c/html\u003e\" \u003e\u003e /tmp/index.html\nEXPOSE 80\nCMD while true; do nc -l 80 \u003c /tmp/index.html; done","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git"},"contextDir":"/latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"gliderlabs/alpine"}}},"output":{"to":{"kind":"DockerImage","name":"172.17.4.50:30005/tangfx/osobuilds:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"completionDeadlineSeconds":900,"triggeredBy":[]},"status":{"phase":"New","outputDockerImageReference":"172.17.4.50:30005/tangfx/osobuilds:latest","config":{"kind":"BuildConfig","namespace":"tangfx","name":"osobuilds"}}}
+ 
+I0827 00:08:47.093692       1 builder.go:61] Build: &api.Build{TypeMeta:unversioned.TypeMeta{Kind:"", APIVersion:""}, ObjectMeta:api.ObjectMeta{Name:"osobuilds", GenerateName:"", Namespace:"tangfx", SelfLink:"/oapi/v1/namespaces/tangfx/builds/osobuilds", UID:"6921fc1f-6bea-11e6-b870-6e6e02edd780", ResourceVersion:"753", Generation:0, CreationTimestamp:unversioned.Time{Time:time.Time{sec:63607853321, nsec:0, loc:(*time.Location)(0x5f7f6c0)}}, DeletionTimestamp:(*unversioned.Time)(nil), DeletionGracePeriodSeconds:(*int64)(nil), Labels:map[string]string{"openshift.io/build-config.name":"osobuilds", "openshift.io/build.start-policy":"Serial"}, Annotations:map[string]string{"openshift.io/build-config.name":"osobuilds", "openshift.io/build.number":"1"}}, Spec:api.BuildSpec{ServiceAccount:"builder", Source:api.BuildSource{Binary:(*api.BinaryBuildSource)(nil), Dockerfile:(*string)(0xc820142580), Git:(*api.GitBuildSource)(0xc8204ece70), Images:[]api.ImageSource(nil), ContextDir:"/latest", SourceSecret:(*api.LocalObjectReference)(nil), Secrets:[]api.SecretBuildSource(nil)}, Revision:(*api.SourceRevision)(nil), Strategy:api.BuildStrategy{DockerStrategy:(*api.DockerBuildStrategy)(0xc820276eb0), SourceStrategy:(*api.SourceBuildStrategy)(nil), CustomStrategy:(*api.CustomBuildStrategy)(nil), JenkinsPipelineStrategy:(*api.JenkinsPipelineBuildStrategy)(nil)}, Output:api.BuildOutput{To:(*api.ObjectReference)(0xc82048d5e0), PushSecret:(*api.LocalObjectReference)(0xc820142650)}, Resources:api.ResourceRequirements{Limits:api.ResourceList(nil), Requests:api.ResourceList(nil)}, PostCommit:api.BuildPostCommitSpec{Command:[]string(nil), Args:[]string(nil), Script:""}, CompletionDeadlineSeconds:(*int64)(0xc8201426c8)}, Status:api.BuildStatus{Phase:"New", Cancelled:false, Reason:"", Message:"", StartTimestamp:(*unversioned.Time)(nil), CompletionTimestamp:(*unversioned.Time)(nil), Duration:0, OutputDockerImageReference:"172.17.4.50:30005/tangfx/osobuilds:latest", Config:(*api.ObjectReference)(0xc82048d730)}}
+warning: OpenShift server version "v1.3.0-alpha.1-39-gde8130a-dirty" differs from this image "v1.3.0-alpha.1"
+I0827 00:08:47.097474       1 builder.go:153] Running build with cgroup limits: api.CGroupLimits{MemoryLimitBytes:92233720368547, CPUShares:2, CPUPeriod:100000, CPUQuota:-1, MemorySwap:92233720368547}
+Downloading "https://github.com/tangfeixiong/docker-nc.git" ...
+I0827 00:08:47.104514       1 glog.go:70] git ls-remote --heads [https://github.com/tangfeixiong/docker-nc.git]
+I0827 00:08:47.116502       1 repository.go:310] Executing git ls-remote --heads https://github.com/tangfeixiong/docker-nc.git
+I0827 00:08:52.945972       1 repository.go:335] Out: d628ecb54e420ababe68c7951f3e73a04e6d5db4	refs/heads/master
+I0827 00:08:52.946137       1 glog.go:70] d628ecb54e420ababe68c7951f3e73a04e6d5db4	refs/heads/master%!(EXTRA []interface {}=[])
+Cloning source from https://github.com/tangfeixiong/docker-nc.git
+I0827 00:08:52.946320       1 repository.go:310] Executing git clone --quiet --recursive --depth=1 https://github.com/tangfeixiong/docker-nc.git /tmp/docker-build073266166
+[vagrant@localhost go-to-cloud-1]$ kubectl logs osobuilds-build --namespace=tangfx
+I0827 00:08:47.055825       1 builder.go:53] $BUILD env var is {"kind":"Build","apiVersion":"v1","metadata":{"name":"osobuilds","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/osobuilds","uid":"6921fc1f-6bea-11e6-b870-6e6e02edd780","resourceVersion":"753","creationTimestamp":"2016-08-27T00:08:41Z","labels":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.number":"1"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"#netcat hello world http server\nFROM alpine/edge\nMAINTAINER tangfeixiong \u003ctangfx128@gmail.com\u003e\nRUN apk add --update bash ca-certificates libc6-compat netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nRUN echo \"\u003chtml\u003e\u003chead\u003e\u003ctitle\u003ewelcome\u003c/title\u003e\u003c/head\u003e\u003cbody\u003e\u003ch1\u003ehello world\u003c/h1\u003e\u003c/body\u003e\u003c/html\u003e\" \u003e\u003e /tmp/index.html\nEXPOSE 80\nCMD while true; do nc -l 80 \u003c /tmp/index.html; done","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git"},"contextDir":"/latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"gliderlabs/alpine"}}},"output":{"to":{"kind":"DockerImage","name":"172.17.4.50:30005/tangfx/osobuilds:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"completionDeadlineSeconds":900,"triggeredBy":[]},"status":{"phase":"New","outputDockerImageReference":"172.17.4.50:30005/tangfx/osobuilds:latest","config":{"kind":"BuildConfig","namespace":"tangfx","name":"osobuilds"}}}
+ 
+I0827 00:08:47.093692       1 builder.go:61] Build: &api.Build{TypeMeta:unversioned.TypeMeta{Kind:"", APIVersion:""}, ObjectMeta:api.ObjectMeta{Name:"osobuilds", GenerateName:"", Namespace:"tangfx", SelfLink:"/oapi/v1/namespaces/tangfx/builds/osobuilds", UID:"6921fc1f-6bea-11e6-b870-6e6e02edd780", ResourceVersion:"753", Generation:0, CreationTimestamp:unversioned.Time{Time:time.Time{sec:63607853321, nsec:0, loc:(*time.Location)(0x5f7f6c0)}}, DeletionTimestamp:(*unversioned.Time)(nil), DeletionGracePeriodSeconds:(*int64)(nil), Labels:map[string]string{"openshift.io/build-config.name":"osobuilds", "openshift.io/build.start-policy":"Serial"}, Annotations:map[string]string{"openshift.io/build-config.name":"osobuilds", "openshift.io/build.number":"1"}}, Spec:api.BuildSpec{ServiceAccount:"builder", Source:api.BuildSource{Binary:(*api.BinaryBuildSource)(nil), Dockerfile:(*string)(0xc820142580), Git:(*api.GitBuildSource)(0xc8204ece70), Images:[]api.ImageSource(nil), ContextDir:"/latest", SourceSecret:(*api.LocalObjectReference)(nil), Secrets:[]api.SecretBuildSource(nil)}, Revision:(*api.SourceRevision)(nil), Strategy:api.BuildStrategy{DockerStrategy:(*api.DockerBuildStrategy)(0xc820276eb0), SourceStrategy:(*api.SourceBuildStrategy)(nil), CustomStrategy:(*api.CustomBuildStrategy)(nil), JenkinsPipelineStrategy:(*api.JenkinsPipelineBuildStrategy)(nil)}, Output:api.BuildOutput{To:(*api.ObjectReference)(0xc82048d5e0), PushSecret:(*api.LocalObjectReference)(0xc820142650)}, Resources:api.ResourceRequirements{Limits:api.ResourceList(nil), Requests:api.ResourceList(nil)}, PostCommit:api.BuildPostCommitSpec{Command:[]string(nil), Args:[]string(nil), Script:""}, CompletionDeadlineSeconds:(*int64)(0xc8201426c8)}, Status:api.BuildStatus{Phase:"New", Cancelled:false, Reason:"", Message:"", StartTimestamp:(*unversioned.Time)(nil), CompletionTimestamp:(*unversioned.Time)(nil), Duration:0, OutputDockerImageReference:"172.17.4.50:30005/tangfx/osobuilds:latest", Config:(*api.ObjectReference)(0xc82048d730)}}
+warning: OpenShift server version "v1.3.0-alpha.1-39-gde8130a-dirty" differs from this image "v1.3.0-alpha.1"
+I0827 00:08:47.097474       1 builder.go:153] Running build with cgroup limits: api.CGroupLimits{MemoryLimitBytes:92233720368547, CPUShares:2, CPUPeriod:100000, CPUQuota:-1, MemorySwap:92233720368547}
+Downloading "https://github.com/tangfeixiong/docker-nc.git" ...
+I0827 00:08:47.104514       1 glog.go:70] git ls-remote --heads [https://github.com/tangfeixiong/docker-nc.git]
+I0827 00:08:47.116502       1 repository.go:310] Executing git ls-remote --heads https://github.com/tangfeixiong/docker-nc.git
+I0827 00:08:52.945972       1 repository.go:335] Out: d628ecb54e420ababe68c7951f3e73a04e6d5db4	refs/heads/master
+I0827 00:08:52.946137       1 glog.go:70] d628ecb54e420ababe68c7951f3e73a04e6d5db4	refs/heads/master%!(EXTRA []interface {}=[])
+Cloning source from https://github.com/tangfeixiong/docker-nc.git
+I0827 00:08:52.946320       1 repository.go:310] Executing git clone --quiet --recursive --depth=1 https://github.com/tangfeixiong/docker-nc.git /tmp/docker-build073266166
+[vagrant@localhost go-to-cloud-1]$ kubectl logs -f osobuilds-build --namespace=tangfx
+I0827 00:08:47.055825       1 builder.go:53] $BUILD env var is {"kind":"Build","apiVersion":"v1","metadata":{"name":"osobuilds","namespace":"tangfx","selfLink":"/oapi/v1/namespaces/tangfx/builds/osobuilds","uid":"6921fc1f-6bea-11e6-b870-6e6e02edd780","resourceVersion":"753","creationTimestamp":"2016-08-27T00:08:41Z","labels":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"osobuilds","openshift.io/build.number":"1"}},"spec":{"serviceAccount":"builder","source":{"type":"Git","dockerfile":"#netcat hello world http server\nFROM alpine/edge\nMAINTAINER tangfeixiong \u003ctangfx128@gmail.com\u003e\nRUN apk add --update bash ca-certificates libc6-compat netcat-openbsd \u0026\u0026 rm -rf /var/cache/apk/*\nRUN echo \"\u003chtml\u003e\u003chead\u003e\u003ctitle\u003ewelcome\u003c/title\u003e\u003c/head\u003e\u003cbody\u003e\u003ch1\u003ehello world\u003c/h1\u003e\u003c/body\u003e\u003c/html\u003e\" \u003e\u003e /tmp/index.html\nEXPOSE 80\nCMD while true; do nc -l 80 \u003c /tmp/index.html; done","git":{"uri":"https://github.com/tangfeixiong/docker-nc.git"},"contextDir":"/latest","secrets":null},"strategy":{"type":"Docker","dockerStrategy":{"from":{"kind":"DockerImage","name":"gliderlabs/alpine"}}},"output":{"to":{"kind":"DockerImage","name":"172.17.4.50:30005/tangfx/osobuilds:latest"},"pushSecret":{"name":"localdockerconfig"}},"resources":{},"postCommit":{},"completionDeadlineSeconds":900,"triggeredBy":[]},"status":{"phase":"New","outputDockerImageReference":"172.17.4.50:30005/tangfx/osobuilds:latest","config":{"kind":"BuildConfig","namespace":"tangfx","name":"osobuilds"}}}
+ 
+I0827 00:08:47.093692       1 builder.go:61] Build: &api.Build{TypeMeta:unversioned.TypeMeta{Kind:"", APIVersion:""}, ObjectMeta:api.ObjectMeta{Name:"osobuilds", GenerateName:"", Namespace:"tangfx", SelfLink:"/oapi/v1/namespaces/tangfx/builds/osobuilds", UID:"6921fc1f-6bea-11e6-b870-6e6e02edd780", ResourceVersion:"753", Generation:0, CreationTimestamp:unversioned.Time{Time:time.Time{sec:63607853321, nsec:0, loc:(*time.Location)(0x5f7f6c0)}}, DeletionTimestamp:(*unversioned.Time)(nil), DeletionGracePeriodSeconds:(*int64)(nil), Labels:map[string]string{"openshift.io/build-config.name":"osobuilds", "openshift.io/build.start-policy":"Serial"}, Annotations:map[string]string{"openshift.io/build-config.name":"osobuilds", "openshift.io/build.number":"1"}}, Spec:api.BuildSpec{ServiceAccount:"builder", Source:api.BuildSource{Binary:(*api.BinaryBuildSource)(nil), Dockerfile:(*string)(0xc820142580), Git:(*api.GitBuildSource)(0xc8204ece70), Images:[]api.ImageSource(nil), ContextDir:"/latest", SourceSecret:(*api.LocalObjectReference)(nil), Secrets:[]api.SecretBuildSource(nil)}, Revision:(*api.SourceRevision)(nil), Strategy:api.BuildStrategy{DockerStrategy:(*api.DockerBuildStrategy)(0xc820276eb0), SourceStrategy:(*api.SourceBuildStrategy)(nil), CustomStrategy:(*api.CustomBuildStrategy)(nil), JenkinsPipelineStrategy:(*api.JenkinsPipelineBuildStrategy)(nil)}, Output:api.BuildOutput{To:(*api.ObjectReference)(0xc82048d5e0), PushSecret:(*api.LocalObjectReference)(0xc820142650)}, Resources:api.ResourceRequirements{Limits:api.ResourceList(nil), Requests:api.ResourceList(nil)}, PostCommit:api.BuildPostCommitSpec{Command:[]string(nil), Args:[]string(nil), Script:""}, CompletionDeadlineSeconds:(*int64)(0xc8201426c8)}, Status:api.BuildStatus{Phase:"New", Cancelled:false, Reason:"", Message:"", StartTimestamp:(*unversioned.Time)(nil), CompletionTimestamp:(*unversioned.Time)(nil), Duration:0, OutputDockerImageReference:"172.17.4.50:30005/tangfx/osobuilds:latest", Config:(*api.ObjectReference)(0xc82048d730)}}
+warning: OpenShift server version "v1.3.0-alpha.1-39-gde8130a-dirty" differs from this image "v1.3.0-alpha.1"
+I0827 00:08:47.097474       1 builder.go:153] Running build with cgroup limits: api.CGroupLimits{MemoryLimitBytes:92233720368547, CPUShares:2, CPUPeriod:100000, CPUQuota:-1, MemorySwap:92233720368547}
+Downloading "https://github.com/tangfeixiong/docker-nc.git" ...
+I0827 00:08:47.104514       1 glog.go:70] git ls-remote --heads [https://github.com/tangfeixiong/docker-nc.git]
+I0827 00:08:47.116502       1 repository.go:310] Executing git ls-remote --heads https://github.com/tangfeixiong/docker-nc.git
+I0827 00:08:52.945972       1 repository.go:335] Out: d628ecb54e420ababe68c7951f3e73a04e6d5db4	refs/heads/master
+I0827 00:08:52.946137       1 glog.go:70] d628ecb54e420ababe68c7951f3e73a04e6d5db4	refs/heads/master%!(EXTRA []interface {}=[])
+Cloning source from https://github.com/tangfeixiong/docker-nc.git
+I0827 00:08:52.946320       1 repository.go:310] Executing git clone --quiet --recursive --depth=1 https://github.com/tangfeixiong/docker-nc.git /tmp/docker-build073266166
+I0827 00:09:22.386043       1 repository.go:310] Executing git rev-parse --abbrev-ref HEAD
+I0827 00:09:22.392505       1 repository.go:335] Out: master
+I0827 00:09:22.392973       1 repository.go:310] Executing git rev-parse --verify HEAD
+I0827 00:09:22.402339       1 repository.go:335] Out: d628ecb54e420ababe68c7951f3e73a04e6d5db4
+I0827 00:09:22.402627       1 repository.go:310] Executing git --no-pager show -s --format=%an HEAD
+I0827 00:09:22.408183       1 repository.go:335] Out: Mike Dillon
+I0827 00:09:22.408269       1 repository.go:310] Executing git --no-pager show -s --format=%ae HEAD
+I0827 00:09:22.417253       1 repository.go:335] Out: mike@appropriate.io
+I0827 00:09:22.417304       1 repository.go:310] Executing git --no-pager show -s --format=%cn HEAD
+I0827 00:09:22.425483       1 repository.go:335] Out: Mike Dillon
+I0827 00:09:22.425682       1 repository.go:310] Executing git --no-pager show -s --format=%ce HEAD
+I0827 00:09:22.442215       1 repository.go:335] Out: mike@appropriate.io
+I0827 00:09:22.442366       1 repository.go:310] Executing git --no-pager show -s --format=%ad HEAD
+I0827 00:09:22.447263       1 repository.go:335] Out: Sun Oct 11 11:24:14 2015 -0700
+I0827 00:09:22.447311       1 repository.go:310] Executing git --no-pager show -s --format=%<(80,trunc)%s HEAD
+I0827 00:09:22.452457       1 repository.go:335] Out: Fix entrypoint handling of args
+I0827 00:09:22.452637       1 repository.go:310] Executing git config --get remote.origin.url
+I0827 00:09:22.459422       1 repository.go:335] Out: https://github.com/tangfeixiong/docker-nc.git
+I0827 00:09:22.469422       1 glog.go:70] Setting build revision to []interface {}{(*api.GitSourceRevision)(0xc8200f5080)}
+error: An error occurred saving build revision: Put https://10.3.0.1:443/oapi/v1/namespaces/tangfx/builds/osobuilds/details: x509: certificate signed by unknown authority
+I0827 00:09:22.528456       1 repository.go:310] Executing git rev-parse --abbrev-ref HEAD
+I0827 00:09:22.532932       1 repository.go:335] Out: master
+I0827 00:09:22.533020       1 repository.go:310] Executing git rev-parse --verify HEAD
+I0827 00:09:22.543162       1 repository.go:335] Out: d628ecb54e420ababe68c7951f3e73a04e6d5db4
+I0827 00:09:22.543289       1 repository.go:310] Executing git --no-pager show -s --format=%an HEAD
+I0827 00:09:22.555550       1 repository.go:335] Out: Mike Dillon
+I0827 00:09:22.555602       1 repository.go:310] Executing git --no-pager show -s --format=%ae HEAD
+I0827 00:09:22.564535       1 repository.go:335] Out: mike@appropriate.io
+I0827 00:09:22.564593       1 repository.go:310] Executing git --no-pager show -s --format=%cn HEAD
+I0827 00:09:22.570755       1 repository.go:335] Out: Mike Dillon
+I0827 00:09:22.574623       1 repository.go:310] Executing git --no-pager show -s --format=%ce HEAD
+I0827 00:09:22.578758       1 repository.go:335] Out: mike@appropriate.io
+I0827 00:09:22.578804       1 repository.go:310] Executing git --no-pager show -s --format=%ad HEAD
+I0827 00:09:22.582126       1 repository.go:335] Out: Sun Oct 11 11:24:14 2015 -0700
+I0827 00:09:22.582213       1 repository.go:310] Executing git --no-pager show -s --format=%<(80,trunc)%s HEAD
+I0827 00:09:22.588701       1 repository.go:335] Out: Fix entrypoint handling of args
+I0827 00:09:22.588804       1 repository.go:310] Executing git config --get remote.origin.url
+I0827 00:09:22.592204       1 repository.go:335] Out: https://github.com/tangfeixiong/docker-nc.git
+I0827 00:09:22.592820       1 glog.go:70] Starting Docker build from build config [osobuilds] ...
+I0827 00:09:22.592929       1 glog.go:70] Invoking Docker build to create ["tangfx/osobuilds:5999fbdd"]
+I0827 00:09:22.593293       1 tar.go:193] Adding "/tmp/docker-build073266166/latest" to tar ...
+I0827 00:09:22.616683       1 tar.go:260] Adding to tar: /tmp/docker-build073266166/latest/Dockerfile as Dockerfile
+I0827 00:09:22.649680       1 tar.go:260] Adding to tar: /tmp/docker-build073266166/latest/README.md as README.md
+I0827 00:09:22.651898       1 tar.go:260] Adding to tar: /tmp/docker-build073266166/latest/entrypoint.sh as entrypoint.sh
+Step 1 : FROM gliderlabs/alpine
+ ---> c4760e001bd3
+Step 2 : MAINTAINER tangfeixiong <tangfx128@gmail.com>
+ ---> Using cache
+ ---> b63073ac43dc
+Step 3 : RUN apk add --update bash ca-certificates libc6-compat netcat-openbsd && rm -rf /var/cache/apk/*
+ ---> Using cache
+ ---> 4861f2b337b5
+Step 4 : RUN echo "<html><head><title>welcome</title></head><body><h1>hello world</h1></body></html>" >> /tmp/index.html
+ ---> Using cache
+ ---> 58aa54ecf5db
+Step 5 : EXPOSE 80
+ ---> Using cache
+ ---> 274dc894d7f1
+Step 6 : CMD while true; do nc -l 80 < /tmp/index.html; done
+ ---> Using cache
+ ---> ce9ddf1aeb09
+Step 7 : ENV "OPENSHIFT_BUILD_NAME" "osobuilds" "OPENSHIFT_BUILD_NAMESPACE" "tangfx" "OPENSHIFT_BUILD_SOURCE" "https://github.com/tangfeixiong/docker-nc.git" "OPENSHIFT_BUILD_COMMIT" "d628ecb54e420ababe68c7951f3e73a04e6d5db4"
+ ---> Using cache
+ ---> a5b91d51899a
+Step 8 : LABEL "io.openshift.build.commit.author" "Mike Dillon \u003cmike@appropriate.io\u003e" "io.openshift.build.commit.date" "Sun Oct 11 11:24:14 2015 -0700" "io.openshift.build.commit.id" "d628ecb54e420ababe68c7951f3e73a04e6d5db4" "io.openshift.build.commit.ref" "master" "io.openshift.build.commit.message" "Fix entrypoint handling of args" "io.openshift.build.source-location" "https://github.com/tangfeixiong/docker-nc.git" "io.openshift.build.source-context-dir" "/latest"
+ ---> Running in d9df58838f2b
+ ---> 2222da889b03
+Removing intermediate container d9df58838f2b
+Successfully built 2222da889b03
+I0827 00:09:26.125420       1 cfg.go:45] Locating docker auth for image 172.17.4.50:30005/tangfx/osobuilds:latest and type PUSH_DOCKERCFG_PATH
+I0827 00:09:26.126168       1 cfg.go:111] Using Docker authentication configuration in '/var/run/secrets/openshift.io/push/.dockerconfigjson'
+I0827 00:09:26.127128       1 cfg.go:83] Using tangfx user for Docker authentication for image 172.17.4.50:30005/tangfx/osobuilds:latest
+I0827 00:09:26.127189       1 glog.go:70] Authenticating Docker push with user ["tangfx"]
+Pushing image 172.17.4.50:30005/tangfx/osobuilds:latest ...
+Push successful
+error: unexpected EOF
+
+
+
+[vagrant@localhost go-to-cloud-1]$ sudo systemctl -l status docker.service
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/etc/systemd/system/docker.service; enabled; vendor preset: disabled)
+   Active: failed (Result: signal) since 六 2016-08-27 00:09:37 UTC; 4min 49s ago
+     Docs: http://docs.docker.com
+  Process: 8830 ExecStart=/usr/bin/docker daemon $OPTIONS $DOCKER_STORAGE_OPTIONS $DOCKER_NETWORK_OPTIONS $INSECURE_REGISTRY (code=killed, signal=ABRT)
+ Main PID: 8830 (code=killed, signal=ABRT)
+
+8月 27 00:09:28 localhost docker[8830]: /builddir/build/BUILD/docker-6ec29ef9a2d48a6ccd716a2bbb00a1ed07412d6a/_build/src/github.com/docker/docker/daemon/monitor.go:145 +0x3b8 fp=0xc821c39f40 sp=0xc821c39e00
+8月 27 00:09:28 localhost docker[8830]: github.com/docker/docker/daemon.(*containerMonitor).Start-fm(0x0, 0x0)
+8月 27 00:09:28 localhost docker[8830]: /builddir/build/BUILD/docker-6ec29ef9a2d48a6ccd716a2bbb00a1ed07412d6a/_build/src/github.com/docker/docker/daemon/container.go:790 +0x2e fp=0xc821c39f60 sp=0xc821c39f40
+8月 27 00:09:28 localhost docker[8830]: github.com/docker/docker/pkg/promise.Go.func1(0xc820b45380, 0xc820cbf9d0)
+8月 27 00:09:28 localhost docker[8830]: /builddir/build/BUILD/docker-6ec29ef9a2d48a6ccd716a2bbb00a1ed07412d6a/_build/src/github.com/docker/docker/pkg/promise/promise.go:8 +0x1d fp=0xc821c39f90 sp=0xc821c39f60
+8月 27 00:09:28 localhost docker[8830]: runtime.goexit()
+8月 27 00:09:37 localhost systemd[1]: docker.service: Main process exited, code=killed, status=6/ABRT
+8月 27 00:09:37 localhost systemd[1]: docker.service: Unit entered failed state.
+8月 27 00:09:37 localhost systemd[1]: docker.service: Failed with result 'signal'.
+8月 27 00:10:29 localhost systemd-coredump[22976]: Process 8830 (docker) of user 0 dumped core.
+                                                    
+                                                    Stack trace of thread 14572:
+                                                    #0  0x0000000000472004 runtime.raise (docker)
+
+
+
+
 [vagrant@localhost go-to-cloud-1]$ oc --config /data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig get projects
 NAME               DISPLAY NAME   STATUS
 gogogo                            Terminating

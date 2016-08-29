@@ -58,7 +58,7 @@ Generage Protobuf only
 
 ### Make
 
-* Example GO environment
+Example GO environment
 
     [vagrant@localhost go-to-cloud-1]$ echo $GOPATH
     /data:/go:/work
@@ -88,6 +88,8 @@ Build into Alpine Docker image
 Install without vendor
 
     [vagrant@localhost go-to-cloud-1]$ unlink vendor && go install -v github.com/tangfeixiong/go-to-cloud-1/cmd/apaas && ln -s _vendor/src vendor
+
+CGO_ENABLED=0 go install -v -a -tags netgo -installsuffix netgo -ldflags "-s -w -X github.com/nats-io/gnatsd/version.GITCOMMIT=`git rev-parse --short HEAD`"
 
 Or using Make tool
 

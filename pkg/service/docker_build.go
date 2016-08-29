@@ -3,7 +3,7 @@ package service
 import (
 	//"bytes"
 	//"log"
-	//"os"
+	"os"
 
 	//"github.com/helm/helm-classic/codec"
 	buildapi "github.com/openshift/origin/pkg/build/api/v1"
@@ -16,7 +16,9 @@ import (
 	kapi "k8s.io/kubernetes/pkg/api/v1"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/gnatsd"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/dispatcher"
 )
 
 var (
@@ -429,16 +431,18 @@ func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.Build
 
 func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-	logger.SetPrefix("[pkg/service, .CreateIntoBuildDockerImage] ")
+	logger.SetPrefix("[service, .CreateIntoBuildDockerImage] ")
 
 	var raw []byte
 	var obj *buildapi.Build
+	var bc *buildapi.BuildConfig
 	var err error
 
-	_, obj = convertIntoBuildObject(req)
+	bc, obj = convertIntoBuildObject(req)
 
-	//raw, obj, err = origin.CreateBuildWithV1(obj)
-	raw, obj, err = origin.DirectlyRunOriginDockerBuilder(obj)
+	op := new(origin.PaaS)
+	raw, obj, bc, err = op.CreateNewBuild(obj, bc)
+	//raw, obj, err = origin.DirectlyRunOriginDockerBuilder(obj)
 	if err != nil {
 		return (*osopb3.DockerBuildResponseData)(nil), err
 	}
@@ -447,48 +451,53 @@ func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
 		return &osopb3.DockerBuildResponseData{nil, nil}, nil
 	}
 
-	status := &osopb3.OsoBuildStatus{
-		Phase:                      string(obj.Status.Phase),
-		Cancelled:                  obj.Status.Cancelled,
-		Reason:                     string(obj.Status.Reason),
-		StartTimestamp:             obj.Status.StartTimestamp,
-		CompletionTimestamp:        obj.Status.CompletionTimestamp,
-		Duration:                   int64(obj.Status.Duration),
-		OutputDockerImageReference: obj.Status.OutputDockerImageReference,
-		Config: obj.Status.Config,
-	}
-	status.OsoBuildPhase = osopb3.OsoBuildStatus_OsoBuildPhase(osopb3.OsoBuildStatus_OsoBuildPhase_value[status.Phase])
+	return u.trackCreatingIntoBuildDockerImage(ctx, req, op, raw, obj, bc), nil
+}
 
-	gvk := unversioned.GroupVersionKind{
-		Group:   "",
-		Version: obj.TypeMeta.APIVersion,
-		Kind:    obj.TypeMeta.Kind,
-	}.String()
-
-	resp := &osopb3.DockerBuildResponseData{
-		Status: status,
-		Raw: &osopb3.RawJSON{
-			ObjectGVK:  gvk,
-			ObjectJSON: raw,
-		},
-	}
-
-	return resp, nil
+func (u *UserResource) trackCreatingIntoBuildDockerImage(ctx context.Context,
+	req *osopb3.DockerBuildRequestData,
+	op *origin.PaaS, raw []byte, obj *buildapi.Build, bc *buildapi.BuildConfig) (resp *osopb3.DockerBuildResponseData) {
+	cmd, o := origin.NewCmdStartBuild("osoc", op.Factory(), os.Stdin, os.Stdout)
+	o.In = os.Stdin
+	o.Out = os.Stdout
+	o.ErrOut = cmd.Out()
+	o.StartBuildOptions.WaitForComplete = true
+	o.StartBuildOptions.Follow = true
+	o.StartBuildOptions.Namespace = obj.Namespace
+	o.StartBuildOptions.Client = op.OC()
+	u.Schedulers["DockerBuilder"].WithPaylodHandler(
+		func() dispatcher.HandleFunc {
+			return o.TrackWith(ctx, req, op, raw, obj, bc)
+		}(),
+	)
+	resp = o.Resp
+	return
 }
 
 func (u *UserResource) RetrieveIntoBuildDockerImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-	logger.SetPrefix("[pkg/service, .RetrieveProjectIntoArbitrary] ")
+	logger.SetPrefix("[service, .RetrieveIntoBuildDockerImage] ")
 
 	if req.Name == "" {
+		logger.Println("Request body required")
 		return (*osopb3.DockerBuildResponseData)(nil), errUnexpected
 	}
-	raw, obj, err := origin.RetrieveBuild(req.ProjectName, req.Name)
+	b, err := gnatsd.Subscribe([]string{}, nil, nil, origin.Subject(req.ProjectName, req.Name))
+	if err != nil {
+		return (*osopb3.DockerBuildResponseData)(nil), err
+	}
+	resp := new(osopb3.DockerBuildResponseData)
+	if err := resp.Unmarshal(b); err != nil {
+		logger.Printf("Could not unmarshal into response: %+v", err)
+		return resp, err
+	}
+
+	/*raw, obj, err := origin.RetrieveBuild(req.ProjectName, req.Name)
 	if err != nil {
 		return (*osopb3.DockerBuildResponseData)(nil), err
 	}
 	if raw == nil || len(raw) == 0 || obj == nil {
-		logger.Println("no data and object retrieved")
+		logger.Println("No data and object retrieved")
 		return &osopb3.DockerBuildResponseData{nil, nil}, nil
 	}
 
@@ -516,7 +525,7 @@ func (u *UserResource) RetrieveIntoBuildDockerImage(ctx context.Context,
 			ObjectGVK:  gvk,
 			ObjectJSON: raw,
 		},
-	}
+	}*/
 
 	return resp, nil
 }

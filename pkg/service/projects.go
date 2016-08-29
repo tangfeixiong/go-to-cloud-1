@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"errors"
 	"log"
 	"os"
@@ -50,11 +49,7 @@ func (u *UserResource) CreateProjectIntoArbitrary(ctx context.Context,
 	}
 	//obj.Spec.Finalizers = append(obj.Spec.Finalizers, kapi.FinalizerName(origin.FinalizerVender))
 
-	b := bytes.Buffer{}
-	if err := codec.JSON.Encode(&b).One(obj); err != nil {
-		return nil, err
-	}
-	data, _, err := origin.CreateProjectFromArbitray(b.Bytes())
+	data, _, err := origin.CreateIntoProject(obj)
 	if err != nil {
 		return nil, err
 	}

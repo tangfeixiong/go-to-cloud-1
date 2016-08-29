@@ -16,11 +16,11 @@ import (
 )
 
 var (
-	factory = &integrationFactory{server: _server}
+	factory = &integrationFactory{server: _grpc_client_endpoint}
 )
 
 func TestProject_retrieve(t *testing.T) {
-	//  cc, err := grpc.Dial(_server, grpc.WithInsecure())
+	//  cc, err := grpc.Dial(_grpc_client_endpoint, grpc.WithInsecure())
 	//	if err != nil {
 	//		log.Fatalf("did not connect: %v", err)
 	//	}
@@ -45,25 +45,32 @@ func TestProject_retrieve(t *testing.T) {
 
 }
 
-func TestDocker_build(t *testing.T) {
-	reqBuild := internalDockerBuildRequestData()
-	reqBuild.ProjectName = "tangfx"
-	reqBuild.Configuration.ProjectName = "tangfx"
-	respBuild, err := factory.CreateDockerBuildIntoImage(reqBuild)
+func TestDocker_Builder(t *testing.T) {
+	exam := dockerbuilder_example()
+	util := &DockerBuildRequestDataUtility{}
+	data, err := util.Builder(exam["Project"].(string), exam["Name"].(string)).
+		Dockerfile(exam["Dockerfile"].(string)).
+		Git(exam["GitURI"].(string), exam["GitRef"].(string), exam["GitPath"].(string)).
+		DockerBuildStrategy(_override_baseimage, "", ".", true, false).
+		DockerBuildOutputOption(exam["DockerPushRepo"].(string), _dockerpush_secret).RequestDataForPOST()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if respBuild == nil {
+	result, err := factory.CreateDockerBuildIntoImage(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result == nil {
 		t.Log("Received nothing")
-	} else if respBuild.Raw != nil && len(respBuild.Raw.ObjectJSON) > 0 {
-		t.Logf("Result: %s", string(respBuild.Raw.ObjectJSON))
+	} else if result.Raw != nil && len(result.Raw.ObjectJSON) > 0 {
+		t.Logf("Result: %s", string(result.Raw.ObjectJSON))
 	} else {
-		t.Logf("Received: %+v", respBuild)
+		t.Logf("Received: %+v", result)
 	}
 }
 
 func TestDockerBuild_retrieve(t *testing.T) {
-	//  cc, err := grpc.Dial(_server, grpc.WithInsecure())
+	//  cc, err := grpc.Dial(_grpc_client_endpoint, grpc.WithInsecure())
 	//	if err != nil {
 	//		log.Fatalf("did not connect: %v", err)
 	//	}
@@ -90,7 +97,7 @@ func TestDockerBuild_retrieve(t *testing.T) {
 		Labels:      map[string]string{},
 		Annotations: map[string]string{},
 	}
-	respBuild, err := factory.RetrieveDockerBuildIntoImage(reqBuild)
+	respBuild, err := factory.QueryDockerBuilderIntoBuilding(reqBuild)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +111,7 @@ func TestDockerBuild_retrieve(t *testing.T) {
 }
 
 func TestDirect_origindockerbuild(t *testing.T) {
-	reqBuild := origindockerbuild()
+	reqBuild := dockerbuilder_data()
 	respBuild, err := factory.CreateDockerBuildIntoImage(reqBuild)
 	if err != nil {
 		t.Fatal(err)

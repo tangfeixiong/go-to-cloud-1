@@ -7,8 +7,6 @@ MAINTAINER tangfeixiong <fxtang@qingyuanos.com>
 #ADD ./mk-docker-opts.sh /opt/bin/
 #CMD /opt/bin/flanneld
 
-LABEL name="apaas-build" version="0.1" description="openshift origin, GitVersion: v1.3.0-alpha.2"
-
 RUN apk add --update bash ca-certificates git libc6-compat && rm -rf /var/cache/apk/*
 
 ADD apaas /bin/
@@ -34,3 +32,5 @@ EXPOSE 50051
 CMD ["/bin/apaas"]
 
 #ENTRYPOINT ["/bin/apaas"]
+
+LABEL name="apaas-build" version="0.1" description="openshift origin, GitVersion: v1.3.0-alpha.2"

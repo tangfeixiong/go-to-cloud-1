@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/tangfeixiong/go-to-cloud-1/cmd/osobuild/cmd"
+import "github.com/tangfeixiong/go-to-cloud-1/cmd/harpoon/cmd"
 
 func main() {
 	cmd.Execute()
