@@ -429,9 +429,9 @@ func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.Build
 	return bldconf, bld
 }
 
-func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
+func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-	logger.SetPrefix("[service, .CreateIntoBuildDockerImage] ")
+	logger.SetPrefix("[service, .CreateDockerBuilderIntoImage] ")
 
 	var raw []byte
 	var obj *buildapi.Build
@@ -453,10 +453,10 @@ func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
 	}
 
 	//return origin.GenerateResponseData(raw, obj), nil
-	return u.trackCreatingIntoBuildDockerImage(ctx, req, op, raw, obj, bc), nil
+	return u.scheduleDockerBuildTracker(ctx, req, op, raw, obj, bc), nil
 }
 
-func (u *UserResource) trackCreatingIntoBuildDockerImage(ctx context.Context,
+func (u *UserResource) scheduleDockerBuildTracker(ctx context.Context,
 	req *osopb3.DockerBuildRequestData,
 	op *origin.PaaS, raw []byte, obj *buildapi.Build, bc *buildapi.BuildConfig) (resp *osopb3.DockerBuildResponseData) {
 	logger.SetPrefix("[service, .trackCreatingIntoBuildDockerImage] ")
@@ -478,9 +478,8 @@ func (u *UserResource) trackCreatingIntoBuildDockerImage(ctx context.Context,
 	return
 }
 
-func (u *UserResource) RetrieveIntoBuildDockerImage(ctx context.Context,
-	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-	logger.SetPrefix("[service, .RetrieveIntoBuildDockerImage] ")
+func (u *UserResource) TrackDockerBuild(ctx context.Context, req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	logger.SetPrefix("[service, .TrackDockerBuild] ")
 
 	if req.Name == "" {
 		logger.Println("Request body required")
@@ -496,70 +495,77 @@ func (u *UserResource) RetrieveIntoBuildDockerImage(ctx context.Context,
 		return resp, err
 	}
 
-	/*raw, obj, err := origin.RetrieveBuild(req.ProjectName, req.Name)
+	return resp, nil
+}
+
+func (u *UserResource) RetrieveDockerBuild(ctx context.Context, req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	logger.SetPrefix("[service, .RetrieveDockerBuild] ")
+
+	if req.Name == "" {
+		logger.Println("Request body required")
+		return (*osopb3.DockerBuildResponseData)(nil), errUnexpected
+	}
+
+	raw, obj, err := origin.RetrieveBuild(req.ProjectName, req.Name)
 	if err != nil {
 		return (*osopb3.DockerBuildResponseData)(nil), err
 	}
 	if raw == nil || len(raw) == 0 || obj == nil {
-		logger.Println("No data and object retrieved")
-		return &osopb3.DockerBuildResponseData{nil, nil}, nil
+		logger.Printf("Nothing received from docker build with config (%+v)", obj)
+		return &osopb3.DockerBuildResponseData{}, nil
 	}
 
-	status := &osopb3.OsoBuildStatus{
-		Phase:                      string(obj.Status.Phase),
-		Cancelled:                  obj.Status.Cancelled,
-		Reason:                     string(obj.Status.Reason),
-		StartTimestamp:             obj.Status.StartTimestamp,
-		CompletionTimestamp:        obj.Status.CompletionTimestamp,
-		Duration:                   int64(obj.Status.Duration),
-		OutputDockerImageReference: obj.Status.OutputDockerImageReference,
-		Config: obj.Status.Config,
+	return origin.GenerateResponseData(raw, obj), nil
+}
+
+func (u *UserResource) RetrieveDockerBuilder(ctx context.Context, in *osopb3.DockerBuildConfigRequestData) (*osopb3.DockerBuildConfigResponseData, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) UpdateDockerBuilderIntoImage(ctx context.Context, in *osopb3.DockerBuildConfigRequestData) (*osopb3.DockerBuildResponseData, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) DockerRebuild(ctx context.Context, in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	return nil, errNotImplemented
+}
+
+func (u *UserResource) DeleteDockerBuild(ctx context.Context, req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+	logger.SetPrefix("[service, .DeleteDockerBuild] ")
+
+	if req.Name == "" {
+		logger.Println("Request body required")
+		return (*osopb3.DockerBuildResponseData)(nil), errUnexpected
 	}
-	status.OsoBuildPhase = osopb3.OsoBuildStatus_OsoBuildPhase(osopb3.OsoBuildStatus_OsoBuildPhase_value[status.Phase])
 
-	gvk := unversioned.GroupVersionKind{
-		Group:   "",
-		Version: obj.TypeMeta.APIVersion,
-		Kind:    obj.TypeMeta.Kind,
-	}.String()
+	err := origin.DeleteBuild(req.ProjectName, req.Name)
+	if err != nil {
+		return (*osopb3.DockerBuildResponseData)(nil), err
+	}
 
-	resp := &osopb3.DockerBuildResponseData{
-		Status: status,
-		Raw: &osopb3.RawJSON{
-			ObjectGVK:  gvk,
-			ObjectJSON: raw,
-		},
-	}*/
-
-	return resp, nil
+	return &osopb3.DockerBuildResponseData{}, nil
 }
 
-func (u *UserResource) UpdateIntoBuildDockerImage(ctx context.Context,
-	in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
+func (u *UserResource) DeleteDockerBuilder(ctx context.Context, req *osopb3.DockerBuildConfigRequestData) (*osopb3.DockerBuildConfigResponseData, error) {
+	logger.SetPrefix("[service, .DeleteDockerBuilder] ")
+
+	if req.Name == "" {
+		logger.Println("Request body required")
+		return (*osopb3.DockerBuildConfigResponseData)(nil), errUnexpected
+	}
+
+	err := origin.DeleteBuildConfig(req.ProjectName, req.Name)
+	if err != nil {
+		return (*osopb3.DockerBuildConfigResponseData)(nil), err
+	}
+
+	return &osopb3.DockerBuildConfigResponseData{}, nil
+}
+
+func (u *UserResource) ArbitraryDockerBuild(ctx context.Context, in *osopb3.RawData) (*osopb3.RawData, error) {
 	return nil, errNotImplemented
 }
 
-func (u *UserResource) DeleteIntoBuildDockerImage(ctx context.Context,
-	in *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
-	return nil, errNotImplemented
-}
-
-func (u *UserResource) NewOsoBuildConfig(ctx context.Context,
-	in *buildapi.BuildConfig) (*buildapi.BuildConfig, error) {
-	return nil, errNotImplemented
-}
-
-func (u *UserResource) StartOsoBuild(ctx context.Context,
-	in *buildapi.Build) (*buildapi.Build, error) {
-	return nil, errNotImplemented
-}
-
-func (u *UserResource) BuildDockerImage(ctx context.Context,
-	in *osopb3.RawData) (*osopb3.RawData, error) {
-	return nil, errNotImplemented
-}
-
-func (u *UserResource) RebuildDockerImage(ctx context.Context,
-	in *osopb3.RawData) (*osopb3.RawData, error) {
+func (u *UserResource) ArbitraryDockerRebuild(ctx context.Context, in *osopb3.RawData) (*osopb3.RawData, error) {
 	return nil, errNotImplemented
 }

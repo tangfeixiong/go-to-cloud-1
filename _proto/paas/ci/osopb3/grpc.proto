@@ -69,52 +69,68 @@ service SimpleService {
 		};
 	}
 
-	//rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
-
-	//rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
-
 	//rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
 
 	//rpc LookupProjects(LookupProjectsRequest) returns (LookupProjectsResponse);
 
 	//rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
+
+
+	//rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
+
+	//rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
+
 	
-	rpc CreateIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+	rpc CreateDockerBuilderIntoImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
 		option (google.api.http) = {
-	      post: "/v1/dockerbuilds"
+	      post: "/v1/projects/{projectname}/dockerbuilders"
 		  body: "*"
 		};
 	}
 
-	rpc RetrieveIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+	rpc TrackDockerBuild(DockerBuildRequestData) returns (DockerBuildResponseData) {
 		option (google.api.http) = {
-	      get: "/v1/dockerbuilds/{buildername}/build/{buildname}"
-		};
-	}
-	
-	rpc UpdateIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
-		option (google.api.http) = {
-	      put: "/v1/dockerbuilds/{buildername}"
+	      get: "/v1/projects/{projectname}/dockerbuilders/{buildername}/builds/{name}/tracks"
 		  body: "*"
 		};
 	}
 
-	rpc DeleteIntoBuildDockerImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
+	rpc RetrieveDockerBuild(DockerBuildRequestData) returns (DockerBuildResponseData) {
 		option (google.api.http) = {
-	      delete: "/v1/dockerbuilds/{buildername}"
+	      get: "/v1/projects/{projectname}/dockerbuilders/{buildername}/builds/{name}"
 		};
 	}
-	
-	rpc BuildDockerImage(RawData) returns (RawData) {
+
+	rpc RetrieveDockerBuilder(DockerBuildConfigRequestData) returns (DockerBuildConfigResponseData) {
 		option (google.api.http) = {
-	      post: "/v1/raw/dockerbuilds"
+	      get: "/v1/projects/{projectname}/dockerbuilders/{buildername}"
 		  body: "*"
 		};
 	}
 	
-	rpc RebuildDockerImage(RawData) returns (RawData) {
+	rpc UpdateDockerBuilderIntoImage(DockerBuildConfigRequestData) returns (DockerBuildResponseData) {
 		option (google.api.http) = {
-	      put: "/v1/raw/dockerbuilds/{buildname}"
+	      put: "/v1/projects/{projectname}/dockerbuilders/{buildername}"
+		  body: "*"
+		};
+	}
+
+	rpc DockerRebuild(DockerBuildRequestData) returns (DockerBuildResponseData) {
+		option (google.api.http) = {
+	      post: "/v1/projects/{projectname}/dockerbuilders/{buildername}/builds"
+		  body: "*"
+		};
+	}
+
+	rpc DeleteDockerBuild(DockerBuildRequestData) returns (DockerBuildResponseData) {
+		option (google.api.http) = {
+	      delete: "/v1/projects/{projectname}/dockerbuilders/{buildername}/builds/{name}"
+		};
+	}
+
+	rpc DeleteDockerBuilder(DockerBuildConfigRequestData) returns (DockerBuildConfigResponseData) {
+		option (google.api.http) = {
+	      delete: "/v1/projects/{projectname}/dockerbuilders/{buildername}"
 		  body: "*"
 		};
 	}
@@ -126,26 +142,28 @@ service SimpleService {
 	//	};
 	//}
 
-	//rpc StartOsoBuild(github.com.openshift.origin.pkg.build.api.v1.Build) returns (github.com.openshift.origin.pkg.build.api.v1.Build) {
+	//rpc StartOpenshiftOriginBuild(github.com.openshift.origin.pkg.build.api.v1.Build) returns (github.com.openshift.origin.pkg.build.api.v1.Build) {
 	//	option (google.api.http) = {
 	//    post: "/v1/oapiv1/builds"
 	//	  body: "*"
 	//	};		
 	//}
+	
+	rpc ArbitraryDockerBuild(RawData) returns (RawData) {
+		option (google.api.http) = {
+	      post: "/v1/raw/dockerbuilds"
+		  body: "*"
+		};
+	}
+	
+	rpc ArbitraryDockerRebuild(RawData) returns (RawData) {
+		option (google.api.http) = {
+	      put: "/v1/raw/dockerbuilds/{name}"
+		  body: "*"
+		};
+	}
 
-	//rpc RebuildDockerImage(RebuildDockerImageRequest) returns (stream RebuildDockerImageResponse) {
-	//}
-
-	//rpc CpDockerfileBuildSource(CpDockerfileBuildSourceRequest) returns (CpDockerfileBuildSourceResponse) {
-	//}
-
-	//rpc CatDockerfileBuildSource(CatDockerfileBuildSourceRequest) returns (CatDockerfileBuildSourceResponse) {
-	//}
-
-	//rpc ViDockerfileBuildSource(ViDockerfileBuildSourceRequest) returns (ViDockerfileBuildSourceResponse) {
-	//}
-
-	//rpc RmDockerfileBuildSource(RmDockerfileBuildSourceRequest) returns (RmDockerfileBuildSourceResponse) {
+	//rpc ArbitraryStream(RawData) returns (stream RawData) {
 	//}
 }
 

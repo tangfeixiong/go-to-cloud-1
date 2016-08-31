@@ -33,7 +33,7 @@ CMD while true; do nc -l 80 < /tmp/index.html; done`
 
 	_override_baseimage = "gliderlabs/alpine"
 
-	_dockpull_secret = "dockerconfigjson-osobuilds-for"
+	_dockerpull_secret = "dockerconfigjson-osobuilds-for"
 
 	_git_hub      = "https://github.com/tangfeixiong/docker-nc.git"
 	_git_ref      = "master"

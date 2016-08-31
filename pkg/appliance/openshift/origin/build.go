@@ -1281,20 +1281,20 @@ func RetrieveBuild(namespace, name string) ([]byte, *buildapiv1.Build, error) {
 	return raw, out, nil
 }
 
-func DeleteBuild(namespace, name string) error {
+func DeleteBuild(project, name string) error {
 	if len(name) == 0 {
 		return errNotFound
 	}
-	f := NewClientCmdFactory()
+	f := util.NewClientCmdFactory()
 	oc, _, err := f.Clients()
 	if err != nil {
-		glog.Errorf("Could not create openshift client: %+v", err)
+		glog.Errorf("Could not setup openshift client: %+v", err)
 		return err
 	}
 	logger.Printf("openshift client: %+v\n", oc)
 
-	if err := oc.Builds(namespace).Delete(name); err != nil {
-		glog.Errorf("Could not delete build config %s: %+v", name, err)
+	if err := oc.Builds(project).Delete(name); err != nil {
+		glog.Errorf("Could not delete build %s: %+v", name, err)
 		return err
 	}
 	return nil
