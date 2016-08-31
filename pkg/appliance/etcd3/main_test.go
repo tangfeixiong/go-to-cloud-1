@@ -19,12 +19,15 @@ var (
 
 	dialTimeout    = 5 * time.Second
 	requestTimeout = 1 * time.Second
-	endpoints      = []string{"10.3.0.213:2379"} //"172.17.4.50:30001"
+	endpoints      = []string{"172.17.4.50:30001"} //"10.3.0.213:2379"
 )
 
 func init() { auth.BcryptCost = bcrypt.MinCost }
 
 func TestMain(m *testing.M) {
+	if v, ok := os.LookupEnv("ETCD_V3_ADDRESSES"); ok && len(v) > 0 {
+		endpoints = append(strings.Split(v, ","), endpoints...)
+	}
 	useCluster := true // default to running all tests
 	for _, arg := range os.Args {
 		if strings.HasPrefix(arg, "-test.run=") {

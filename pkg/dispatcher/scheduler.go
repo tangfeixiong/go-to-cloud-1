@@ -1,5 +1,9 @@
 package dispatcher
 
+import (
+	"sync"
+)
+
 // A buffered channel that we can send work requests on.
 type Scheduler interface {
 	Start()
@@ -10,12 +14,14 @@ type Scheduler interface {
 type QueueScheduler struct {
 	Dispatcher *Dispatcher
 	Queue      chan Job
+	wg         *sync.WaitGroup
 }
 
-func NewQueueScheduler(maxWorkers int) Scheduler {
+func NewQueueScheduler(maxWorkers int, wg *sync.WaitGroup) Scheduler {
 	sch := &QueueScheduler{
 		Dispatcher: NewDispatcher(maxWorkers),
 		Queue:      make(chan Job),
+		wg:         wg,
 	}
 	sch.create()
 	return sch
@@ -27,7 +33,13 @@ func (qs *QueueScheduler) WithPaylodHandler(handler HandleFunc) {
 
 func (qs *QueueScheduler) Start() {
 	d := qs.Dispatcher
+	if qs.wg != nil {
+		qs.wg.Add(1)
+	}
 	go func(sch Scheduler) {
+		if qs.wg != nil {
+			defer qs.wg.Done()
+		}
 		for {
 			select {
 			case job := <-qs.Queue:

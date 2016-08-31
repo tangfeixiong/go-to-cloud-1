@@ -16,6 +16,7 @@ import (
 	"sync"
 
 	"github.com/golang/glog"
+	"github.com/helm/helm-classic/codec"
 	"github.com/spf13/cobra"
 
 	"golang.org/x/net/context"
@@ -26,7 +27,8 @@ import (
 	"k8s.io/kubernetes/pkg/client/restclient"
 	"k8s.io/kubernetes/pkg/fields"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	//"k8s.io/kubernetes/pkg/watch"
+	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/runtime/serializer"
 
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
@@ -103,15 +105,17 @@ func NewCmdStartBuild(fullName string, f *clientcmd.Factory, in io.Reader, out i
 	return cmd, o
 }
 
-func (o *StartBuildOptions) TrackWith(ctx context.Context, req *osopb3.DockerBuildRequestData, op *PaaS,
-	raw []byte, obj *buildapiv1.Build, bc *buildapiv1.BuildConfig) func() {
+func (o *StartBuildOptions) TrackWith(ctx context.Context,
+	req *osopb3.DockerBuildRequestData, resp *osopb3.DockerBuildResponseData,
+	op *PaaS, raw []byte, obj *buildapiv1.Build, bc *buildapiv1.BuildConfig) func() {
 	o.Ctx = ctx
 	o.Req = req
 	o.OP = op
 	o.Raw = raw
 	o.Obj = obj
 	o.BC = bc
-	o.Resp = GenerateResponseData(raw, obj)
+	o.Resp = resp
+	o.ClientConfig = o.OP.Factory().OpenShiftClientConfig
 	return o.tracker
 }
 
@@ -143,20 +147,45 @@ func Subject(ns, name string) string {
 	return fmt.Sprintf("/namespaces/%s/builds/%s", ns, name)
 }
 
-func (o *StartBuildOptions) cacheBuilds(v *buildapi.Build) {
-	raw, obj, err := ConvertBuildIntoV1(nil, v)
+func convertIntoV1WithRuntimeObject(obj runtime.Object) (b []byte, v *buildapiv1.Build, ok bool) {
+	buf := &bytes.Buffer{}
+	if err := codec.JSON.Encode(buf).One(obj); err != nil {
+		glog.Errorf("Failed to decode runtime object: %+v", err)
+		return
+	}
+	b = buf.Bytes()
+	hco, err := codec.JSON.Decode(b).One()
+	if err != nil {
+		glog.Errorf("Failed to decode runtime object: %+v", err)
+		return
+	}
+	v = new(buildapiv1.Build)
+	if err := hco.Object(obj); err != nil {
+		glog.Errorf("Failed to decode runtime object: %+v", err)
+		return
+	}
+	ok = true
+	return
+}
+
+func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
+	/*raw, obj, err := ConvertBuildIntoV1(nil, v)
 	if err != nil {
 		glog.Warningf("Failed to read runtime object: %+v", err)
 		return
-	}
+	}*/
+
 	resp := GenerateResponseData(raw, obj)
 	if bytes.Compare(raw, o.Raw) != 0 {
 		o.Raw = raw
 		o.Obj = obj
 		o.Resp = resp
 		if b, err := o.Resp.Marshal(); err != nil {
-			gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
+			glog.Infof("cache: %+v", string(b))
+			//gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
 		}
+	} else {
+		glog.Infof("noting to cache")
 	}
 }
 
@@ -181,6 +210,19 @@ func (o *StartBuildOptions) cacheLogs() {
 	}
 }
 
+func (o *StartBuildOptions) restClient() (*restclient.RESTClient, error) {
+	config, err := o.ClientConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+	kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.BuildConfig{})
+	kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.BuildConfig{})
+	cf := serializer.NewCodecFactory(kapi.Scheme)
+	config.GroupVersion = &buildapi.SchemeGroupVersion
+	config.NegotiatedSerializer = &cf
+	return restclient.RESTClientFor(config)
+}
+
 func (o *StartBuildOptions) tracker() {
 	var (
 		wg       sync.WaitGroup
@@ -203,6 +245,7 @@ func (o *StartBuildOptions) tracker() {
 			//	DoRaw()
 			list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
 			if err != nil {
+				glog.Errorf("Failed to list builds (%s): %+v", name, err)
 				exitErr = err
 				return
 			}
@@ -222,32 +265,50 @@ func (o *StartBuildOptions) tracker() {
 			}
 
 			rv := list.ResourceVersion
-			//w, err := o.Client.RESTClient.Verb("GET").Prefix("watch").Namespace(project).Resource("builds").
-			//	VersionedParams(kapiv1.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector(), ResourceVersion: rv}).
-			//	Watch()
-			w, err := c.Watch(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector(), ResourceVersion: rv})
+			c, err := o.restClient()
 			if err != nil {
+				glog.Errorf("Failed to setup restclient: %+v", err)
+				exitErr = err
+				return
+			}
+			w, err := c.Verb("GET").Prefix("watch").Namespace(o.Namespace).Resource("builds").
+				VersionedParams(&kapi.ListOptions{
+					FieldSelector:   fields.Set{"name": name}.AsSelector(),
+					ResourceVersion: rv,
+				}, kapi.ParameterCodec).Watch()
+			//w, err := c.Watch(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector(), ResourceVersion: rv})
+			if err != nil {
+				glog.Errorf("Failed to setup watcher (%s): %+v", name, err)
 				exitErr = err
 				return
 			}
 			defer w.Stop()
+			if w == nil {
+				glog.Warningln("Failed to setup watcher: nil")
+				exitErr = fmt.Errorf("Failed to setup watcher: nil")
+				return
+			}
 
 			for {
 				val, ok := <-w.ResultChan()
 				if !ok {
 					// reget and re-watch
+					glog.Infoln("reget and re-watch")
 					break
 				}
-				if e, ok := val.Object.(*buildapi.Build); ok {
-					o.cacheBuilds(e)
-					if name == e.Name && e.Status.Phase == buildapi.BuildPhaseComplete {
+				//if e, ok := val.Object.(*buildapi.Build); ok {
+				if b, e, ok := convertIntoV1WithRuntimeObject(val.Object); ok {
+					o.cacheBuilds(b, e)
+					if name == e.Name && e.Status.Phase == buildapiv1.BuildPhaseComplete {
+						glog.Infoln("completed")
 						exitErr = nil
 						return
 					}
-					if name != e.Name || e.Status.Phase == buildapi.BuildPhaseFailed ||
-						e.Status.Phase == buildapi.BuildPhaseCancelled ||
-						e.Status.Phase == buildapi.BuildPhaseError {
+					if name != e.Name || e.Status.Phase == buildapiv1.BuildPhaseFailed ||
+						e.Status.Phase == buildapiv1.BuildPhaseCancelled ||
+						e.Status.Phase == buildapiv1.BuildPhaseError {
 						exitErr = fmt.Errorf("The build %s/%s status is %q", e.Namespace, name, e.Status.Phase)
+						glog.Warningf("failed: %+v", exitErr)
 						return
 					}
 				}

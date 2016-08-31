@@ -28,35 +28,37 @@ func createIntoBuild(oc *oclient.Client, data []byte, obj *buildapiv1.Build) ([]
 		var err error
 		oc, _, err = f.Clients()
 		if err != nil {
-			logger.Printf("Could not create openshift client: %+v", err)
+			glog.Errorf("Could not setup openshift origin client: %+v", err)
 			return nil, nil, err
 		}
 	}
 	if len(data) == 0 {
 		b := &bytes.Buffer{}
 		if err := codec.JSON.Encode(b).One(obj); err != nil {
+			logger.Printf("Could not serialize: %+v\n", err)
 			return nil, nil, err
 		}
 		data = b.Bytes()
 	}
+
 	raw, err := oc.RESTClient.Verb("POST").Namespace(obj.Namespace).Resource("builds").Body(data).DoRaw()
 	if err != nil {
-		glog.Errorf("Could not access openshift: %s", err)
+		glog.Errorf("Could not access openshift origin: %+v", err)
 		return nil, nil, err
 	}
 	if len(raw) == 0 {
-		logger.Println("Nothing deserialized")
+		logger.Println("Nothing responsed")
 		return nil, nil, errUnexpected
 	}
 
 	hco, err := codec.JSON.Decode(raw).One()
 	if err != nil {
-		glog.Errorf("Could not create helm object: %s", err)
+		logger.Printf("Could not setup helm object: %s\n", err)
 		return raw, nil, err
 	}
 	meta := new(unversioned.TypeMeta)
 	if err := hco.Object(meta); err != nil {
-		glog.Errorf("Could not decode into typemeta: %s\nReturn: %+v\n", err, string(raw))
+		logger.Printf("Could not inspect typemeta: %s\nReturn: %+v\n", err, string(raw))
 		return raw, nil, err
 	}
 
@@ -64,11 +66,11 @@ func createIntoBuild(oc *oclient.Client, data []byte, obj *buildapiv1.Build) ([]
 		if strings.EqualFold("Status", meta.Kind) {
 			status := new(unversioned.Status)
 			if err := hco.Object(status); err != nil {
-				glog.Warningf("Could not inspect metadata: %+v", meta)
+				logger.Printf("Could not inspect metadata: %+v\n", meta)
 				return raw, nil, err
 			}
-			glog.Warningf("Status inspected: %+v", status.Message)
-			return raw, nil, nil
+			logger.Printf("Status inspected: %+v\n", status.Message)
+			return raw, nil, errUnexpected
 		}
 		glog.Errorf("Unexpected result: %+v", string(raw))
 		return raw, nil, errUnexpected
@@ -77,7 +79,7 @@ func createIntoBuild(oc *oclient.Client, data []byte, obj *buildapiv1.Build) ([]
 	//meta, err := hco.Meta()
 	result := new(buildapiv1.Build)
 	if err := hco.Object(result); err != nil {
-		logger.Printf("Could not decode into runtime object: %s", err)
+		logger.Printf("Could not decode into runtime object: %s\n", err)
 		return raw, nil, err
 	}
 	glog.V(10).Infof("Build result: %+v\n", string(raw))
@@ -430,13 +432,13 @@ func V1ToBuild(obj *buildapiv1.Build) *buildapi.Build {
 			}
 			tgt.Spec.Strategy.SourceStrategy.Env = append(tgt.Spec.Strategy.SourceStrategy.Env, val)
 		}
-	}
-	for _, ele := range obj.Spec.Strategy.SourceStrategy.RuntimeArtifacts {
-		val := buildapi.ImageSourcePath{
-			SourcePath:     ele.SourcePath,
-			DestinationDir: ele.DestinationDir,
+		for _, ele := range obj.Spec.Strategy.SourceStrategy.RuntimeArtifacts {
+			val := buildapi.ImageSourcePath{
+				SourcePath:     ele.SourcePath,
+				DestinationDir: ele.DestinationDir,
+			}
+			tgt.Spec.Strategy.SourceStrategy.RuntimeArtifacts = append(tgt.Spec.Strategy.SourceStrategy.RuntimeArtifacts, val)
 		}
-		tgt.Spec.Strategy.SourceStrategy.RuntimeArtifacts = append(tgt.Spec.Strategy.SourceStrategy.RuntimeArtifacts, val)
 	}
 	if obj.Spec.Strategy.CustomStrategy != nil {
 		tgt.Spec.Strategy.CustomStrategy = &buildapi.CustomBuildStrategy{
@@ -499,15 +501,15 @@ func V1ToBuild(obj *buildapiv1.Build) *buildapi.Build {
 			}
 			tgt.Spec.Strategy.CustomStrategy.Env = append(tgt.Spec.Strategy.CustomStrategy.Env, val)
 		}
-	}
-	for _, ele := range obj.Spec.Strategy.CustomStrategy.Secrets {
-		val := buildapi.SecretSpec{
-			SecretSource: kapi.LocalObjectReference{
-				Name: ele.SecretSource.Name,
-			},
-			MountPath: ele.MountPath,
+		for _, ele := range obj.Spec.Strategy.CustomStrategy.Secrets {
+			val := buildapi.SecretSpec{
+				SecretSource: kapi.LocalObjectReference{
+					Name: ele.SecretSource.Name,
+				},
+				MountPath: ele.MountPath,
+			}
+			tgt.Spec.Strategy.CustomStrategy.Secrets = append(tgt.Spec.Strategy.CustomStrategy.Secrets, val)
 		}
-		tgt.Spec.Strategy.CustomStrategy.Secrets = append(tgt.Spec.Strategy.CustomStrategy.Secrets, val)
 	}
 	if obj.Spec.Strategy.JenkinsPipelineStrategy != nil {
 		tgt.Spec.Strategy.JenkinsPipelineStrategy = &buildapi.JenkinsPipelineBuildStrategy{

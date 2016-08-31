@@ -444,19 +444,22 @@ func (u *UserResource) CreateIntoBuildDockerImage(ctx context.Context,
 	raw, obj, bc, err = op.CreateNewBuild(obj, bc)
 	//raw, obj, err = origin.DirectlyRunOriginDockerBuilder(obj)
 	if err != nil {
-		return (*osopb3.DockerBuildResponseData)(nil), err
+		logger.Printf("Failed to docker build with config (%+v)\n", bc)
+		return &osopb3.DockerBuildResponseData{}, err
 	}
 	if len(raw) == 0 || obj == nil {
-		logger.Println("no data object retrieved")
-		return &osopb3.DockerBuildResponseData{nil, nil}, nil
+		logger.Printf("Nothing received from docker build with config (%+v)", bc)
+		return &osopb3.DockerBuildResponseData{}, nil
 	}
 
+	//return origin.GenerateResponseData(raw, obj), nil
 	return u.trackCreatingIntoBuildDockerImage(ctx, req, op, raw, obj, bc), nil
 }
 
 func (u *UserResource) trackCreatingIntoBuildDockerImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData,
 	op *origin.PaaS, raw []byte, obj *buildapi.Build, bc *buildapi.BuildConfig) (resp *osopb3.DockerBuildResponseData) {
+	logger.SetPrefix("[service, .trackCreatingIntoBuildDockerImage] ")
 	cmd, o := origin.NewCmdStartBuild("osoc", op.Factory(), os.Stdin, os.Stdout)
 	o.In = os.Stdin
 	o.Out = os.Stdout
@@ -465,12 +468,13 @@ func (u *UserResource) trackCreatingIntoBuildDockerImage(ctx context.Context,
 	o.StartBuildOptions.Follow = true
 	o.StartBuildOptions.Namespace = obj.Namespace
 	o.StartBuildOptions.Client = op.OC()
+	resp = origin.GenerateResponseData(raw, obj)
 	u.Schedulers["DockerBuilder"].WithPaylodHandler(
 		func() dispatcher.HandleFunc {
-			return o.TrackWith(ctx, req, op, raw, obj, bc)
+			logger.Printf("Schedule docker builder into tracker: %s/%s(%s)\n", obj.Namespace, obj.Name, bc.Name)
+			return o.TrackWith(ctx, req, resp, op, raw, obj, bc)
 		}(),
 	)
-	resp = o.Resp
 	return
 }
 

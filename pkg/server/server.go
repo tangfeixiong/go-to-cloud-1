@@ -9,9 +9,9 @@ import (
 	//"os/signal"
 	"path"
 	"strings"
-	//"sync"
+	"sync"
 	//"syscall"
-	//"time"
+	"time"
 
 	"github.com/emicklei/go-restful"
 	"github.com/gengo/grpc-gateway/runtime"
@@ -33,6 +33,7 @@ type AppContext struct {
 var (
 	AppServer  *AppContext
 	swaggerDir = "docs/apidocs.json"
+	wg         sync.WaitGroup
 )
 
 func init() {
@@ -61,13 +62,16 @@ func runGrpcServer() error {
 	if v, ok := os.LookupEnv("APAAS_GRPC_PORT"); ok && v != "" {
 		host = v
 	}
+
+	fmt.Printf("Listenning tcp on %s\n", host)
+
 	lstn, err := net.Listen("tcp", host)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
+		fmt.Fprintf(os.Stderr, "gRPC Server died: %s\n", err)
 		return err
 	}
 
-	fmt.Printf("Starting grpc server on %s\n", host)
+	fmt.Println("Starting grpc server")
 
 	//s := grpc.NewServer()
 	//examples.RegisterEchoServiceServer(s, newEchoServer())
@@ -80,7 +84,8 @@ func runGrpcServer() error {
 	//s.Serve(l)
 
 	if err := AppServer.grpcServer.Serve(lstn); err != nil {
-		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
+		fmt.Fprintf(os.Stderr, "gRPC Server died: %s\n", err)
+		//_ = lstn.Close()
 		return err
 	}
 	return nil
@@ -167,21 +172,26 @@ func runGrpcGateway(address string, opts ...runtime.ServeMuxOption) error {
 }
 
 func Run() {
-	if err := runGrpcServer(); err != nil {
-		log.Fatal(err)
-	}
-	/*var wg sync.WaitGroup
+	go func() {
 		wg.Add(1)
-		errCh := make(chan error, 2)
-		go func() {
-			if err := runGrpcServer(); err != nil {
-				errCh <- fmt.Errorf("cannot run gRPC service: %v", err)
-	            if AppServer.grpcServer != nil {
-				    AppServer.grpcServer.Stop()
-	            }
-			}
-		}()
+		defer wg.Done()
+		if err := runGrpcServer(); err != nil {
+			AppServer.grpcServer = nil
+			log.Fatal(err)
+		}
+	}()
 
+	time.Sleep(1000 * time.Millisecond)
+	if AppServer.grpcServer == nil {
+		os.Exit(1)
+	}
+
+	go func() {
+		fmt.Println("Starting dispatcher")
+		service.Usrs.Dispatch(&wg)
+	}()
+	/*
+		//errCh := make(chan error, 2)
 		go func() {
 			time.Sleep(1000 * time.Millisecond)
 			if AppServer.grpcServer == nil {
@@ -216,4 +226,6 @@ func Run() {
 			// Block until a signal is received.
 			<-c
 		}*/
+	wg.Wait()
+	fmt.Println("Stopped.")
 }

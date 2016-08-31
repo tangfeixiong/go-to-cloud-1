@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	//"time"
 
 	restful "github.com/emicklei/go-restful"
@@ -49,11 +50,13 @@ func init() {
 	Usrs = new(UserResource)
 }
 
-func (u *UserResource) Register(ws *restful.WebService, container *restful.Container) {
-
+func (u *UserResource) Dispatch(wg *sync.WaitGroup) {
 	u.Schedulers = make(map[string]dispatcher.Scheduler)
-	u.Schedulers["DockerBuilder"] = dispatcher.NewQueueScheduler(50)
+	u.Schedulers["DockerBuilder"] = dispatcher.NewQueueScheduler(10, wg)
 	u.Schedulers["DockerBuilder"].Start()
+}
+
+func (u *UserResource) Register(ws *restful.WebService, container *restful.Container) {
 
 	/*
 	   Services of building Dockerfile and image, ACI

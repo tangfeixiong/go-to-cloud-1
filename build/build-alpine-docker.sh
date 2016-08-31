@@ -3,14 +3,17 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-#TAG=0.1-$(date +%m%dT%H%M)-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')
-TAG=0.1-$(date +%m%dT%H%M)-$(git rev-parse --short=7 HEAD)
+VER=0.1
+TAG=${VER}-$(git rev-parse --short=7 HEAD)
 if [[ $# > 0 ]]; then
 	TAG=$1
+elif [[ ! -z $(git status --porcelain) ]]; then
+    #echo "0.1-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')-$(date +%m%dT%H%M)"
+    TAG=${TAG}-$(date +%m%dT%H%M)
 fi
+DOCKER_IMAGE="hub.qingyuanos.com/admin/apaas:${TAG}"
 
 BUILD_ROOT=$(dirname "${BASH_SOURCE[0]}")
-
 if [[ ! -f ${BUILD_ROOT}/docker/apaas ]]; then
 	if [[ -d "/work" ]]; then
 		GOPATH=/work CGO_ENABLED=0 go build -a -v -installsuffix CGO -o ${BUILD_ROOT}/docker/apaas github.com/tangfeixiong/go-to-cloud-1/cmd/apaas
@@ -20,8 +23,6 @@ if [[ ! -f ${BUILD_ROOT}/docker/apaas ]]; then
 fi
 
 DOCKER_BUILD_CONTEXT=$(mktemp -d)
-DOCKER_IMAGE="hub.qingyuanos.com/admin/apaas:${TAG}"
-
 cp -r ${BUILD_ROOT}/docker/* $DOCKER_BUILD_CONTEXT
 
 cat <<DF >${DOCKER_BUILD_CONTEXT}/Dockerfile
@@ -44,6 +45,7 @@ ENV OSO_CONTEXT default/20-0-0-64:8443/system:admin
 ENV ORIGIN_VERSION v1.3.0-alpha.3
 ENV APAAS_GRPC_PORT :50051
 ENV GNATSD_ADDRESSES 10.3.0.39:4222
+ENV ETCD_V3_ADDRESSES 10.3.0.212:2379
 
 VOLUME ["/root/.kube", "/openshift.local.config"]
 

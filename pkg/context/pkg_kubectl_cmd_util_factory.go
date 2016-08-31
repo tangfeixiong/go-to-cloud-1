@@ -1,13 +1,15 @@
-package kubernetes
+package e2e
 
 import (
+	"fmt"
+	"io"
+
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/meta"
-	"k8s.io/kubernetes/pkg/client/restclient"
+	//"k8s.io/kubernetes/pkg/client/restclient"
 	"k8s.io/kubernetes/pkg/kubectl"
 	"k8s.io/kubernetes/pkg/kubectl/cmd/util"
-
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/kubernetes"
+	"k8s.io/kubernetes/pkg/runtime"
 )
 
 // PrintObject prints an api object given command line flags to modify the output format
@@ -36,7 +38,7 @@ func PrintObject(f *util.Factory, mapper meta.RESTMapper, obj runtime.Object, ou
 func PrinterForMapping(f *util.Factory, mapping *meta.RESTMapping, withNamespace bool,
 	outputversion, template, sortby string, noheaders, wide, showall, showlabels, iswatch bool,
 	labelcolumns []string) (kubectl.ResourcePrinter, error) {
-	printer, ok, err := kubernetes.PrinterForCommand(outputversion, template, sortby)
+	printer, ok, err := PrinterForCommand(outputversion, template, sortby)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,7 @@ func PrinterForMapping(f *util.Factory, mapping *meta.RESTMapping, withNamespace
 			return nil, err
 		}
 
-		version, err := kubernetes.OutputVersion(outputversion, clientConfig.GroupVersion)
+		version, err := OutputVersion(outputversion, clientConfig.GroupVersion)
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +82,7 @@ func PrinterForMapping(f *util.Factory, mapping *meta.RESTMapping, withNamespace
 		if err != nil {
 			return nil, err
 		}
-		printer = kubernetes.MaybeWrapSortingPrinter(sortby, printer)
+		printer = MaybeWrapSortingPrinter(sortby, printer)
 	}
 
 	return printer, nil
