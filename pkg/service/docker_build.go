@@ -2,10 +2,10 @@ package service
 
 import (
 	//"bytes"
-	//"log"
+	"fmt"
 	"os"
 
-	//"github.com/helm/helm-classic/codec"
+	"github.com/docker/engine-api/types"
 	buildapi "github.com/openshift/origin/pkg/build/api/v1"
 
 	"golang.org/x/net/context"
@@ -17,14 +17,15 @@ import (
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/gnatsd"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/kubernetes"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/dispatcher"
 )
 
 var (
-	_builderServiceAccount string = "builder"
-	_dockerfile            string = "FROM busybox\nCMD [\"sh\"]"
-	_timeout               int64  = 900
+	_openshift_origin_serviceaccount_builder string = "builder"
+	_dockerfile                              string = "FROM busybox\nCMD [\"sh\"]"
+	_timeout                                 int64  = 900
 )
 
 func toOriginBuildOutputType(t string) string {
@@ -37,7 +38,7 @@ func toOriginBuildStrategyType(t string) string {
 
 func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.BuildConfig, *buildapi.Build) {
 	common := buildapi.CommonSpec{
-		ServiceAccount: _builderServiceAccount,
+		ServiceAccount: _openshift_origin_serviceaccount_builder,
 		Source: buildapi.BuildSource{
 			Type:       buildapi.BuildSourceNone,
 			Binary:     (*buildapi.BinaryBuildSource)(nil),
@@ -429,6 +430,14 @@ func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.Build
 	return bldconf, bld
 }
 
+func secretname_for_pull_with_dockerbuilder(buildname string) string {
+	return fmt.Sprintf("dockerconfigjson-%s-for", buildname)
+}
+
+func secretname_for_push_with_dockerbuilder(buildname string) string {
+	return fmt.Sprintf("dockerconfigjson-%s-to", buildname)
+}
+
 func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
 	logger.SetPrefix("[service, .CreateDockerBuilderIntoImage] ")
@@ -441,6 +450,48 @@ func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 	bc, obj = convertIntoBuildObject(req)
 
 	op := new(origin.PaaS)
+	err = op.VerifyProject(req.ProjectName)
+	if err != nil {
+		logger.Printf("Failed to create origin project (%+v)\n", bc)
+		return &osopb3.DockerBuildResponseData{}, err
+	}
+
+	orchestra := kubernetes.NewOrchestration()
+	if obj.Spec.Strategy.DockerStrategy != nil &&
+		obj.Spec.Strategy.DockerStrategy.PullSecret == nil &&
+		req.Configuration.CommonSpec.Strategy.DockerStrategy != nil &&
+		req.Configuration.CommonSpec.Strategy.DockerStrategy.DockerconfigJson != nil {
+		secret := secretname_for_pull_with_dockerbuilder(bc.Name)
+		for k, v := range req.Configuration.CommonSpec.Strategy.DockerStrategy.DockerconfigJson.AuthConfigs {
+			_, _, _, err = orchestra.VerifyDockerConfigJsonSecretAndServiceAccount(
+				obj.Namespace, secret, types.AuthConfig{
+					Username:      v.Username,
+					Password:      v.Password,
+					ServerAddress: k,
+				}, _openshift_origin_serviceaccount_builder)
+			if err != nil {
+				return &osopb3.DockerBuildResponseData{}, err
+			}
+		}
+		obj.Spec.Strategy.DockerStrategy.PullSecret = &kapi.LocalObjectReference{secret}
+	}
+	if obj.Spec.Output.PushSecret == nil &&
+		req.Configuration.CommonSpec.Output.DockerconfigJson != nil {
+		secret := secretname_for_push_with_dockerbuilder(bc.Name)
+		for k, v := range req.Configuration.CommonSpec.Output.DockerconfigJson.AuthConfigs {
+			_, _, _, err = orchestra.VerifyDockerConfigJsonSecretAndServiceAccount(
+				obj.Namespace, secret, types.AuthConfig{
+					Username:      v.Username,
+					Password:      v.Password,
+					ServerAddress: k,
+				}, _openshift_origin_serviceaccount_builder)
+			if err != nil {
+				return &osopb3.DockerBuildResponseData{}, err
+			}
+		}
+		obj.Spec.Output.PushSecret = &kapi.LocalObjectReference{secret}
+	}
+
 	raw, obj, bc, err = op.CreateNewBuild(obj, bc)
 	//raw, obj, err = origin.DirectlyRunOriginDockerBuilder(obj)
 	if err != nil {

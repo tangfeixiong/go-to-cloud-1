@@ -192,21 +192,23 @@ func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 func (o *StartBuildOptions) cacheLogs() {
 	var b []byte
 	o.mutex.Lock()
-	b = o.buf.Bytes()
-	o.buf.Reset()
-	o.mutex.Unlock()
-	if o.Resp != nil && o.Resp.Status != nil {
-		o.Resp.Status.Message = string(b)
+	defer o.mutex.Unlock()
+	if o.Resp != nil {
+		if o.Resp.Status != nil {
+			o.Resp.Status.Message = o.buf.String()
+		}
 		var err error
 		b, err = o.Resp.Marshal()
-		if err != nil {
-			gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
+		if err != nil || len(b) == 0 {
+			glog.Errorf("Failed to operate message: %+v, data: %+v", err, o.Resp)
+			return
 		}
-	}
-	if glog.V(2) {
-		glog.V(2).Infof("Publish message: %s", string(b))
-	} else {
-		glog.Info("Publish message: %s", string(b))
+		gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
+		if glog.V(2) {
+			glog.V(2).Infof("Publish message: %+v", o.Resp)
+		} else {
+			glog.Infof("Publish message: %+v", o.Resp)
+		}
 	}
 }
 

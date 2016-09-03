@@ -135,6 +135,33 @@ func (p *PaaS) config() {
 	p.oc, _, p.err = p.ccf.Clients()
 }
 
+func (p *PaaS) VerifyProject(project string) error {
+	ok, err := findProject(p.oc, project)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		tgt := &projectapi.Project{
+			TypeMeta: unversioned.TypeMeta{
+				Kind:       "Project",
+				APIVersion: projectapi.SchemeGroupVersion.Version,
+			},
+			ObjectMeta: kapiv1.ObjectMeta{
+				Name: project,
+			},
+			Spec: projectapi.ProjectSpec{
+				Finalizers: []kapiv1.FinalizerName{projectapi.FinalizerOrigin,
+					kapiv1.FinalizerKubernetes},
+			},
+		}
+		_, _, err = createIntoProject(p.oc, nil, tgt)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build,
 	conf *buildapiv1.BuildConfig) ([]byte, *buildapiv1.Build, *buildapiv1.BuildConfig, error) {
 	logger.SetPrefix("[appliance/openshift/origin, PaaS.CreateNewBuild] ")
@@ -144,29 +171,6 @@ func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build,
 	}
 	var ok bool
 	var err error
-	ok, err = findProject(p.oc, obj.Namespace)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	if !ok {
-		tgt := &projectapi.Project{
-			TypeMeta: unversioned.TypeMeta{
-				Kind:       "Project",
-				APIVersion: projectapi.SchemeGroupVersion.Version,
-			},
-			ObjectMeta: kapiv1.ObjectMeta{
-				Name: obj.Namespace,
-			},
-			Spec: projectapi.ProjectSpec{
-				Finalizers: []kapiv1.FinalizerName{projectapi.FinalizerOrigin,
-					kapiv1.FinalizerKubernetes},
-			},
-		}
-		_, _, err = createIntoProject(p.oc, nil, tgt)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-	}
 	ok, err = findBuildConfig(p.oc, conf.Namespace, conf.Name)
 	if err != nil {
 		return nil, nil, nil, err
@@ -200,10 +204,6 @@ func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build,
 		return nil, nil, nil, err
 	}
 	return raw, result, bc, nil
-}
-
-func (p *PaaS) WatchNewBuild(data []byte) ([]byte, *userapi.User, error) {
-	return createUser(data, nil)
 }
 
 func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1.Build, error) {
@@ -802,7 +802,7 @@ func LoginWithBasicAuth(username, password string) error {
 	return nil
 }
 
-func ProjectWithSimple(name string, in io.Reader, out, errOut io.Writer) {
+func ProjectCreation(name string, in io.Reader, out, errOut io.Writer) {
 	logger = log.New(os.Stdout, "[appliance/openshift/origin, ProjectWithSimple] ", log.LstdFlags|log.Lshortfile)
 
 	f := oclientcmd.NewFactory(withOClientConfig())

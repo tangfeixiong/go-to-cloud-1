@@ -129,153 +129,6 @@ func NewDockerBuildRequestDataUtility() *DockerBuildRequestDataUtility {
 	}
 }
 
-/*func NewDockerBuildRequestDataUtility(kubeconfigPath, kubeContext, apiServer string) *DockerBuildRequestDataUtility {
-	return &DockerBuildRequestDataUtility{
-		//kcc:    kcc,
-		kubeconfigPath: kubeconfigPath,
-		kubeContext:    kubeContext,
-		apiServer:      apiServer,
-		target:         internalDockerBuildRequestData(),
-	}
-}*/
-
-// k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
-/*func directKClientConfig(kubeconfigPath, kubeContext, apiServer string) (kclientcmd.ClientConfig, error) {
-	data, err := ioutil.ReadFile(kubeconfigPath)
-	if err != nil {
-		return nil, err
-	}
-
-	conf, err := kclientcmd.Load(data)
-	if err != nil {
-		return nil, err
-	}
-
-	return kclientcmd.NewNonInteractiveClientConfig(*conf, kubeContext,
-		&kclientcmd.ConfigOverrides{
-			ClusterInfo: kclientcmdapi.Cluster{
-				Server: apiServer,
-			},
-		},
-		kclientcmd.NewDefaultClientConfigLoadingRules()), nil
-}
-
-func (b *DockerBuildRequestDataUtility) RetrieveDockerSecret(project, repo, username, password, email string) (string, error) {
-	kcc, err := directKClientConfig(b.kubeconfigPath, b.kubeContext, b.apiServer)
-	if err != nil {
-		return "", err
-	}
-	cc, err := kcc.ClientConfig()
-	if err != nil {
-		return "", err
-	}
-	client, err := kclient.New(cc)
-	if err != nil {
-		return "", err
-	}
-
-	offset := strings.LastIndex(repo, "/")
-	account := repo
-	if offset > 0 {
-		account = repo[0:offset]
-	}
-	sEnc := base64.StdEncoding.EncodeToString([]byte(account))
-	secret, err := client.Secrets(project).Get(sEnc)
-	if err != nil {
-		return "", err
-	}
-	if secret != nil && string(secret.Type) != string(kapi.SecretTypeDockercfg) {
-		return "", fmt.Errorf("secret is existed as not dockercfg")
-	}
-	sAuth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
-	if secret != nil && string(secret.Data[kapi.DockerConfigKey]) == sAuth {
-		return sEnc, nil
-	}
-	if secret != nil {
-		secret.Data[kapi.DockerConfigKey] = []byte(sEnc)
-		if _, err := client.Secrets(project).Update(secret); err != nil {
-			return "", err
-		}
-	} else {
-		secret = &k8sapi.Secret{
-			TypeMeta: unversioned.TypeMeta{
-				APIVersion: "v1",
-				Kind:       "Secret",
-			},
-			ObjectMeta: k8sapi.ObjectMeta{
-				Name:      sEnc,
-				Namespace: project,
-				Annotations: map[string]string{
-					"qingyuanos.com/docker-registry": account,
-				},
-			},
-			Data: map[string][]byte{
-				k8sapi.DockerConfigKey: []byte(sAuth),
-			},
-			Type: k8sapi.SecretTypeDockercfg,
-		}
-		if _, err := client.Secrets(project).Create(secret); err != nil {
-			return "", err
-		}
-		sa, err := client.ServiceAccounts(project).Get("builder")
-		if err != nil {
-			return "", err
-		}
-		sa.Secrets = append(sa.Secrets, k8sapi.ObjectReference{Name: sEnc})
-		sa.ImagePullSecrets = append(sa.ImagePullSecrets, k8sapi.LocalObjectReference{Name: sEnc})
-		if _, err := client.ServiceAccounts(project).Update(sa); err != nil {
-			return "", err
-		}
-	}
-	return sEnc, nil
-}
-
-func (b *DockerBuildRequestDataUtility) RetrieveGitSecretBasicAuth(project, repo, username, password string) (string, error) {
-	kcc, err := directKClientConfig(b.kubeconfigPath, b.kubeContext, b.apiServer)
-	if err != nil {
-		return "", err
-	}
-	cc, err := kcc.ClientConfig()
-	if err != nil {
-		return "", err
-	}
-	client, err := kclient.New(cc)
-	if err != nil {
-		return "", err
-	}
-
-	offset := strings.LastIndex(repo, "://")
-	account := repo
-	if offset > 0 {
-		offset += 3
-		n := strings.Index(repo[offset:], "/")
-		if n > 0 {
-			offset += n
-			n = strings.Index(repo[offset:], "/")
-			if n > 0 {
-				offset += n
-			}
-		}
-		account = repo[0:offset]
-	}
-	sEnc := base64.StdEncoding.EncodeToString([]byte(account))
-	secret, err := client.Secrets(project).Get(sEnc)
-	if err != nil {
-		return "", err
-	}
-	if string(secret.Type) != string(kapi.SecretTypeOpaque) {
-		return "", fmt.Errorf("secret is existed as not opaque")
-	}
-	sAuth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
-	if string(secret.Data["BasicAuth"]) != sAuth {
-		secret.Data["BasicAuth"] = []byte(sEnc)
-		if _, err := client.Secrets(project).Update(secret); err != nil {
-			return "", err
-		}
-	}
-	return sEnc, nil
-}*/
-
 func (b *DockerBuildRequestDataUtility) RequestDataForGET(project, name string) *osopb3.DockerBuildRequestData {
 	return b.Builder(project, name).target
 }
@@ -408,6 +261,27 @@ func (b *DockerBuildRequestDataUtility) DockerBuildStrategy(overrideBaseImage,
 	return b
 }
 
+func (b *DockerBuildRequestDataUtility) DockerPullCredential(addr, username, password string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.target.Configuration.CommonSpec.Strategy == nil {
+		b.target.Configuration.CommonSpec.Strategy = &osopb3.BuildStrategy{}
+	}
+	if b.target.Configuration.CommonSpec.Strategy.DockerStrategy == nil {
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy = &osopb3.DockerBuildStrategy{}
+	}
+	b.target.Configuration.CommonSpec.Strategy.DockerStrategy.DockerconfigJson = &osopb3.DockerConfigFile{
+		AuthConfigs: map[string]*osopb3.DockerAuthConfig{
+			addr: &osopb3.DockerAuthConfig{
+				Username:       username,
+				password:       password,
+				ServiceAddress: addr,
+			},
+		},
+	}
+}
+
 func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
 	pushSecret string) *DockerBuildRequestDataUtility {
 	if b.target == nil {
@@ -429,4 +303,23 @@ func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
 		}
 	}
 	return b
+}
+
+func (b *DockerBuildRequestDataUtility) DockerPushCredential(addr, username, password string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.target.Configuration.CommonSpec.Output == nil {
+		b.target.Configuration.CommonSpec.Output = &osopb3.BuildOutput{}
+	}
+
+	b.target.Configuration.CommonSpec.Output.DockerconfigJson = &osopb3.DockerConfigFile{
+		AuthConfigs: map[string]*osopb3.DockerAuthConfig{
+			addr: &osopb3.DockerAuthConfig{
+				Username:       username,
+				password:       password,
+				ServiceAddress: addr,
+			},
+		},
+	}
 }

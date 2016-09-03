@@ -1,4 +1,4 @@
-package e2e
+package kubernetes
 
 import (
 	"bytes"
@@ -7,14 +7,98 @@ import (
 	"os"
 	"strings"
 
+	"github.com/golang/glog"
+	"github.com/helm/helm-classic/codec"
+
+	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/api/meta"
 	"k8s.io/kubernetes/pkg/api/unversioned"
+	kapiv1 "k8s.io/kubernetes/pkg/api/v1"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	utilerrors "k8s.io/kubernetes/pkg/util/errors"
-
-	"github.com/golang/glog"
 )
+
+func createSecret(c *kclient.Client, namespace string, secret *kapiv1.Secret) ([]byte, *kapi.Secret, *kapiv1.Secret, error) {
+	data, err := c.RESTClient.Verb("POST").Namespace(namespace).Resource("Secrets").Body(secret).DoRaw()
+	if err != nil {
+		glog.Errorf("Could not access kubernetes: %+v", err)
+		return nil, nil, nil, err
+	}
+	glog.V(10).Infof("received from creation: %+v", data)
+
+	hco, err := codec.JSON.Decode(data).One()
+	if err != nil {
+		glog.Errorf("Could not setup hco: %+v\n", err)
+		return nil, nil, nil, err
+	}
+	result := &kapi.Secret{}
+	if err := hco.Object(result); err != nil {
+		glog.Errorf("Could not decode runtime object: %+v\n", err)
+		return data, nil, nil, err
+	}
+	v1 := &kapiv1.Secret{}
+	if err := hco.Object(v1); err != nil {
+		glog.Errorf("Could not decode runtime object: %+v\n", err)
+		return data, result, nil, err
+	}
+	return data, result, v1, nil
+}
+
+func retrieveSecret(c *kclient.Client, namespace, secret string) (*kapi.Secret, error) {
+	data, err := c.RESTClient.Verb("GET").Namespace(namespace).Resource("Secrets").Name(secret).DoRaw()
+	if err != nil {
+		glog.Errorf("Could not access kubernetes: %+v", err)
+		return nil, err
+	}
+
+	hco, err := codec.JSON.Decode(data).One()
+	if err != nil {
+		glog.Errorf("Could not setup hco: %+v\n", err)
+		return nil, err
+	}
+	meta := &unversioned.TypeMeta{}
+	if err := hco.Object(meta); err != nil {
+		glog.Errorf("Could not decode into TypeMeta: %+v\n", err)
+		return nil, err
+	}
+	if strings.EqualFold("Status", meta.Kind) {
+		return nil, nil
+	}
+
+	obj := &kapi.Secret{}
+	if err := hco.Object(obj); err != nil {
+		glog.Errorf("Could not decode runtime object: %+v\n", err)
+		return nil, err
+	}
+	return obj, nil
+}
+
+func updateSecret(c *kclient.Client, namespace string, obj *kapi.Secret) (*kapi.Secret, error) {
+	result, err := c.Secrets(namespace).Update(obj)
+	if err != nil {
+		glog.Errorf("Could not update secret: %+v\n", err)
+		return nil, err
+	}
+	glog.V(10).Infof("Secret updated: %+v\n", result)
+	return result, nil
+}
+
+func deleteSecret(c *kclient.Client, namespace, secret string) error {
+	err := c.Secrets(namespace).Delete(secret)
+	if err != nil {
+		glog.Errorf("Could not delete secret: %+v\n", err)
+		return err
+	}
+	glog.V(10).Infof("Secret deleted")
+	return nil
+}
+
+type debugError interface {
+	DebugError() (msg string, args []interface{})
+}
 
 var fatalErrHandler = fatal
 
@@ -52,7 +136,7 @@ func checkErr(err error, handleErr func(string)) {
 		details := err.(*errors.StatusError).Status().Details
 		prefix := fmt.Sprintf("The %s %q is invalid.\n", details.Kind, details.Name)
 		errs := statusCausesToAggrError(details.Causes)
-		handleErr(MultilineError(prefix, errs))
+		handleErr(kcmdutil.MultilineError(prefix, errs))
 	}
 
 	if noMatch, ok := err.(*meta.NoResourceMatchError); ok {
@@ -74,7 +158,7 @@ func checkErr(err error, handleErr func(string)) {
 		handleErr(MultilineError("Error in configuration: ", err))
 	}
 	if agg, ok := err.(utilerrors.Aggregate); ok && len(agg.Errors()) > 0 {
-		handleErr(MultipleErrors("", agg.Errors()))
+		handleErr(kcmdutil.MultipleErrors("", agg.Errors()))
 	}
 
 	msg, ok := StandardErrorMessage(err)

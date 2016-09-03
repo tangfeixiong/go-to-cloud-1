@@ -2,63 +2,6 @@
 // source: paas/ci/osopb3/grpc.proto
 // DO NOT EDIT!
 
-/*
-	Package osopb3 is a generated protocol buffer package.
-
-	It is generated from these files:
-		paas/ci/osopb3/grpc.proto
-		paas/ci/osopb3/model.proto
-
-	It has these top-level messages:
-		ProjectResponseDataArbitrary
-		ProjectCreationRequestData
-		ProjectCreationResponseData
-		ProjectRetrieveRequestData
-		ProjectRetrieveResponseData
-		ProjectUpdationRequestData
-		ProjectDeletionRequestData
-		ProjectDeletionResponseData
-		CreateOriginProjectRequest
-		CreateOriginProjectResponse
-		FindProjectRequest
-		FindProjectResponse
-		DeleteProjectRequest
-		DeleteProjectResponse
-		DockerBuildConfigRequestData
-		DockerBuildConfigResponseData
-		DockerBuildRequestData
-		DockerBuildResponseData
-		RawJSON
-		RawData
-		VersionRequestData
-		VersionResponseData
-		SourceControlUser
-		GitSourceRevision
-		SourceRevision
-		BuildPostCommitSpec
-		BuildOutput
-		JenkinsPipelineBuildStrategy
-		SecretSpec
-		CustomBuildStrategy
-		SourceBuildStrategy
-		DockerBuildStrategy
-		BuildStrategy
-		SecretBuildSource
-		ImageSourcePath
-		ImageSource
-		GitBuildSource
-		BinaryBuildSource
-		BuildSource
-		OsoCommonSpec
-		WebHookTrigger
-		ImageChangeTrigger
-		OsoBuildTriggerPolicy
-		GenericWebHookCause
-		GitHubWebHookCause
-		ImageChangeCause
-		OsoBuildTriggerCause
-		OsoBuildStatus
-*/
 package osopb3
 
 import proto "github.com/golang/protobuf/proto"
@@ -79,10 +22,6 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-const _ = proto.ProtoPackageIsVersion1
 
 type K8SNamespacePhase int32
 

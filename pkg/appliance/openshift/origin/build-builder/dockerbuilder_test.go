@@ -25,16 +25,8 @@ import (
 )
 
 var (
-	fakeUser    string = "system:admin"
-	fakeProject string = "tangfx"
-	fakeBuild   string = "netcat-http"
-
-	fakeDockerfile string = `"FROM alpine:edge\nRUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*\nCOPY entrypoint.sh /\nENTRYPOINT [\"/entrypoint.sh\"]\nCMD [\"nc\"]"`
-
-	fakeGitSecrets        = map[string]string{"gogs": "tangfx:tangfx"}
-	fakeGitURI     string = "https://github.com/tangfeixiong/docker-nc.git"
-	fakeGitRef     string = "master"
-	fakeContextDir string = "latest"
+	fake_dockerbuildproject string = "tangfx"
+	fake_dockerbuildname    string = "osobuilds"
 
 	fakeImagePath    = map[string]string{"sourcePath": "/go", "destinationDir": "/workspace"}
 	fakeSourceImages = []map[string]interface{}{{
@@ -43,35 +35,10 @@ var (
 			"paths":      [...]map[string]string{fakeImagePath},
 			"pullSecret": "base64:encoding"}}}
 
-	exampleBuild string = "/examples/github101.json"
-	buildName    string = "osobuilds"
-	buildProject string = "tangfx"
-
-	_nats_addrs    []string = []string{"10.3.0.39:4222"}
-	_nats_user     string   = "derek"
-	_nats_password string   = "T0pS3cr3t"
+	exampleDockerBuild string = "/examples/github101.json"
 )
 
-func TestMain(m *testing.M) {
-	flag.Parse()
-	f := flag.Lookup("v")
-	if f != nil {
-		f.Value.Set("2")
-	}
-
-	//	if _, _, err := origin.CreateDockerBuildV1Example(fakeBuild, fakeProject,
-	//		nil, fakeGitURI, fakeGitRef, fakeContextDir,
-	//		nil, fakeDockerfile, nil, nil); err != nil {
-	//		fmt.Printf("Failed: %s", err)
-	//	}
-
-	ret := m.Run()
-
-	os.Exit(ret)
-}
-
 func TestOriginDockerBuilder(t *testing.T) {
-	_ = flag.Int("loglevel", 5, "loglevel binding with glog v")
 	flag.Parse()
 	if f := flag.Lookup("v"); f != nil {
 		f.Value.Set("5")
@@ -82,7 +49,7 @@ func TestOriginDockerBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f := wd + "/../../../../.." + exampleBuild
+	f := wd + "/../../../../.." + exampleDockerBuild
 
 	b, err := ioutil.ReadFile(f)
 	if err != nil {

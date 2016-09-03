@@ -1,18 +1,20 @@
 syntax = "proto3";
 
-//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
+option go_package = "osopb3";
+option java_package = "com.qingyuanos.core.googleprotobuf.osopb3";
+option java_outer_classname = "OciAciBuildApiModel";
+
+package paas.ci.osopb3;
 
 import "google/api/annotations.proto";
 //import "google/protobuf/any.proto";
 
+//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
+
 import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
 import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
 
-package paas.ci.osopb3;
-
-option go_package = "osopb3";
-option java_package = "com.qingyuanos.core.googleprotobuf.osopb3";
-option java_outer_classname = "BaseModel";
+import "paas/ci/osopb3/docker-engine-api.proto";
 
 
 //
@@ -54,6 +56,8 @@ message BuildOutput {
 	k8s.io.kubernetes.pkg.api.v1.ObjectReference to = 1;
 	
 	k8s.io.kubernetes.pkg.api.v1.LocalObjectReference pushSecret = 2;
+	
+	DockerConfigFile dockerconfigJson = 3;	
 }
 	
 message JenkinsPipelineBuildStrategy {
@@ -110,6 +114,8 @@ message DockerBuildStrategy {
 	bool forcePull = 5;
 	
 	string dockerfilePath = 6;
+	
+	DockerConfigFile dockerconfigJson = 7;
 }
 
 message BuildStrategy {
@@ -297,6 +303,8 @@ message OsoBuildStatus {
 		Failed = 4;
 		Error = 5;
 		Cancelled = 6;
+		
+		Incorrect = 7;
 	}	
 	OsoBuildPhase osoBuildPhase = 10;
 }
