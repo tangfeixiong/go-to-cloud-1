@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/helm/helm-classic/codec"
@@ -24,11 +25,12 @@ import (
 	kapi "k8s.io/kubernetes/pkg/api"
 	kerrors "k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/api/unversioned"
+	//kapiv1 "k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	"k8s.io/kubernetes/pkg/fields"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 	"k8s.io/kubernetes/pkg/runtime"
-	"k8s.io/kubernetes/pkg/runtime/serializer"
+	//"k8s.io/kubernetes/pkg/runtime/serializer"
 
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
@@ -176,16 +178,25 @@ func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 	}*/
 
 	resp := GenerateResponseData(raw, obj)
-	if bytes.Compare(raw, o.Raw) != 0 {
+	if strings.Compare(string(o.Obj.Status.Phase), string(obj.Status.Phase)) != 0 {
 		o.Raw = raw
 		o.Obj = obj
-		o.Resp = resp
-		if b, err := o.Resp.Marshal(); err != nil {
-			glog.Infof("cache: %+v", string(b))
-			//gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
-		}
+		glog.Infof("Watched data: %+v", obj)
 	} else {
-		glog.Infof("noting to cache")
+		glog.Infoln("Watched data is same as previous")
+		time.Sleep(1000)
+	}
+	o.Resp = resp
+	b, err := o.Resp.Marshal()
+	if err != nil {
+		glog.Errorf("Faild to marshal data for cache: %+v", err)
+		return
+	}
+	gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
+	if glog.V(2) {
+		glog.V(2).Infof("Publish building: %+v", o.Resp)
+	} else {
+		glog.Infof("Publish building: %+v", o.Resp)
 	}
 }
 
@@ -212,26 +223,13 @@ func (o *StartBuildOptions) cacheLogs() {
 	}
 }
 
-func (o *StartBuildOptions) restClient() (*restclient.RESTClient, error) {
-	config, err := o.ClientConfig.ClientConfig()
-	if err != nil {
-		return nil, err
-	}
-	kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.BuildConfig{})
-	kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.BuildConfig{})
-	cf := serializer.NewCodecFactory(kapi.Scheme)
-	config.GroupVersion = &buildapi.SchemeGroupVersion
-	config.NegotiatedSerializer = &cf
-	return restclient.RESTClientFor(config)
-}
-
 func (o *StartBuildOptions) tracker() {
 	var (
-		wg       sync.WaitGroup
-		exitErr  error
-		c        osclient.BuildInterface = o.Client.Builds(o.Namespace)
-		name     string                  = o.Obj.Name
-		newBuild *buildapi.Build         = V1ToBuild(o.Obj)
+		wg      sync.WaitGroup
+		exitErr error
+		//c        osclient.BuildInterface = o.Client.Builds(o.Namespace)
+		name     string          = o.Obj.Name
+		newBuild *buildapi.Build = V1ToBuild(o.Obj)
 	)
 	o.Out = o.buf
 	o.ErrOut = o.buf
@@ -242,17 +240,11 @@ func (o *StartBuildOptions) tracker() {
 		defer wg.Done()
 		//exitErr = WaitForBuildComplete(o.Client.Builds(o.Namespace), newBuild.Name)
 		for {
-			//raw, err := o.Client.RESTClient.Verb("GET").Namespace(project).Resource("Builds").
-			//	VersionedParams(kapiv1.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()}).
-			//	DoRaw()
-			list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
+			/*list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
 			if err != nil {
 				glog.Errorf("Failed to list builds (%s): %+v", name, err)
 				exitErr = err
 				return
-			}
-			if len(list.Items) == 0 {
-				glog.Warningln("Unexpected")
 			}
 			for i := range list.Items {
 				if name == list.Items[i].Name &&
@@ -269,16 +261,61 @@ func (o *StartBuildOptions) tracker() {
 					exitErr = fmt.Errorf("the build %s/%s status is %q", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
 					return
 				}
-			}
-
-			rv := list.ResourceVersion
-			c, err := o.restClient()
+			}*/
+			raw, err := o.OP.OC().RESTClient.Verb("GET").Namespace(o.Namespace).
+				Resource("Builds").Name(name).DoRaw()
 			if err != nil {
-				glog.Errorf("Failed to setup restclient: %+v", err)
+				glog.Errorf("Failed to list builds (%s): %+v", name, err)
 				exitErr = err
 				return
 			}
-			w, err := c.Verb("GET").Prefix("watch").Namespace(o.Namespace).Resource("builds").
+			hco, err := codec.JSON.Decode(raw).One()
+			if err != nil {
+				glog.Errorf("Failed to setup helm codec (%s): %+v", name, err)
+				exitErr = err
+				return
+			}
+			meta := new(unversioned.TypeMeta)
+			if err := hco.Object(meta); err != nil {
+				glog.Errorf("Failed to decode TypeMeta (%s): %+v", name, err)
+				exitErr = err
+				return
+			}
+			if !strings.EqualFold(meta.Kind, "Build") {
+				glog.Warningln("Nothing found, Unexpected")
+				exitErr = fmt.Errorf("Unexpected as nothing found")
+				return
+			}
+
+			obj := new(buildapiv1.Build)
+			if err := hco.Object(obj); err != nil {
+				glog.Errorf("Failed to decode build (%s): %+v", name, err)
+				exitErr = err
+				return
+			}
+			o.cacheBuilds(raw, obj)
+			list := buildapiv1.BuildList{
+				Items: []buildapiv1.Build{*obj},
+			}
+			for i := range list.Items {
+				if name == list.Items[i].Name &&
+					list.Items[i].Status.Phase == buildapiv1.BuildPhaseComplete {
+					glog.Infof("Build %+v is completed", name)
+					exitErr = nil
+					return
+				}
+				if name != list.Items[i].Name ||
+					list.Items[i].Status.Phase == buildapiv1.BuildPhaseFailed ||
+					list.Items[i].Status.Phase == buildapiv1.BuildPhaseCancelled ||
+					list.Items[i].Status.Phase == buildapiv1.BuildPhaseError {
+					glog.Errorf("Unexpected %s/%s status: %+v", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
+					exitErr = fmt.Errorf("the build %s/%s status is %q", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
+					return
+				}
+			}
+
+			/*rv := list.ResourceVersion
+			w, err := o.OP.OC().RESTClient.Verb("GET").Prefix("watch").Namespace(o.Namespace).Resource("builds").
 				VersionedParams(&kapi.ListOptions{
 					FieldSelector:   fields.Set{"name": name}.AsSelector(),
 					ResourceVersion: rv,
@@ -305,7 +342,6 @@ func (o *StartBuildOptions) tracker() {
 				}
 				//if e, ok := val.Object.(*buildapi.Build); ok {
 				if b, e, ok := convertIntoV1WithRuntimeObject(val.Object); ok {
-					o.cacheBuilds(b, e)
 					if name == e.Name && e.Status.Phase == buildapiv1.BuildPhaseComplete {
 						glog.Infoln("completed")
 						exitErr = nil
@@ -319,7 +355,7 @@ func (o *StartBuildOptions) tracker() {
 						return
 					}
 				}
-			}
+			}*/
 		}
 	}()
 

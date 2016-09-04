@@ -3,6 +3,7 @@ package gnatsd
 import (
 	"log"
 	"os"
+	"sync"
 
 	"github.com/cloudfoundry/yagnats"
 )
@@ -30,7 +31,7 @@ func Publish(addrs []string, user, password *string, subject string, message []b
 }
 
 func Subscribe(addrs []string, user, password *string, subject string) ([]byte, error) {
-	var logger *log.Logger = log.New(os.Stdout, "[appliance/gnatsd, Publish] ", log.LstdFlags|log.Lshortfile)
+	var logger *log.Logger = log.New(os.Stdout, "[appliance/gnatsd, Subscribe] ", log.LstdFlags|log.Lshortfile)
 
 	if len(subject) > 0 {
 		_subject = subject
@@ -43,14 +44,17 @@ func Subscribe(addrs []string, user, password *string, subject string) ([]byte, 
 	}
 
 	var data []byte
+	m := &sync.Mutex{}
+	m.Lock()
 	id, err := c.Subscribe(_subject, func(msg *yagnats.Message) {
-		data = msg.Payload
+		defer m.Unlock()
+		data = append(data, msg.Payload...)
+		c.Disconnect()
 	})
 	if err != nil {
 		logger.Printf("Faile to subscribe into gnatsd: %+v", err)
 		return []byte{}, err
 	}
 	logger.Printf("Got message(id=%d): %s\n", id, string(data))
-	c.Disconnect()
 	return data, nil
 }

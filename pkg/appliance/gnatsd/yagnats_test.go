@@ -20,15 +20,15 @@ func TestYagnats_simple(t *testing.T) {
 		//panic("Wrong auth or something.")
 	}
 
+	client.Publish("some.subject", []byte("Sup son?"))
+
+	client.Publish("some.subject", []byte("Again?"))
+
 	var data yagnats.Message
 	client.Subscribe("some.subject", func(msg *yagnats.Message) {
 		data = *msg
 		fmt.Printf("Got message: %s\n", msg.Payload)
 	})
-
-	client.Publish("some.subject", []byte("Sup son?"))
-
-	client.Publish("some.subject", []byte("Again?"))
 
 	t.Log(string(data.Payload))
 }

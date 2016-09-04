@@ -24,16 +24,16 @@ var (
 	_oso_Dockerfile     string = "FROM alpine:3.4\nRUN apk add --update bash netcat-openbsd && rm -rf /var/cache/apk/*\nRUN echo \"<html><body><h1>hello world</h1></body></html>\" >> /tmp/index.html\nEXPOSE 80\nCMD [\"nc\", \"-l\", \"80\", \"</tmp/index.html\"]"
 	_oso_dockerPush     string = "172.17.4.50:30005/tangfx/nchellohttp:latest"
 	_oso_GitURI         string = "http://172.17.4.50:30080/tangfx/netcat-alpine"
-	_oso_timeout        int64  = 900
+	_oso_timeout        int64  = 300
 )
 
 func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 	return &osopb3.DockerBuildRequestData{
-		Name:        _oso_builder,
-		ProjectName: _oso_project,
+		Name:        "",
+		ProjectName: "",
 		Configuration: &osopb3.DockerBuildConfigRequestData{
-			Name:        _oso_builder,
-			ProjectName: _oso_project,
+			Name:        "",
+			ProjectName: "",
 			Triggers:    []*osopb3.OsoBuildTriggerPolicy{},
 			RunPolicy:   osopb3.DockerBuildConfigRequestData_Serial.String(),
 			CommonSpec: &osopb3.OsoCommonSpec{
@@ -41,10 +41,10 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 				Source: &osopb3.BuildSource{
 					Type:       osopb3.OsoBuildSourceType_Dockerfile.String(),
 					Binary:     (*osopb3.BinaryBuildSource)(nil),
-					Dockerfile: _oso_Dockerfile,
+					Dockerfile: "",
 					Git: &osopb3.GitBuildSource{
-						Uri:        _oso_GitURI,
-						Ref:        "master",
+						Uri:        "",
+						Ref:        "",
 						HttpProxy:  "",
 						HttpsProxy: "",
 					},
@@ -75,13 +75,11 @@ func internalDockerBuildRequestData() *osopb3.DockerBuildRequestData {
 					OsoBuildStrategyType:    osopb3.BuildStrategy_Docker,
 				},
 				Output: &osopb3.BuildOutput{
-					To: &kapi.ObjectReference{
-						Kind: "DockerImage",
-						Name: _oso_dockerPush,
-					},
-					PushSecret: &kapi.LocalObjectReference{
-						Name: `localdockerconfig`,
-					},
+					/*To: &kapi.ObjectReference{
+					Kind: "DockerImage",
+					Name: _oso_dockerPush},*/
+					To:         (*kapi.ObjectReference)(nil),
+					PushSecret: (*kapi.LocalObjectReference)(nil),
 				},
 				Resources: &kapi.ResourceRequirements{
 					Limits:   kapi.ResourceList(map[kapi.ResourceName]resource.Quantity{}),
