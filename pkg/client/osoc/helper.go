@@ -274,12 +274,13 @@ func (b *DockerBuildRequestDataUtility) DockerPullCredential(addr, username, pas
 	b.target.Configuration.CommonSpec.Strategy.DockerStrategy.DockerconfigJson = &osopb3.DockerConfigFile{
 		AuthConfigs: map[string]*osopb3.DockerAuthConfig{
 			addr: &osopb3.DockerAuthConfig{
-				Username:       username,
-				password:       password,
-				ServiceAddress: addr,
+				Username:      username,
+				Password:      password,
+				ServerAddress: addr,
 			},
 		},
 	}
+	return b
 }
 
 func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
@@ -316,10 +317,11 @@ func (b *DockerBuildRequestDataUtility) DockerPushCredential(addr, username, pas
 	b.target.Configuration.CommonSpec.Output.DockerconfigJson = &osopb3.DockerConfigFile{
 		AuthConfigs: map[string]*osopb3.DockerAuthConfig{
 			addr: &osopb3.DockerAuthConfig{
-				Username:       username,
-				password:       password,
-				ServiceAddress: addr,
+				Username:      username,
+				Password:      password,
+				ServerAddress: addr,
 			},
 		},
 	}
+	return b
 }

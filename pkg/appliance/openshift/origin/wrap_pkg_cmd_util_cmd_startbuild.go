@@ -251,9 +251,13 @@ func (o *StartBuildOptions) tracker() {
 				exitErr = err
 				return
 			}
+			if len(list.Items) == 0 {
+				glog.Warningln("Unexpected")
+			}
 			for i := range list.Items {
 				if name == list.Items[i].Name &&
 					list.Items[i].Status.Phase == buildapi.BuildPhaseComplete {
+					glog.Infof("Build %+v is completed", name)
 					exitErr = nil
 					return
 				}
@@ -261,6 +265,7 @@ func (o *StartBuildOptions) tracker() {
 					list.Items[i].Status.Phase == buildapi.BuildPhaseFailed ||
 					list.Items[i].Status.Phase == buildapi.BuildPhaseCancelled ||
 					list.Items[i].Status.Phase == buildapi.BuildPhaseError {
+					glog.Errorf("Unexpected %s/%s status: %+v", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
 					exitErr = fmt.Errorf("the build %s/%s status is %q", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
 					return
 				}
