@@ -25,6 +25,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		for {
+			time.Sleep(1 * time.Second)
 			status, ok = e2e.TrackingDockerBuild()
 			if !ok || status == 0 {
 				fmt.Println("Received failed")
@@ -32,16 +33,15 @@ func main() {
 			}
 			switch status {
 			case 1:
-				fmt.Printf("Continuning: %+v", status)
-				time.Sleep(1000)
+				fmt.Printf("Continuning: %+v\n", status)
 			case 2:
-				fmt.Printf("Failure: %+v", status)
+				fmt.Printf("Failure: %+v\n", status)
 				return
 			case 3:
-				fmt.Printf("Succeeded: %+v", status)
+				fmt.Printf("Succeeded: %+v\n", status)
 				return
 			case 4:
-				fmt.Printf("Warning: %+v", status)
+				fmt.Printf("Warning: %+v\n", status)
 				return
 			default:
 				fmt.Println("Unexpected")

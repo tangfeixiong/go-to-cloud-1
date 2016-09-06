@@ -143,6 +143,10 @@ func TrackingDockerBuild() (status int, ok bool) {
 	send := &osopb3.DockerBuildRequestData{
 		Name:        exam["Name"].(string),
 		ProjectName: exam["Project"].(string),
+		Configuration: &osopb3.DockerBuildConfigRequestData{
+			Name:        exam["Name"].(string),
+			ProjectName: exam["Project"].(string),
+		},
 	}
 
 	f := osoc.NewIntegrationFactory(_apaas_grpc_addresses[0])
@@ -156,7 +160,7 @@ func TrackingDockerBuild() (status int, ok bool) {
 		return
 	}
 	if received == nil || received.Status == nil {
-		return 1, true
+		return
 	}
 
 	switch received.Status.OsoBuildPhase {

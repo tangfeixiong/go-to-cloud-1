@@ -769,9 +769,10 @@ func ConvertBuildIntoV1(data []byte, obj *buildapi.Build) ([]byte, *buildapiv1.B
 		logger.Printf("Could not decode into TypeMeta: %+v", err)
 		return nil, nil, err
 	}
-	if !strings.EqualFold(tgt.Kind, "Build") || !strings.EqualFold(tgt.APIVersion, "v1") {
-		glog.Errorf("Invalid destination type from meta: %s, %s", tgt.Kind, tgt.APIVersion)
-		return nil, nil, errUnexpected
+	if !(strings.EqualFold(tgt.Kind, "Build") && strings.EqualFold(tgt.APIVersion, "v1")) {
+		glog.Warningf("Invalid destination type from meta: %s, %s", tgt.Kind, tgt.APIVersion)
+		tgt.Kind = "Build"
+		tgt.APIVersion = "v1"
 	}
 	b.Reset()
 	if err = codec.JSON.Encode(b).One(&obj.ObjectMeta); err != nil {

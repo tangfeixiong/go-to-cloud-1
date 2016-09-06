@@ -1,4 +1,4 @@
-package etcd3
+package etcd
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 
 func TestKV_put(t *testing.T) {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   endpoints,
+		Endpoints:   endpoints[:1],
 		DialTimeout: dialTimeout,
 	})
 	if err != nil {
@@ -47,7 +47,7 @@ func TestKV_put(t *testing.T) {
 
 func TestKV_get(t *testing.T) {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   endpoints,
+		Endpoints:   endpoints[:1],
 		DialTimeout: dialTimeout,
 	})
 	if err != nil {

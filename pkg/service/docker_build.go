@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strings"
 	//"bytes"
 	"fmt"
 	"os"
@@ -449,7 +450,7 @@ func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 
 	bc, obj = convertIntoBuildObject(req)
 
-	op := new(origin.PaaS)
+	op := new(origin.PaaS).WithOcCtl("", "", "", "").WithEtcdCtl([]string{}, 0, 0)
 	err = op.VerifyProject(req.ProjectName)
 	if err != nil {
 		logger.Printf("Failed to create origin project (%+v)\n", bc)
@@ -536,14 +537,37 @@ func (u *UserResource) TrackDockerBuild(ctx context.Context, req *osopb3.DockerB
 		logger.Println("Request body required")
 		return (*osopb3.DockerBuildResponseData)(nil), errUnexpected
 	}
-	b, err := gnatsd.Subscribe([]string{}, nil, nil, origin.Subject(req.ProjectName, req.Name))
-	if err != nil {
-		return (*osopb3.DockerBuildResponseData)(nil), err
-	}
 	resp := new(osopb3.DockerBuildResponseData)
-	if err := resp.Unmarshal(b); err != nil {
-		logger.Printf("Could not unmarshal into response: %+v", err)
-		return resp, err
+
+	op := new(origin.PaaS).WithOcCtl("", "", "", "").WithEtcdCtl([]string{}, 0, 0)
+	if etcdctl := op.EtcdCtl(); etcdctl != nil {
+		prefix := origin.EtcdV3BuildCacheKey("v1", "default", req.ProjectName, req.Configuration.Name, req.Name, false)
+		result, err := etcdctl.GetWithPrefix(prefix)
+		if err != nil {
+			return resp, err
+		}
+		if result == nil || len(result.Kvs) == 0 {
+			return resp, fmt.Errorf("Unexpected to nothing as result")
+		}
+		for _, val := range result.Kvs {
+			if strings.Compare(prefix, string(val.Key)) == 0 {
+				if err := resp.Unmarshal(val.Value); err != nil {
+					logger.Printf("Could not unmarshal into response: %+v", err)
+					return resp, err
+				}
+			} else {
+				resp.Status.Message = fmt.Sprintf("%s\n%s", resp.Status.Message, val.Value)
+			}
+		}
+	} else {
+		b, err := gnatsd.Subscribe([]string{}, nil, nil, origin.Subject(req.ProjectName, req.Name))
+		if err != nil {
+			return resp, err
+		}
+		if err := resp.Unmarshal(b); err != nil {
+			logger.Printf("Could not unmarshal into response: %+v", err)
+			return resp, err
+		}
 	}
 
 	return resp, nil

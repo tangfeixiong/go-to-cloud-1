@@ -145,10 +145,6 @@ func GenerateResponseData(raw []byte, obj *buildapiv1.Build) *osopb3.DockerBuild
 	}
 }
 
-func Subject(ns, name string) string {
-	return fmt.Sprintf("/namespaces/%s/builds/%s", ns, name)
-}
-
 func convertIntoV1WithRuntimeObject(obj runtime.Object) (b []byte, v *buildapiv1.Build, ok bool) {
 	buf := &bytes.Buffer{}
 	if err := codec.JSON.Encode(buf).One(obj); err != nil {
@@ -166,17 +162,37 @@ func convertIntoV1WithRuntimeObject(obj runtime.Object) (b []byte, v *buildapiv1
 		glog.Errorf("Failed to decode runtime object: %+v", err)
 		return
 	}
+	b, err = hco.JSON()
+	if err != nil {
+		glog.Errorf("Failed to encode runtime object: %+v", err)
+		return
+	}
 	ok = true
 	return
 }
 
-func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
-	/*raw, obj, err := ConvertBuildIntoV1(nil, v)
-	if err != nil {
-		glog.Warningf("Failed to read runtime object: %+v", err)
-		return
-	}*/
+func Subject(ns, name string) string {
+	return fmt.Sprintf("/namespaces/%s/builds/%s", ns, name)
+}
 
+func EtcdV3BuildCacheKey(version, cluster, ns, buildername, buildname string, isBuildLog bool) string {
+	v := "v1"
+	if len(version) > 0 {
+		v = version
+	}
+	c := "default"
+	if len(cluster) > 0 {
+		c = cluster
+	}
+	key := fmt.Sprintf("/harpoonapis/%s/clusters/%s/namespaces/%s/builders/%s/builds/%s", v, c, ns, buildername, buildname)
+	key = fmt.Sprintf("harpoonapis%sclusters%snamespaces%sbuilders%sbuilds%s", v, c, ns, buildername, buildname)
+	if isBuildLog {
+		return fmt.Sprintf("%slmaggregates", key)
+	}
+	return key
+}
+
+func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 	resp := GenerateResponseData(raw, obj)
 	if strings.Compare(string(o.Obj.Status.Phase), string(obj.Status.Phase)) != 0 {
 		o.Raw = raw
@@ -184,7 +200,7 @@ func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 		glog.Infof("Watched data: %+v", obj)
 	} else {
 		glog.Infoln("Watched data is same as previous")
-		time.Sleep(1000)
+		return
 	}
 	o.Resp = resp
 	b, err := o.Resp.Marshal()
@@ -192,18 +208,31 @@ func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 		glog.Errorf("Faild to marshal data for cache: %+v", err)
 		return
 	}
-	gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
 	if glog.V(2) {
-		glog.V(2).Infof("Publish building: %+v", o.Resp)
+		glog.V(2).Infof("cache build object with phase: %+v", o.Resp)
 	} else {
-		glog.Infof("Publish building: %+v", o.Resp)
+		glog.Infof("cache build object with phase: %+v", o.Resp)
+	}
+
+	if etcdctl := o.OP.EtcdCtl(); etcdctl != nil {
+		key := EtcdV3BuildCacheKey("v1", "default", o.Namespace, o.Req.Configuration.Name, o.Req.Name, false)
+		_, _ = etcdctl.Put(key, string(b))
+	} else {
+		gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
 	}
 }
 
 func (o *StartBuildOptions) cacheLogs() {
+	if etcdctl := o.OP.EtcdCtl(); etcdctl != nil {
+		key := EtcdV3BuildCacheKey("v1", "default", o.Namespace, o.Req.Configuration.Name, o.Req.Name, true)
+		o.mutex.Lock()
+		defer o.mutex.Unlock()
+		_, _ = etcdctl.Put(key, o.buf.String())
+		o.buf.Reset()
+		return
+	}
+
 	var b []byte
-	o.mutex.Lock()
-	defer o.mutex.Unlock()
 	if o.Resp != nil {
 		if o.Resp.Status != nil {
 			o.Resp.Status.Message = o.buf.String()
@@ -225,14 +254,18 @@ func (o *StartBuildOptions) cacheLogs() {
 
 func (o *StartBuildOptions) tracker() {
 	var (
-		wg      sync.WaitGroup
-		exitErr error
-		//c        osclient.BuildInterface = o.Client.Builds(o.Namespace)
-		name     string          = o.Obj.Name
-		newBuild *buildapi.Build = V1ToBuild(o.Obj)
+		wg       sync.WaitGroup
+		exitErr  error
+		c        osclient.BuildInterface = o.Client.Builds(o.Namespace)
+		name     string                  = o.Obj.Name
+		newBuild *buildapi.Build         = V1ToBuild(o.Obj)
 	)
 	o.Out = o.buf
 	o.ErrOut = o.buf
+	mapper, _ := o.OP.Factory().Object(false)
+	kapi.RegisterRESTMapper(mapper)
+	buildapi.AddToScheme(kapi.Scheme)
+	buildapiv1.AddToScheme(kapi.Scheme)
 
 	// Wait for the build to complete
 	wg.Add(1)
@@ -240,29 +273,7 @@ func (o *StartBuildOptions) tracker() {
 		defer wg.Done()
 		//exitErr = WaitForBuildComplete(o.Client.Builds(o.Namespace), newBuild.Name)
 		for {
-			/*list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
-			if err != nil {
-				glog.Errorf("Failed to list builds (%s): %+v", name, err)
-				exitErr = err
-				return
-			}
-			for i := range list.Items {
-				if name == list.Items[i].Name &&
-					list.Items[i].Status.Phase == buildapi.BuildPhaseComplete {
-					glog.Infof("Build %+v is completed", name)
-					exitErr = nil
-					return
-				}
-				if name != list.Items[i].Name ||
-					list.Items[i].Status.Phase == buildapi.BuildPhaseFailed ||
-					list.Items[i].Status.Phase == buildapi.BuildPhaseCancelled ||
-					list.Items[i].Status.Phase == buildapi.BuildPhaseError {
-					glog.Errorf("Unexpected %s/%s status: %+v", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
-					exitErr = fmt.Errorf("the build %s/%s status is %q", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
-					return
-				}
-			}*/
-			raw, err := o.OP.OC().RESTClient.Verb("GET").Namespace(o.Namespace).
+			/*raw, err := o.OP.OC().RESTClient.Verb("GET").Namespace(o.Namespace).
 				Resource("Builds").Name(name).DoRaw()
 			if err != nil {
 				glog.Errorf("Failed to list builds (%s): %+v", name, err)
@@ -294,27 +305,51 @@ func (o *StartBuildOptions) tracker() {
 				return
 			}
 			o.cacheBuilds(raw, obj)
-			list := buildapiv1.BuildList{
+			list1 := buildapiv1.BuildList{
 				Items: []buildapiv1.Build{*obj},
+			}
+			for i := range list1.Items {
+				if name == list1.Items[i].Name &&
+					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseComplete {
+					glog.Infof("Build %+v is completed", name)
+					exitErr = nil
+					return
+				}
+				if name != list1.Items[i].Name ||
+					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseFailed ||
+					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseCancelled ||
+					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseError {
+					glog.Errorf("Unexpected %s/%s status: %+v", list1.Items[i].Namespace, list1.Items[i].Name, list1.Items[i].Status.Phase)
+					exitErr = fmt.Errorf("the build %s/%s status is %q", list1.Items[i].Namespace, list1.Items[i].Name, list1.Items[i].Status.Phase)
+					return
+				}
+			}*/
+			time.Sleep(2 * time.Second)
+
+			list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
+			if err != nil {
+				glog.Errorf("Failed to list builds (%s): %+v", name, err)
+				exitErr = err
+				return
 			}
 			for i := range list.Items {
 				if name == list.Items[i].Name &&
-					list.Items[i].Status.Phase == buildapiv1.BuildPhaseComplete {
+					list.Items[i].Status.Phase == buildapi.BuildPhaseComplete {
 					glog.Infof("Build %+v is completed", name)
 					exitErr = nil
 					return
 				}
 				if name != list.Items[i].Name ||
-					list.Items[i].Status.Phase == buildapiv1.BuildPhaseFailed ||
-					list.Items[i].Status.Phase == buildapiv1.BuildPhaseCancelled ||
-					list.Items[i].Status.Phase == buildapiv1.BuildPhaseError {
+					list.Items[i].Status.Phase == buildapi.BuildPhaseFailed ||
+					list.Items[i].Status.Phase == buildapi.BuildPhaseCancelled ||
+					list.Items[i].Status.Phase == buildapi.BuildPhaseError {
 					glog.Errorf("Unexpected %s/%s status: %+v", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
 					exitErr = fmt.Errorf("the build %s/%s status is %q", list.Items[i].Namespace, list.Items[i].Name, list.Items[i].Status.Phase)
 					return
 				}
 			}
 
-			/*rv := list.ResourceVersion
+			rv := list.ResourceVersion
 			w, err := o.OP.OC().RESTClient.Verb("GET").Prefix("watch").Namespace(o.Namespace).Resource("builds").
 				VersionedParams(&kapi.ListOptions{
 					FieldSelector:   fields.Set{"name": name}.AsSelector(),
@@ -340,22 +375,28 @@ func (o *StartBuildOptions) tracker() {
 					glog.Infoln("reget and re-watch")
 					break
 				}
-				//if e, ok := val.Object.(*buildapi.Build); ok {
-				if b, e, ok := convertIntoV1WithRuntimeObject(val.Object); ok {
-					if name == e.Name && e.Status.Phase == buildapiv1.BuildPhaseComplete {
+				if e, ok := val.Object.(*buildapi.Build); ok {
+					raw, v1, err := ConvertBuildIntoV1([]byte{}, e)
+					if err != nil {
+						exitErr = err
+						glog.Warningf("convert failed: %+v", exitErr)
+						return
+					}
+					o.cacheBuilds(raw, v1)
+					if name == e.Name && e.Status.Phase == buildapi.BuildPhaseComplete {
 						glog.Infoln("completed")
 						exitErr = nil
 						return
 					}
-					if name != e.Name || e.Status.Phase == buildapiv1.BuildPhaseFailed ||
-						e.Status.Phase == buildapiv1.BuildPhaseCancelled ||
-						e.Status.Phase == buildapiv1.BuildPhaseError {
+					if name != e.Name || e.Status.Phase == buildapi.BuildPhaseFailed ||
+						e.Status.Phase == buildapi.BuildPhaseCancelled ||
+						e.Status.Phase == buildapi.BuildPhaseError {
 						exitErr = fmt.Errorf("The build %s/%s status is %q", e.Namespace, name, e.Status.Phase)
 						glog.Warningf("failed: %+v", exitErr)
 						return
 					}
 				}
-			}*/
+			}
 		}
 	}()
 
@@ -374,6 +415,10 @@ func (o *StartBuildOptions) tracker() {
 			NoWait: false,
 		}
 		for {
+			time.Sleep(3 * time.Second)
+			//raw, err := o.OP.OC().RESTClient.Verb("GET").
+			//	Namespace(o.Namespace).Resource("builds").Name(name).
+			//	SubResource("log").VersionedParams(&opts, kapi.ParameterCodec).DoRaw()
 			rd, err := o.Client.BuildLogs(o.Namespace).Get(newBuild.Name, opts).Stream()
 			if err != nil {
 				// if --wait options is set, then retry the connection to build logs

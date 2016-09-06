@@ -46,6 +46,7 @@ import (
 	//"k8s.io/kubernetes/pkg/runtime"
 	//"k8s.io/kubernetes/pkg/runtime/serializer/json"
 
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/etcd"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/build-builder"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/utility"
@@ -87,39 +88,45 @@ var (
 	dockerPushSecret   string = "localdockerconfig"
 	timeout            int64  = 1200
 
-	_nats_addrs    []string = []string{"10.3.0.39:4222"}
-	_nats_user     string   = "derek"
-	_nats_password string   = "T0pS3cr3t"
+	etcdAddresses []string = []string{"10.3.0.212:2379"}
+
+	gnatsdAddresses []string = []string{"10.3.0.39:4222"}
+	gnatsdUsername  string   = "derek"
+	gnatsdPassword  string   = "T0pS3cr3t"
 )
 
 func init() {
 	//	flagtypes.GLog(rootCommand.PersistentFlags())
 	if v, ok := os.LookupEnv("KUBE_CONFIG"); ok {
-		if v != "" {
-			kubeconfigPath = v
-		}
+		kubeconfigPath = v
 	}
 	if v, ok := os.LookupEnv("KUBE_CONTEXT"); ok {
-		if v != "" {
-			kubeconfigContext = v
-		}
+		kubeconfigContext = v
 	}
 	if v, ok := os.LookupEnv("OSO_CONFIG"); ok {
-		if v != "" {
-			oconfigPath = v
-		}
+		oconfigPath = v
 	}
 	if v, ok := os.LookupEnv("OSO_CONTEXT"); ok {
-		if v != "" {
-			oconfigContext = v
-		}
+		oconfigContext = v
+	}
+	if v, ok := os.LookupEnv("ETCD_V3_ADDRESSES"); ok {
+		etcdAddresses = strings.Split(v, ",")
 	}
 }
 
 type PaaS struct {
-	ccf *oclientcmd.Factory
-	oc  *oclient.Client
-	err error
+	ccf     *oclientcmd.Factory
+	oc      *oclient.Client
+	err     error
+	etcdctl *etcd.V3ClientContext
+}
+
+func (p *PaaS) WithOcCtl(kubeconfigPath, kubectlContext, osoconfigPath, ocContext string) *PaaS {
+	if p == nil {
+		p = &PaaS{}
+	}
+	p.ccf = util.NewClientCmdFactory()
+	return p
 }
 
 func (p *PaaS) Factory() *oclientcmd.Factory {
@@ -130,12 +137,34 @@ func (p *PaaS) OC() *oclient.Client {
 	return p.oc
 }
 
-func (p *PaaS) config() {
-	p.ccf = util.NewClientCmdFactory()
+func (p *PaaS) octl() {
+	if p.ccf == nil {
+		p.ccf = util.NewClientCmdFactory()
+	}
 	p.oc, _, p.err = p.ccf.Clients()
 }
 
+func (p *PaaS) WithEtcdCtl(addr []string, dialTimeout, requestTimeout time.Duration) *PaaS {
+	if p == nil {
+		p = &PaaS{}
+	}
+	p.etcdctl = etcd.NewV3ClientContext(addr, dialTimeout, requestTimeout)
+	return p
+}
+
+func (p *PaaS) EtcdCtl() *etcd.V3ClientContext {
+	return p.etcdctl
+}
+
 func (p *PaaS) VerifyProject(project string) error {
+	if p.oc == nil {
+		p.octl()
+	}
+	if p.err != nil {
+		glog.Errorf("Could not config openshift origin: %+v\n", p.err)
+		return p.err
+	}
+
 	ok, err := findProject(p.oc, project)
 	if err != nil {
 		return err
@@ -164,11 +193,14 @@ func (p *PaaS) VerifyProject(project string) error {
 
 func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build,
 	conf *buildapiv1.BuildConfig) ([]byte, *buildapiv1.Build, *buildapiv1.BuildConfig, error) {
-	logger.SetPrefix("[appliance/openshift/origin, PaaS.CreateNewBuild] ")
-	p.config()
-	if p.err != nil {
-		logger.Printf("Could not config openshift origin: %+v\n", p.err)
+	if p.oc == nil {
+		p.octl()
 	}
+	if p.err != nil {
+		glog.Errorf("Could not config openshift origin: %+v\n", p.err)
+		return nil, nil, nil, p.err
+	}
+
 	var ok bool
 	var err error
 	ok, err = findBuildConfig(p.oc, conf.Namespace, conf.Name)
@@ -284,9 +316,9 @@ func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1
 
 	clientnats := yagnats.NewClient()
 	if err := clientnats.Connect(&yagnats.ConnectionInfo{
-		Addr:     _nats_addrs[0],
-		Username: _nats_user,
-		Password: _nats_password,
+		Addr:     gnatsdAddresses[0],
+		Username: gnatsdUsername,
+		Password: gnatsdPassword,
 	}); err != nil {
 		return nil, nil, err
 	}

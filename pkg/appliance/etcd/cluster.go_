@@ -1,4 +1,4 @@
-package etcd3
+package etcd
 
 import (
 	"crypto/tls"

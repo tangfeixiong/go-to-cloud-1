@@ -19,32 +19,24 @@ import (
 )
 
 var (
-	_kubeconfig_path      string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
-	_kubeconfig_context   string = "openshift-origin-single"
-	_originconfig_path    string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig"
-	_originconfig_context string = "default/172-17-4-50:30443/system:admin"
+	kubeconfig_path      string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
+	kubeconfig_context   string = "openshift-origin-single"
+	originconfig_path    string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig"
+	originconfig_context string = "default/172-17-4-50:30443/system:admin"
 )
 
 func init() {
 	if v, ok := os.LookupEnv("KUBE_CONFIG"); ok {
-		if v != "" {
-			_kubeconfig_path = v
-		}
+		kubeconfig_path = v
 	}
 	if v, ok := os.LookupEnv("KUBE_CONTEXT"); ok {
-		if v != "" {
-			_kubeconfig_context = v
-		}
+		kubeconfig_context = v
 	}
 	if v, ok := os.LookupEnv("OSO_CONFIG"); ok {
-		if v != "" {
-			_originconfig_path = v
-		}
+		originconfig_path = v
 	}
 	if v, ok := os.LookupEnv("OSO_CONTEXT"); ok {
-		if v != "" {
-			_originconfig_context = v
-		}
+		originconfig_context = v
 	}
 }
 
@@ -110,7 +102,7 @@ To view or setup config directly use the 'config' command.`)
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func directKClientConfig() *kclientcmd.DirectClientConfig {
-	data, err := ioutil.ReadFile(_kubeconfig_path)
+	data, err := ioutil.ReadFile(kubeconfig_path)
 	if err != nil {
 		glog.Errorf("kubeconfig not found: %v\n", err)
 		return nil
@@ -127,7 +119,7 @@ func directKClientConfig() *kclientcmd.DirectClientConfig {
 	glog.V(10).Infof("cmd client config: %+v\n", conf)
 
 	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		_kubeconfig_context, &kclientcmd.ConfigOverrides{},
+		kubeconfig_context, &kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 	glog.V(10).Infof("rest kclient config: %+v\n", kClientConfig)
 	return kClientConfig.(*kclientcmd.DirectClientConfig)
@@ -135,7 +127,7 @@ func directKClientConfig() *kclientcmd.DirectClientConfig {
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func directOClientConfig() kclientcmd.ClientConfig {
-	conf, err := kclientcmd.LoadFromFile(_originconfig_path)
+	conf, err := kclientcmd.LoadFromFile(originconfig_path)
 	if err != nil {
 		glog.Errorf("openshift cmd api client not configured: %v\n", err)
 		return nil
@@ -143,7 +135,7 @@ func directOClientConfig() kclientcmd.ClientConfig {
 	glog.V(10).Infof("openshift cmd api cmd client config: %+v\n", conf)
 
 	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		_originconfig_context,
+		originconfig_context,
 		&kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 
@@ -221,7 +213,7 @@ func makeServerIdentificationConfig(info clientauth.Info) restclient.Config {
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func withKClientConfig() kclientcmd.ClientConfig {
-	data, err := ioutil.ReadFile(_kubeconfig_path)
+	data, err := ioutil.ReadFile(kubeconfig_path)
 	if err != nil {
 		glog.Errorf("kubeconfig not found: %v\n", err)
 		os.Exit(1)
@@ -238,7 +230,7 @@ func withKClientConfig() kclientcmd.ClientConfig {
 	glog.V(10).Infof("cmd client config: %+v\n", conf)
 
 	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		_kubeconfig_context,
+		kubeconfig_context,
 		&kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 	glog.V(10).Infof("rest client config: %+v\n", kClientConfig)
@@ -247,7 +239,7 @@ func withKClientConfig() kclientcmd.ClientConfig {
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func withOClientConfig() kclientcmd.ClientConfig {
-	conf, err := kclientcmd.LoadFromFile(_originconfig_path)
+	conf, err := kclientcmd.LoadFromFile(originconfig_path)
 	if err != nil {
 		glog.Errorf("openshift cmd api client not configured: %v\n", err)
 		os.Exit(1)
@@ -255,7 +247,7 @@ func withOClientConfig() kclientcmd.ClientConfig {
 	glog.V(10).Infof("openshift cmd api cmd client config: %+v\n", conf)
 
 	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		_originconfig_context,
+		originconfig_context,
 		&kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 	glog.V(10).Infof("rest client config: %+v\n", oClientConfig)
@@ -271,7 +263,7 @@ func withAdminConfig() {
 		Burst:              10,
 	}
 	//configapi.SetProtobufClientDefaults(overrides)
-	if kClient, kConfig, err := configapi.GetKubeClient(_kubeconfig_path, overrides); err != nil {
+	if kClient, kConfig, err := configapi.GetKubeClient(kubeconfig_path, overrides); err != nil {
 		glog.V(10).Infof("Could not get kubernetes admin client: %+v\n", err)
 	} else if kClient == nil || kConfig == nil {
 		glog.V(10).Infoln("Could not find kubernetes admin client\n")
@@ -279,7 +271,7 @@ func withAdminConfig() {
 		glog.V(10).Infof("Kubernetes admin client %v with config %+v", kClient, kConfig)
 	}
 
-	if oClient, oConfig, err := configapi.GetOpenShiftClient(_originconfig_path, overrides); err != nil {
+	if oClient, oConfig, err := configapi.GetOpenShiftClient(originconfig_path, overrides); err != nil {
 		glog.V(10).Infof("Could not get openshift admin client: %+v\n", err)
 	} else if oClient == nil || oConfig == nil {
 		glog.V(10).Infoln("Could not find openshift admin client\n")

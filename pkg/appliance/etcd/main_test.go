@@ -1,28 +1,26 @@
-package etcd3
+package etcd
 
 import (
 	"fmt"
-	"log"
+	//"log"
 	"os"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/coreos/etcd/auth"
+	//"github.com/coreos/etcd/auth"
 
-	"golang.org/x/crypto/bcrypt"
+	//"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	logger *log.Logger = log.New(os.Stdout, "[tangfx] ", log.LstdFlags|log.Lshortfile)
-
 	dialTimeout    = 5 * time.Second
 	requestTimeout = 1 * time.Second
-	endpoints      = []string{"172.17.4.50:30001"} //"10.3.0.213:2379"
+	endpoints      = []string{"10.3.0.212:2379", "172.17.4.50:30001"}
 )
 
-func init() { auth.BcryptCost = bcrypt.MinCost }
+//func init() { auth.BcryptCost = bcrypt.MinCost }
 
 func TestMain(m *testing.M) {
 	if v, ok := os.LookupEnv("ETCD_V3_ADDRESSES"); ok && len(v) > 0 {
