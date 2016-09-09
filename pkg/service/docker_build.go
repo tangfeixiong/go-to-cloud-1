@@ -23,12 +23,6 @@ import (
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/dispatcher"
 )
 
-var (
-	_openshift_origin_serviceaccount_builder string = "builder"
-	_dockerfile                              string = "FROM busybox\nCMD [\"sh\"]"
-	_timeout                                 int64  = 900
-)
-
 func toOriginBuildOutputType(t string) string {
 	return t[len("output_"):]
 }
@@ -39,7 +33,7 @@ func toOriginBuildStrategyType(t string) string {
 
 func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.BuildConfig, *buildapi.Build) {
 	common := buildapi.CommonSpec{
-		ServiceAccount: _openshift_origin_serviceaccount_builder,
+		ServiceAccount: openshift_origin_serviceaccount_builder,
 		Source: buildapi.BuildSource{
 			Type:       buildapi.BuildSourceNone,
 			Binary:     (*buildapi.BinaryBuildSource)(nil),
@@ -431,14 +425,6 @@ func convertIntoBuildObject(req *osopb3.DockerBuildRequestData) (*buildapi.Build
 	return bldconf, bld
 }
 
-func secretname_for_pull_with_dockerbuilder(buildname string) string {
-	return fmt.Sprintf("dockerconfigjson-%s-for", buildname)
-}
-
-func secretname_for_push_with_dockerbuilder(buildname string) string {
-	return fmt.Sprintf("dockerconfigjson-%s-to", buildname)
-}
-
 func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 	req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
 	logger.SetPrefix("[service, .CreateDockerBuilderIntoImage] ")
@@ -450,7 +436,7 @@ func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 
 	bc, obj = convertIntoBuildObject(req)
 
-	op := new(origin.PaaS).WithOcCtl("", "", "", "").WithEtcdCtl([]string{}, 0, 0)
+	op := new(origin.PaaS).WithOCctl("", "", "", "").WithEtcdCtl([]string{}, 0, 0)
 	err = op.VerifyProject(req.ProjectName)
 	if err != nil {
 		logger.Printf("Failed to create origin project (%+v)\n", bc)
@@ -469,7 +455,7 @@ func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 					Username:      v.Username,
 					Password:      v.Password,
 					ServerAddress: k,
-				}, _openshift_origin_serviceaccount_builder)
+				}, openshift_origin_serviceaccount_builder)
 			if err != nil {
 				return &osopb3.DockerBuildResponseData{}, err
 			}
@@ -485,7 +471,7 @@ func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 					Username:      v.Username,
 					Password:      v.Password,
 					ServerAddress: k,
-				}, _openshift_origin_serviceaccount_builder)
+				}, openshift_origin_serviceaccount_builder)
 			if err != nil {
 				return &osopb3.DockerBuildResponseData{}, err
 			}
@@ -539,7 +525,7 @@ func (u *UserResource) TrackDockerBuild(ctx context.Context, req *osopb3.DockerB
 	}
 	resp := new(osopb3.DockerBuildResponseData)
 
-	op := new(origin.PaaS).WithOcCtl("", "", "", "").WithEtcdCtl([]string{}, 0, 0)
+	op := new(origin.PaaS).WithOCctl("", "", "", "").WithEtcdCtl([]string{}, 0, 0)
 	if etcdctl := op.EtcdCtl(); etcdctl != nil {
 		prefix := origin.EtcdV3BuildCacheKey("v1", "default", req.ProjectName, req.Configuration.Name, req.Name, false)
 		result, err := etcdctl.GetWithPrefix(prefix)

@@ -32,6 +32,8 @@
 		DockerBuildRequestData
 		DockerBuildResponseData
 		RawJSON
+		StiBuildRequestData
+		StiBuildResponseData
 		RawData
 		VersionRequestData
 		VersionResponseData

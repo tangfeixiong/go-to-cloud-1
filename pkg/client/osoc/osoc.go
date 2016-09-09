@@ -302,3 +302,75 @@ func (itft *integrationFactory) DeleteDockerBuilder(in *osopb3.DockerBuildConfig
 
 	return DeleteDockerBuilder(osopb3.NewSimpleServiceClient(cc), context.Background(), in)
 }
+
+func CreateStiBuilderIntoImage(c osopb3.SimpleServiceClient,
+	ctx context.Context,
+	in *osopb3.StiBuildRequestData) (out *osopb3.StiBuildResponseData, err error) {
+	logger.SetPrefix("[client/osoc, CreateStiBuilderIntoImage] ")
+
+	opts := []grpc.CallOption{}
+	if ctx != nil {
+		out, err = c.CreateStiBuilderIntoImage(ctx, in, opts...)
+	} else {
+		out, err = c.CreateStiBuilderIntoImage(context.Background(), in, opts...)
+	}
+	if err != nil {
+		logger.Printf("Could not receive result: %v", err)
+		return nil, err
+	}
+	if out == nil {
+		return
+	}
+	if len(out.BuildResponses) > 0 {
+		logger.Printf("Received: %+v\n", out.BuildResponses)
+	}
+	return out, nil
+}
+
+func TrackStiBuild(c osopb3.SimpleServiceClient,
+	ctx context.Context,
+	in *osopb3.StiBuildRequestData) (out *osopb3.StiBuildResponseData, err error) {
+	logger.SetPrefix("[client/osoc, TrackStiBuild] ")
+
+	opts := []grpc.CallOption{}
+	if ctx != nil {
+		out, err = c.TrackStiBuild(ctx, in, opts...)
+	} else {
+		out, err = c.TrackStiBuild(context.Background(), in, opts...)
+	}
+	if err != nil {
+		logger.Printf("Could not receive result: %v\n", err)
+		return nil, err
+	}
+	if out == nil {
+		return
+	}
+	if len(out.BuildResponses) > 0 {
+		logger.Printf("Received: %+v\n", out.BuildResponses)
+	}
+	return out, nil
+}
+
+func (itft *integrationFactory) CreateStiBuilderIntoImage(in *osopb3.StiBuildRequestData) (*osopb3.StiBuildResponseData, error) {
+	logger.SetPrefix("[client/osoc, .CreateStiBuilderIntoImage] ")
+	cc, err := grpc.Dial(itft.server, grpc.WithInsecure())
+	if err != nil {
+		logger.Printf("Did not connect: %v\n", err)
+		return nil, err
+	}
+	defer cc.Close()
+
+	return CreateStiBuilderIntoImage(osopb3.NewSimpleServiceClient(cc), context.Background(), in)
+}
+
+func (itft *integrationFactory) TrackStiBuild(in *osopb3.StiBuildRequestData) (*osopb3.StiBuildResponseData, error) {
+	logger.SetPrefix("[client/osoc, .TrackStiBuild] ")
+	cc, err := grpc.Dial(itft.server, grpc.WithInsecure())
+	if err != nil {
+		logger.Printf("Did not connect: %v\n", err)
+		return nil, err
+	}
+	defer cc.Close()
+
+	return TrackStiBuild(osopb3.NewSimpleServiceClient(cc), context.Background(), in)
+}

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/golang/glog"
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/tc-origin-docker-builder/builder"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/docker-builder"
 )
 
 func main() {

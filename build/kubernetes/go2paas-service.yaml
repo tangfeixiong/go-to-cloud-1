@@ -12,7 +12,7 @@ metadata:
   name: apaas
   # namespace: qingyuancloud
 spec:
-  type: ClusterIP
+  type: NodePort # ClusterIP
   ports:
   - port: 50051
     protocol: TCP

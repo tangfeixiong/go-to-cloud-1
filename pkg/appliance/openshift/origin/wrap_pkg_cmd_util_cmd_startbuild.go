@@ -184,10 +184,10 @@ func EtcdV3BuildCacheKey(version, cluster, ns, buildername, buildname string, is
 	if len(cluster) > 0 {
 		c = cluster
 	}
-	key := fmt.Sprintf("/harpoonapis/%s/clusters/%s/namespaces/%s/builders/%s/builds/%s", v, c, ns, buildername, buildname)
-	key = fmt.Sprintf("harpoonapis%sclusters%snamespaces%sbuilders%sbuilds%s", v, c, ns, buildername, buildname)
+	key := fmt.Sprintf("/apaas/apis/%s/clusters/%s/projects/%s/builders/%s/builds/%s", v, c, ns, buildername, buildname)
+	//key = fmt.Sprintf("apaasapis%sclusters%projects%sbuilders%sbuilds%s", v, c, ns, buildername, buildname)
 	if isBuildLog {
-		return fmt.Sprintf("%slmaggregates", key)
+		return fmt.Sprintf("%s/tracks", key)
 	}
 	return key
 }

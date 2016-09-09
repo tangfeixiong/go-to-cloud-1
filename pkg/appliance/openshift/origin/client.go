@@ -115,18 +115,33 @@ func init() {
 }
 
 type PaaS struct {
-	ccf     *oclientcmd.Factory
-	oc      *oclient.Client
-	err     error
-	etcdctl *etcd.V3ClientContext
+	kubeconfigPath string
+	kubectlContext string
+	osoconfigPath  string
+	ocContext      string
+	ccf            *oclientcmd.Factory
+	oc             *oclient.Client
+	err            error
+	etcdctl        *etcd.V3ClientContext
 }
 
-func (p *PaaS) WithOcCtl(kubeconfigPath, kubectlContext, osoconfigPath, ocContext string) *PaaS {
+func (p *PaaS) WithOCctl(kubeconfigPath, kubectlContext, osoconfigPath, ocContext string) *PaaS {
 	if p == nil {
 		p = &PaaS{}
 	}
-	p.ccf = util.NewClientCmdFactory()
+	p.kubeconfigPath = kubeconfigPath
+	p.kubectlContext = kubectlContext
+	p.osoconfigPath = osoconfigPath
+	p.ocContext = ocContext
+	p.occtl()
 	return p
+}
+
+func (p *PaaS) occtl() {
+	p.ccf = util.NewClientCmdFactory()
+	mapper, _ := p.ccf.Object(false)
+	kapi.RegisterRESTMapper(mapper)
+	p.oc, _, p.err = p.ccf.Clients()
 }
 
 func (p *PaaS) Factory() *oclientcmd.Factory {
@@ -135,13 +150,6 @@ func (p *PaaS) Factory() *oclientcmd.Factory {
 
 func (p *PaaS) OC() *oclient.Client {
 	return p.oc
-}
-
-func (p *PaaS) octl() {
-	if p.ccf == nil {
-		p.ccf = util.NewClientCmdFactory()
-	}
-	p.oc, _, p.err = p.ccf.Clients()
 }
 
 func (p *PaaS) WithEtcdCtl(addr []string, dialTimeout, requestTimeout time.Duration) *PaaS {
@@ -158,7 +166,7 @@ func (p *PaaS) EtcdCtl() *etcd.V3ClientContext {
 
 func (p *PaaS) VerifyProject(project string) error {
 	if p.oc == nil {
-		p.octl()
+		p.occtl()
 	}
 	if p.err != nil {
 		glog.Errorf("Could not config openshift origin: %+v\n", p.err)
@@ -191,10 +199,9 @@ func (p *PaaS) VerifyProject(project string) error {
 	return nil
 }
 
-func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build,
-	conf *buildapiv1.BuildConfig) ([]byte, *buildapiv1.Build, *buildapiv1.BuildConfig, error) {
+func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build, conf *buildapiv1.BuildConfig) ([]byte, *buildapiv1.Build, *buildapiv1.BuildConfig, error) {
 	if p.oc == nil {
-		p.octl()
+		p.occtl()
 	}
 	if p.err != nil {
 		glog.Errorf("Could not config openshift origin: %+v\n", p.err)

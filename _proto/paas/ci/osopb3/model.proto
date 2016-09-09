@@ -100,6 +100,8 @@ message SourceBuildStrategy {
 	bool incremental = 5;
 	
 	bool forcePull = 6;
+	
+	DockerConfigFile dockerconfigJson = 7;
 }
 				
 message DockerBuildStrategy {

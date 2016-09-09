@@ -1,5 +1,17 @@
 package builder
 
+import (
+	"bytes"
+	"os"
+	"testing"
+	"text/template"
+
+	"github.com/helm/helm-classic/codec"
+	buildapi "github.com/openshift/origin/pkg/build/api/v1"
+
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
+)
+
 type FakeCommonBuildTemplateOption struct {
 	Name                   string
 	GitURI                 string
@@ -27,7 +39,7 @@ type FakeBuildConfigTemplateOption struct {
 var (
 	fake_sourceprojectname = "tangfx"
 
-	fake_sourcebuilds_commontplopt = []FakeBuildTemplateOption{
+	fake_sourcebuilds_commontplopt = []FakeCommonBuildTemplateOption{
 		{
 			Name:                   "springbootms-web",
 			GitURI:                 "https://github.com/tangfeixiong/osev3-examples",
@@ -56,7 +68,7 @@ var (
 		},
 	}
 
-	fake_sourcebuilds_bctplopt []string = []FakeBuildConfigTemplateOption{
+	fake_sourcebuilds_bctplopt []FakeBuildConfigTemplateOption = []FakeBuildConfigTemplateOption{
 		{
 			GithubTriggerSecret:           "",
 			GenericTriggerSecret:          "",
@@ -83,111 +95,6 @@ var (
 
 	fake_sourcebuild_pullsecret string = ""
 	fake_sourcebuild_pushsecret string = "dockerconfigjson-springbootms-web-to"
-
-	fake_sourcebuild_bcTemplate []string = []string{`
-      {
-         "kind": "BuildConfig",
-         "apiVersion": "v1",
-         "metadata": {
-            "name": "{{.Name}}"
-         },
-         "spec": {
-            "triggers": [
-               {
-                  "type": "GitHub",
-                  "github": {
-                     "secret": "{{.GithubTriggerSecret}}"
-                  }
-               },
-               {
-                  "type": "Generic",
-                  "generic": {
-                     "secret": "{{.GenericTriggerSecret}}"
-                  }
-               },
-               {
-                  "type": "ImageChange",
-                  "imageChange": {}
-               }
-            ],
-            "source": {
-               "type": "Git",
-               "git": {
-                  "uri": "{{.GitURI}}",
-                  "ref": "{{.GitRef}}"
-               },
-               "contextDir": "{{.ContextDir}}"
-            },
-            "strategy": {
-               "type": "Source",
-               "sourceStrategy": {
-                  "from": {
-                     "kind": "{{.SourceStrategyFromKind}}",
-                     "name": "{{.SourceStrategyFromName}}"
-                  }
-               }
-            },
-            "output": {
-               "to": {
-                  "kind": "{{.OutputToKind}}",
-                  "name": "{{.OutputToRegistry}}/{{.Name}}:{{.OutputToTag}}"
-               }
-            },
-            "resources": {}
-         }
-      }`, `
-      {
-         "kind": "BuildConfig",
-         "apiVersion": "v1",
-         "metadata": {
-            "name": "{{.Name}}"
-         },
-         "spec": {
-            "triggers": [
-               {
-                  "type": "GitHub",
-                  "github": {
-                     "secret": "{{.GithubTriggerSecret}}"
-                  }
-               },
-               {
-                  "type": "Generic",
-                  "generic": {
-                     "secret": "{{.GenericTriggerSecret}}"
-                  }
-               },
-               {
-                  "type": "ImageChange",
-                  "imageChange": {}
-               }
-            ],
-            "source": {
-               "type": "Git",
-               "git": {
-                  "uri": "{{.GitURI}}",
-                  "ref": "{{.GitRef}}"
-               },
-               "contextDir": "{{.ContextDir}}"
-            },
-            "strategy": {
-               "type": "Source",
-               "sourceStrategy": {
-                  "from": {
-                     "kind": "{{.SourceStrategyFromKind}}",
-                     "name": "{{.SourceStrategyFromName}}"
-                  }
-               }
-            },
-            "output": {
-               "to": {
-                  "kind": "{{.OutputToKind}}",
-                  "name": "{{.OutputToRegistry}}/{{.Name}}:{{.OutputToTag}}"
-               }
-            },
-            "resources": {}
-         }
-      }`,
-	}
 
 	fake_sourcebuilds_istemplate []string = []string{`
       {
@@ -222,3 +129,30 @@ var (
       }`,
 	}
 )
+
+func TestSource_One(t *testing.T) {
+	tmpl := template.New("source build")
+	tmpl = template.Must(tmpl.Parse(bTmpl))
+	buf := &bytes.Buffer{}
+	if err := tmpl.Execute(buf, bTmplOpt); err != nil {
+		t.Fatal(err)
+	}
+	t.Log(buf.String())
+
+	hco, err := codec.JSON.Decode(buf.Bytes()).One()
+	if err != nil {
+		t.Fatal(err)
+	}
+	bld := new(buildapi.Build)
+	if err := hco.Object(bld); err != nil {
+		t.Fatal(err)
+	}
+
+	ccf := util.NewClientCmdFactory()
+
+	if err := RunS2IBuild(os.Stdout, bld, ccf); err != nil {
+		t.Fatal(err)
+	}
+	t.Log(bld)
+
+}

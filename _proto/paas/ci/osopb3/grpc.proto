@@ -135,20 +135,22 @@ service SimpleService {
 		};
 	}
 
-	//rpc NewOsoBuildConfig(github.com.openshift.origin.pkg.build.api.v1.BuildConfig) returns (github.com.openshift.origin.pkg.build.api.v1.BuildConfig) {
-	//	option (google.api.http) = {
-	//    post: "/v1/oapiv1/buildconfigs"
-	//	  body: "*"
-	//	};
-	//}
+	rpc CreateStiBuilderIntoImage(StiBuildRequestData) returns (StiBuildResponseData) {
+		option (google.api.http) = {
+	      post: "/v1/projects/{projectname}/stibuilders"
+		  body: "*"
+		};
+	}
 
-	//rpc StartOpenshiftOriginBuild(github.com.openshift.origin.pkg.build.api.v1.Build) returns (github.com.openshift.origin.pkg.build.api.v1.Build) {
-	//	option (google.api.http) = {
-	//    post: "/v1/oapiv1/builds"
-	//	  body: "*"
-	//	};		
-	//}
+	rpc TrackStiBuild(StiBuildRequestData) returns (StiBuildResponseData) {
+		option (google.api.http) = {
+	      get: "/v1/projects/{projectname}/stibuilders/{buildername}/builds/{name}/tracks"
+		  body: "*"
+		};		
+	}
 	
+    // for test
+    //
 	rpc ArbitraryDockerBuild(RawData) returns (RawData) {
 		option (google.api.http) = {
 	      post: "/v1/raw/dockerbuilds"
@@ -343,6 +345,18 @@ message RawJSON {
     bytes objectJSON = 2;
 }
 
+message StiBuildRequestData {
+	string   credential = 1;
+	string   project = 2;
+	repeated DockerBuildRequestData buildRequests = 3;
+}
+
+message StiBuildResponseData {
+	bool     authorized    = 1;
+	string   project = 2;
+	repeated DockerBuildResponseData buildResponses = 3;
+}
+
 message RawData {
 	string objectName = 1;
 	bytes objectBytes = 2;
@@ -354,18 +368,6 @@ message VersionRequestData {
 message VersionResponseData {
 	string version = 1;
 }	
-
-//message BuildRequest {
-//	string    name    = 1;
-//	string    project = 2;
-//	BuildSpec spec    = 3;
-//}
-//
-//message BuildResponse {
-//	string    name    = 1;
-//	string    project = 2;
-//	BuildSpec spec    = 3;
-//}
 //
 //message BuildConfigRequest {
 //	string          name    = 1;

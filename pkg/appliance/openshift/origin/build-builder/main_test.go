@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"testing"

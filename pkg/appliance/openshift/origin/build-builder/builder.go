@@ -21,7 +21,8 @@ import (
 
 	s2iapi "github.com/openshift/source-to-image/pkg/api"
 
-	"github.com/openshift/origin/pkg/build/api"
+	buildapi "github.com/openshift/origin/pkg/build/api"
+	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
 	"github.com/openshift/origin/pkg/build/api/validation"
 	bld "github.com/openshift/origin/pkg/build/builder"
 	"github.com/openshift/origin/pkg/build/builder/cmd/scmauth"
@@ -33,19 +34,22 @@ import (
 )
 
 var (
-	_masterVersion string = "v1.3.0-alpha.1-83-g16d6863"
-	//_masterVersion string = "v1.3.0-alpha.0-52-gbc1ddaa"
-	_build_name    string
-	_build_project string
+	openshift_master_version string = "v1.3.0-alpha.2+88b8a33-dirty"
+	//openshift_master_version string = "v1.3.0-alpha.1-83-g16d6863"
+	//openshift_master_version string = "v1.3.0-alpha.0-52-gbc1ddaa"
+	docker_build_name         string
+	docker_build_project_name string
+	source_build_name         string
+	source_build_project_name string
 )
 
 type builder interface {
-	Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *api.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error
+	Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *buildapi.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error
 }
 
 type builderConfig struct {
 	out             io.Writer
-	build           *api.Build
+	build           *buildapi.Build
 	sourceSecretDir string
 	dockerClient    *docker.Client
 	dockerEndpoint  string
@@ -61,7 +65,7 @@ func newBuilderConfigFromEnvironment(out io.Writer) (*builderConfig, error) {
 	// build (BUILD)
 	buildStr := os.Getenv("BUILD")
 	glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
-	cfg.build = &api.Build{}
+	cfg.build = &buildapi.Build{}
 	if err := runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), []byte(buildStr), cfg.build); err != nil {
 		return nil, fmt.Errorf("unable to parse build: %v", err)
 	}
@@ -70,7 +74,7 @@ func newBuilderConfigFromEnvironment(out io.Writer) (*builderConfig, error) {
 	}
 	glog.V(4).Infof("Build: %#v", cfg.build)
 
-	masterVersion := os.Getenv(api.OriginVersion)
+	masterVersion := os.Getenv(buildapi.OriginVersion)
 	thisVersion := version.Get().String()
 	if len(masterVersion) != 0 && masterVersion != thisVersion {
 		glog.V(3).Infof("warning: OpenShift server version %q differs from this image %q\n", masterVersion, thisVersion)
@@ -204,11 +208,11 @@ func fixSecretPermissions(secretsDir string) (string, error) {
 type dockerBuilder struct{}
 
 // Build starts a Docker build.
-func (dockerBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *api.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error {
+func (dockerBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *buildapi.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error {
 	if build.Name == "" {
 		glog.Warningln("Lost build name and project during deserialization")
-		build.Name = _build_name
-		build.Namespace = _build_project
+		build.Name = docker_build_name
+		build.Namespace = docker_build_project_name
 	}
 	if build.Spec.Output.To != nil &&
 		build.Spec.Output.To.Kind == "DockerImage" &&
@@ -224,7 +228,7 @@ func (dockerBuilder) Build(dockerClient bld.DockerClient, sock string, buildsCli
 type s2iBuilder struct{}
 
 // Build starts an S2I build.
-func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *api.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error {
+func (s2iBuilder) Build(dockerClient bld.DockerClient, sock string, buildsClient client.BuildInterface, build *buildapi.Build, gitClient bld.GitClient, cgLimits *s2iapi.CGroupLimits) error {
 	return bld.NewS2IBuilder(dockerClient, sock, buildsClient, build, gitClient, cgLimits).Build()
 }
 
@@ -237,7 +241,7 @@ func runBuild(out io.Writer, builder builder) error {
 }
 
 // RunDockerBuild creates a docker builder and runs its build
-func RunDockerBuild(out io.Writer, data *api.Build, ccfactory *clientcmd.Factory) (*api.Build, error) {
+func RunDockerBuild(out io.Writer, data *buildapi.Build, ccfactory *clientcmd.Factory) (*buildapi.Build, error) {
 	//return runBuild(out, dockerBuilder{})
 
 	cfg := &builderConfig{}
@@ -248,10 +252,10 @@ func RunDockerBuild(out io.Writer, data *api.Build, ccfactory *clientcmd.Factory
 	// build (BUILD)
 	buildStr := os.Getenv("BUILD")
 	//glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
-	cfg.build = &api.Build{}
+	cfg.build = &buildapi.Build{}
 
 	b := &bytes.Buffer{}
-	//if b, err = runtime.Encode(kapi.Codecs.LegacyCodec(api.SchemeGroupVersion), data); err != nil {
+	//if b, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapi.SchemeGroupVersion), data); err != nil {
 	//	glog.Errorf("Could not feed data: %+v", err)
 	//	return nil, fmt.Errorf("unable to parse build: %v", err)
 	//}
@@ -272,8 +276,8 @@ func RunDockerBuild(out io.Writer, data *api.Build, ccfactory *clientcmd.Factory
 		glog.Infoln("Missing key fields: name or project or output to ...")
 		return nil, fmt.Errorf("Missing key fields")
 	}
-	_build_name = cfg.build.Name
-	_build_project = cfg.build.Namespace
+	docker_build_name = cfg.build.Name
+	docker_build_project_name = cfg.build.Namespace
 
 	if errs := validation.ValidateBuild(cfg.build); len(errs) > 0 {
 		glog.Infof("Could not validate object fields: %+v", errs)
@@ -281,9 +285,9 @@ func RunDockerBuild(out io.Writer, data *api.Build, ccfactory *clientcmd.Factory
 	}
 	glog.V(4).Infof("Build: %#v", cfg.build)
 
-	masterVersion := os.Getenv(api.OriginVersion)
+	masterVersion := os.Getenv(buildapi.OriginVersion)
 	if masterVersion == "" {
-		masterVersion = _masterVersion
+		masterVersion = openshift_master_version
 	}
 	thisVersion := version.Get().String()
 	if len(masterVersion) != 0 && masterVersion != thisVersion {
@@ -320,6 +324,104 @@ func RunDockerBuild(out io.Writer, data *api.Build, ccfactory *clientcmd.Factory
 }
 
 // RunS2IBuild creates a S2I builder and runs its build
-func RunS2IBuild(out io.Writer) error {
-	return runBuild(out, s2iBuilder{})
+func RunS2IBuild(out io.Writer, data *buildapiv1.Build, ccfactory *clientcmd.Factory) error {
+	//return runBuild(out, s2iBuilder{})
+
+	if data == nil {
+		glog.Errorf("data required")
+		return fmt.Errorf("data required")
+	}
+	if ccfactory == nil {
+		glog.Errorf("occtl config required")
+		return fmt.Errorf("occtl required")
+	} else {
+		mapper, _ := ccfactory.Object(false)
+		kapi.RegisterRESTMapper(mapper)
+		buildapi.AddToScheme(kapi.Scheme)
+		buildapiv1.AddToScheme(kapi.Scheme)
+
+	}
+
+	cfg := &builderConfig{}
+	var err error
+
+	cfg.out = out
+
+	// build (BUILD)
+	buildStr := os.Getenv("BUILD")
+	//glog.V(4).Infof("$BUILD env var is %s \n", buildStr)
+	cfg.build = &buildapi.Build{}
+
+	var buf *bytes.Buffer
+	b, err := runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), data)
+	if err != nil {
+		glog.Errorf("Could not transform data: %+v", err)
+		return fmt.Errorf("unable to parse build: %v", err)
+	}
+	buf = bytes.NewBuffer(b)
+	//	if err := codec.JSON.Encode(b).One(data); err != nil {
+	//		glog.Errorf("Could not transform data with helm codec: %+v", err)
+	//		return fmt.Errorf("Could not transform data: %v", err)
+	//	}
+	buildStr = buf.String()
+	glog.Infof("$BUILD env var is %s \n", buildStr)
+	if err := runtime.DecodeInto(kapi.Codecs.UniversalDecoder(), buf.Bytes(), cfg.build); err != nil {
+		glog.Errorf("Could not decode raw bytes: %s", err)
+		return fmt.Errorf("unable to parse build: %v", err)
+	}
+	if cfg.build.Name == "" || cfg.build.Namespace == "" ||
+		cfg.build.Spec.Output.To == nil ||
+		(len(cfg.build.Spec.Output.To.Kind) == 0 && len(cfg.build.Spec.Output.To.Name) == 0) {
+		glog.Errorln("Missing key fields: name or project or output to ...")
+		return fmt.Errorf("Missing key fields")
+	}
+	//docker_build_name = cfg.build.Name
+	//docker_build_project_name = cfg.build.Namespace
+	if len(cfg.build.Status.OutputDockerImageReference) == 0 {
+		glog.Warningf("Force output docker image reference with predefined name(%s)",
+			data.Spec.Output.To.Name)
+		cfg.build.Status.OutputDockerImageReference = data.Spec.Output.To.Name
+	}
+	if errs := validation.ValidateBuild(cfg.build); len(errs) > 0 {
+		glog.Infof("Could not validate object fields: %+v", errs)
+		return errors.NewInvalid(unversioned.GroupKind{Kind: "Build"}, cfg.build.Name, errs)
+	}
+	glog.V(4).Infof("Build: %#v", cfg.build)
+
+	masterVersion := os.Getenv(buildapi.OriginVersion)
+	if len(masterVersion) == 0 {
+		masterVersion = openshift_master_version
+	}
+	thisVersion := version.Get().String()
+	if len(masterVersion) != 0 && masterVersion != thisVersion {
+		glog.Warningf("Master version %q does not match Builder image version %q", masterVersion, thisVersion)
+	} else {
+		glog.V(2).Infof("Master version %q, Builder version %q", masterVersion, thisVersion)
+	}
+
+	// sourceSecretsDir (SOURCE_SECRET_PATH)
+	cfg.sourceSecretDir = os.Getenv("SOURCE_SECRET_PATH")
+
+	// dockerClient and dockerEndpoint (DOCKER_HOST)
+	// usually not set, defaults to docker socket
+	cfg.dockerClient, cfg.dockerEndpoint, err = dockerutil.NewHelper().GetClient()
+	if err != nil {
+		glog.Infof("Could not setup docker client: %+v", err)
+		return fmt.Errorf("error obtaining docker client: %v", err)
+	}
+
+	// buildsClient (KUBERNETES_SERVICE_HOST, KUBERNETES_SERVICE_PORT)
+	//clientConfig, err := restclient.InClusterConfig()
+	//if err != nil {
+	//	return fmt.Errorf("failed to get client config: %v", err)
+	//}
+	//osClient, err := client.New(clientConfig)
+	osClient, _, err := ccfactory.Clients()
+	if err != nil {
+		glog.Infof("Could not setup openshift client: %+v", err)
+		return fmt.Errorf("error obtaining OpenShift client: %v", err)
+	}
+	cfg.buildsClient = osClient.Builds(cfg.build.Namespace)
+
+	return cfg.execute(s2iBuilder{})
 }
