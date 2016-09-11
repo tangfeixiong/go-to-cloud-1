@@ -3,13 +3,13 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-VER=0.1
+VER=0.2
 TAG=${VER}-$(git rev-parse --short=7 HEAD)
 if [[ $# > 0 ]]; then
 	TAG=$1
 elif [[ ! -z $(git status --porcelain) ]]; then
-    #echo "0.1-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')-$(date +%m%dT%H%M)"
-    TAG=${TAG}-$(date +%m%dT%H%M)
+    echo "$(date +%m%d%H%M)".gitref-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')
+    TAG=$(date +%m%d%H%M).gitref-$(git rev-parse --short=7 HEAD)
 fi
 DOCKER_IMAGE="hub.qingyuanos.com/admin/apaas:${TAG}"
 
@@ -29,7 +29,7 @@ cat <<DF >${DOCKER_BUILD_CONTEXT}/Dockerfile
 FROM gliderlabs/alpine
 MAINTAINER tangfeixiong <fxtang@qingyuanos.com>
 
-LABEL name="apaas" version="0.1" description="openshift origin, GitVersion: v1.3.0-alpha.2"
+LABEL name="apaas" version="${VER}" description="openshift origin, GitVersion: v1.3.0-alpha.3"
 
 RUN apk add --update bash ca-certificates git libc6-compat && rm -rf /var/cache/apk/*
 
