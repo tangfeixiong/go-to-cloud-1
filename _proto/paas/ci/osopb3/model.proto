@@ -100,8 +100,12 @@ message SourceBuildStrategy {
 	bool incremental = 5;
 	
 	bool forcePull = 6;
+    
+    k8s.io.kubernetes.pkg.api.v1.ObjectReference runtimeImage = 7;
+    
+    repeated ImageSourcePath runtimeArtifacts = 8;
 	
-	DockerConfigFile dockerconfigJson = 7;
+	DockerConfigFile dockerconfigJson = 9;
 }
 				
 message DockerBuildStrategy {

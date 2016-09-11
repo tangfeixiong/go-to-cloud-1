@@ -348,13 +348,15 @@ message RawJSON {
 message StiBuildRequestData {
 	string   credential = 1;
 	string   project = 2;
-	repeated DockerBuildRequestData buildRequests = 3;
+    string   application = 3;
+	repeated DockerBuildRequestData buildRequests = 4;
 }
 
 message StiBuildResponseData {
 	bool     authorized    = 1;
 	string   project = 2;
-	repeated DockerBuildResponseData buildResponses = 3;
+    string   application = 3;
+	repeated DockerBuildResponseData buildResponses = 4;
 }
 
 message RawData {

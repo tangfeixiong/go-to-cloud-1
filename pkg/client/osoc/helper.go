@@ -259,6 +259,43 @@ func (b *DockerBuildRequestDataUtility) DockerBuildStrategy(overrideBaseImage,
 	return b
 }
 
+func (b *DockerBuildRequestDataUtility) StiBuildStrategy(overrideBaseImage,
+	pullSecret string, forcePull bool) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.target.Configuration.CommonSpec.Strategy == nil {
+		b.target.Configuration.CommonSpec.Strategy = &osopb3.BuildStrategy{}
+	}
+	b.target.Configuration.CommonSpec.Strategy.Type = osopb3.BuildStrategy_Source.String()
+	if b.target.Configuration.CommonSpec.Strategy.DockerStrategy != nil {
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy = nil
+	}
+	b.target.Configuration.CommonSpec.Strategy.SourceStrategy = &osopb3.SourceBuildStrategy{
+		From:             (*kapi.ObjectReference)(nil),
+		PullSecret:       (*kapi.LocalObjectReference)(nil),
+		Env:              []*kapi.EnvVar{},
+		Scripts:          "",
+		Incremental:      false,
+		ForcePull:        forcePull,
+		RuntimeImage:     (*kapi.ObjectReference)(nil),
+		RuntimeArtifacts: []*osopb3.ImageSourcePath{},
+	}
+	if pullSecret != "" {
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy.PullSecret = &kapi.LocalObjectReference{
+			Name: pullSecret,
+		}
+	}
+	if overrideBaseImage != "" {
+		st := osopb3.OsoBuildStrategyObjectReferenceType_Strategy_DockerImage.String()
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy.From = &kapi.ObjectReference{
+			Kind: st[len("Strategy_"):],
+			Name: overrideBaseImage,
+		}
+	}
+	return b
+}
+
 func (b *DockerBuildRequestDataUtility) DockerPullCredential(addr, username, password string) *DockerBuildRequestDataUtility {
 	if b.target == nil {
 		b.target = internalDockerBuildRequestData()
