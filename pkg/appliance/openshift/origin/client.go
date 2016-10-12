@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/yagnats"
+	"github.com/docker/engine-api/types"
 	"github.com/golang/glog"
 	"github.com/helm/helm-classic/codec"
 	"github.com/spf13/cobra"
@@ -30,7 +31,8 @@ import (
 	// "github.com/openshift/origin/pkg/cmd/util/tokencmd"
 	//"github.com/openshift/origin/pkg/generate/git"
 	//"github.com/openshift/origin/pkg/cmd/cli"
-	projectapi "github.com/openshift/origin/pkg/project/api/v1"
+	projectapi "github.com/openshift/origin/pkg/project/api"
+	projectapiv1 "github.com/openshift/origin/pkg/project/api/v1"
 	userapi "github.com/openshift/origin/pkg/user/api"
 	userapiv1 "github.com/openshift/origin/pkg/user/api/v1"
 
@@ -43,10 +45,11 @@ import (
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 	// clientcmdapi "k8s.io/kubernetes/pkg/client/unversioned/clientcmd/api"
 	// kubecmdconfig "k8s.io/kubernetes/pkg/kubectl/cmd/config"
-	//"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/runtime"
 	//"k8s.io/kubernetes/pkg/runtime/serializer/json"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/etcd"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/kubernetes"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/build-builder"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/utility"
@@ -55,8 +58,8 @@ import (
 var (
 	rootCommand *cobra.Command = utility.RootCommand
 
-	kubeconfigPath    string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
-	kubeconfigContext string = "openshift-origin-single"
+	kubeconfig_path string = "/data/src/github.com/openshift/origin/etc/kubeconfig"
+	kubectl_context string = "openshift-origin-single"
 
 	apiVersion string = "v1"
 	oca        string = "/data/src/github.com/openshift/origin/openshift.local.config/master/ca.crt"
@@ -65,8 +68,8 @@ var (
 
 	// token string = "IqEFJ7eK2_Pls4JHItvMPLBqGcuct5ogPN6NrapH20s"
 
-	oconfigPath    string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig"
-	oconfigContext string = "default/172-17-4-50:30443/system:admin"
+	osoconfig_path string = "/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig"
+	oc_context     string = "default/172-17-4-50:30443/system:admin"
 
 	kClientConfig, oClientConfig *clientcmd.ClientConfig
 	kClient                      *kclient.Client
@@ -88,7 +91,7 @@ var (
 	dockerPushSecret   string = "localdockerconfig"
 	timeout            int64  = 1200
 
-	etcdAddresses []string = []string{"10.3.0.212:2379"}
+	etcdv3_addresses []string = []string{"10.3.0.212:2379"}
 
 	gnatsdAddresses []string = []string{"10.3.0.39:4222"}
 	gnatsdUsername  string   = "derek"
@@ -98,31 +101,73 @@ var (
 func init() {
 	//	flagtypes.GLog(rootCommand.PersistentFlags())
 	if v, ok := os.LookupEnv("KUBE_CONFIG"); ok {
-		kubeconfigPath = v
+		kubeconfig_path = v
 	}
 	if v, ok := os.LookupEnv("KUBE_CONTEXT"); ok {
-		kubeconfigContext = v
+		kubectl_context = v
 	}
 	if v, ok := os.LookupEnv("OSO_CONFIG"); ok {
-		oconfigPath = v
+		osoconfig_path = v
 	}
 	if v, ok := os.LookupEnv("OSO_CONTEXT"); ok {
-		oconfigContext = v
+		oc_context = v
 	}
 	if v, ok := os.LookupEnv("ETCD_V3_ADDRESSES"); ok {
-		etcdAddresses = strings.Split(v, ",")
+		etcdv3_addresses = strings.Split(v, ",")
 	}
 }
 
 type PaaS struct {
-	kubeconfigPath string
-	kubectlContext string
-	osoconfigPath  string
-	ocContext      string
-	ccf            *oclientcmd.Factory
-	oc             *oclient.Client
-	err            error
-	etcdctl        *etcd.V3ClientContext
+	kubeconfigPath  string
+	kubectlContext  string
+	osoconfigPath   string
+	ocContext       string
+	ccf             *oclientcmd.Factory
+	oc              *oclient.Client
+	kc              *kclient.Client
+	orchestra       *kubernetes.Orchestration
+	err             error
+	etcdctl         *etcd.V3ClientContext
+	WaitForComplete bool
+	Follow          bool
+	In              io.Reader
+	Out             io.Writer
+	ErrOut          io.Writer
+}
+
+func NewPaaS() *PaaS {
+	return NewPaaSWith(kubeconfig_path, kubectl_context, osoconfig_path, oc_context)
+}
+
+func NewPaaSWith(kubeconfigPath, kubectlContext, osoconfigPath, ocContext string) *PaaS {
+	p := &PaaS{
+		kubeconfigPath: kubeconfigPath,
+		kubectlContext: kubectlContext,
+		osoconfigPath:  osoconfigPath,
+		ocContext:      ocContext,
+	}
+	p.ccf = util.NewClientCmdFactoryWith(kubeconfigPath, kubectlContext, osoconfigPath, ocContext)
+	p.oc, p.kc, p.err = p.ccf.Clients()
+	p.orchestra = kubernetes.NewOrchestrationWith(p.kc)
+	projectapi.AddToScheme(kapi.Scheme)
+	projectapiv1.AddToScheme(kapi.Scheme)
+	buildapi.AddToScheme(kapi.Scheme)
+	buildapiv1.AddToScheme(kapi.Scheme)
+	userapi.AddToScheme(kapi.Scheme)
+	userapiv1.AddToScheme(kapi.Scheme)
+	return p
+}
+
+func (p *PaaS) Factory() *oclientcmd.Factory {
+	return p.ccf
+}
+
+func (p *PaaS) OC() *oclient.Client {
+	return p.oc
+}
+
+func (p *PaaS) KC() *kclient.Client {
+	return p.kc
 }
 
 func (p *PaaS) WithOCctl(kubeconfigPath, kubectlContext, osoconfigPath, ocContext string) *PaaS {
@@ -141,15 +186,7 @@ func (p *PaaS) occtl() {
 	p.ccf = util.NewClientCmdFactory()
 	mapper, _ := p.ccf.Object(false)
 	kapi.RegisterRESTMapper(mapper)
-	p.oc, _, p.err = p.ccf.Clients()
-}
-
-func (p *PaaS) Factory() *oclientcmd.Factory {
-	return p.ccf
-}
-
-func (p *PaaS) OC() *oclient.Client {
-	return p.oc
+	p.oc, p.kc, p.err = p.ccf.Clients()
 }
 
 func (p *PaaS) WithEtcdCtl(addr []string, dialTimeout, requestTimeout time.Duration) *PaaS {
@@ -162,6 +199,274 @@ func (p *PaaS) WithEtcdCtl(addr []string, dialTimeout, requestTimeout time.Durat
 
 func (p *PaaS) EtcdCtl() *etcd.V3ClientContext {
 	return p.etcdctl
+}
+
+/*
+  github.com/openshift/origin/pkg/cmd/cli/cmd/newbuild.go
+*/
+func (p *PaaS) OSO_startbuild_NewCmdNewBuild(bc *buildapi.BuildConfig, buildName string, binarySource io.Reader) (messageTarget io.Reader, err error) {
+	cmd, o := NewCmdNewBuild("osoc", p.Factory(), os.Stdin, os.Stdout)
+	r, w := io.Pipe()
+	o.In = binarySource
+	o.Out = w
+	cmd.SetOutput(o.Out)
+	o.ErrOut = cmd.Out()
+
+	//o.NewBuildOptions.Env = []string{}
+	//o.NewBuildOptions.WaitForComplete = false
+	//o.NewBuildOptions.Follow = true
+	//o.NewBuildOptions.Client = p.OC()
+	o.NewBuildOptions.Config.OriginNamespace = bc.Namespace
+	o.NewBuildOptions.Action.DryRun = false
+
+	o.PaaS = p
+	if err = o.complete("osoc", p.Factory(), cmd, []string{}, o.Out, o.In); err != nil {
+		glog.Errorf("incorrect new-build settings: %+v", err)
+		r.CloseWithError(nil)
+		w.CloseWithError(nil)
+		messageTarget = nil
+		return
+	}
+	if err = o.runBuildConfig(bc, buildName); err != nil {
+		glog.Errorf("failed to invoke new-build: %+v", err)
+		r.CloseWithError(nil)
+		w.CloseWithError(nil)
+		messageTarget = nil
+		return
+	}
+	messageTarget = r
+	return
+}
+
+func (p *PaaS) OSO_startbuild_NewCmdStartBuild(bc *buildapiv1.BuildConfig, obj *buildapiv1.Build, binarySource io.Reader) (binaryMessage io.Reader, err error) {
+	buildconfig := &buildapi.BuildConfig{}
+	build := &buildapi.Build{}
+	var data []byte
+	kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, bc, obj)
+	kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, buildconfig, build)
+	data, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), bc)
+	if err != nil {
+		return nil, err
+	}
+	if err := runtime.DecodeInto(kapi.Codecs.UniversalDeserializer(), data, buildconfig); err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		data, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), obj)
+		if err != nil {
+			return nil, err
+		}
+		if err := runtime.DecodeInto(kapi.Codecs.UniversalDeserializer(), data, build); err != nil {
+			return nil, err
+		}
+	}
+	return p.oso_startbuild_NewCmdStartBuild(buildconfig, build, binarySource)
+}
+
+/*
+  github.com/openshift/origin/pkg/cmd/cli/cmd/startbuild.go
+*/
+func (p *PaaS) oso_startbuild_NewCmdStartBuild(bc *buildapi.BuildConfig, obj *buildapi.Build, binarySource io.Reader) (binaryMessage io.Reader, err error) {
+	cmd, o := NewCmdStartBuild("osoc", p.Factory(), os.Stdin, os.Stdout)
+	r, w := io.Pipe()
+	o.In = binarySource
+	o.Out = w
+	cmd.SetOutput(o.Out)
+	o.ErrOut = cmd.Out()
+	o.StartBuildOptions.Env = []string{}
+	o.StartBuildOptions.WaitForComplete = false
+	o.StartBuildOptions.Follow = true
+	o.StartBuildOptions.Namespace = bc.Namespace
+	o.StartBuildOptions.Client = p.OC()
+
+	o.OP = p
+	if err = o.completeBuildConfig(bc.Name, "5"); err != nil {
+		glog.Errorf("incorrect start-build settings: %+v", err)
+		r.CloseWithError(nil)
+		w.CloseWithError(nil)
+		binaryMessage = nil
+		return
+	}
+	if err = o.Run(); err != nil {
+		glog.Errorf("failed to invoke start-build: %+v", err)
+		r.CloseWithError(nil)
+		w.CloseWithError(nil)
+		binaryMessage = nil
+		return
+	}
+
+	//	u.Schedulers["DockerBuilder"].WithPaylodHandler(
+	//		func() dispatcher.HandleFunc {
+	//			glog.Errorf("Schedule docker builder into tracker: %s/%s(%s)\n", obj.Namespace, obj.Name, bc.Name)
+	//			return o.TrackWith(ctx, req, resp, op, raw, obj, bc)
+	//		}(),
+	//	)
+	binaryMessage = r
+	return
+}
+
+func (p *PaaS) RequestProjectCreation(project string) error {
+	ok, err := findProject(p.oc, project)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		tgt := &projectapiv1.Project{
+			TypeMeta: unversioned.TypeMeta{
+				Kind:       "Project",
+				APIVersion: projectapiv1.SchemeGroupVersion.Version,
+			},
+			ObjectMeta: kapiv1.ObjectMeta{
+				Name: project,
+			},
+			Spec: projectapiv1.ProjectSpec{
+				Finalizers: []kapiv1.FinalizerName{projectapiv1.FinalizerOrigin,
+					kapiv1.FinalizerKubernetes},
+			},
+		}
+		_, _, err = createIntoProject(p.oc, nil, tgt)
+		return err
+	}
+	return nil
+}
+
+func (p *PaaS) RequestBuilderSecretCreationWithDockerRegistry(project, secret, builder string, dac types.AuthConfig) error {
+	_, _, _, err := p.orchestra.VerifyDockerConfigJsonSecretAndServiceAccount(project, secret, dac, builder)
+	return err
+}
+
+func (p *PaaS) RequestBuildConfigCreation(rawJSON []byte) (data []byte, obj *buildapiv1.BuildConfig, err error) {
+	obj, err = reapBuildConfig(rawJSON)
+	if err != nil {
+		glog.Errorf("Cloud not deserilize into object: %+V", err)
+		data = make([]byte, 0)
+		obj = nil
+		err = fmt.Errorf("%+v: %+v", errUnexpected, err)
+		return
+	}
+	glog.Infof("%+v", obj)
+	kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, obj)
+	if obj.Spec.Output.PushSecret != nil {
+		if obj.Spec.Strategy.DockerStrategy != nil && obj.Spec.Strategy.DockerStrategy.PullSecret != nil {
+			if strings.Compare(obj.Spec.Output.PushSecret.Name, obj.Spec.Strategy.DockerStrategy.PullSecret.Name) == 0 {
+				obj.Spec.Output.PushSecret = nil
+			}
+		} else if obj.Spec.Strategy.SourceStrategy != nil && obj.Spec.Strategy.SourceStrategy.PullSecret != nil {
+			if strings.Compare(obj.Spec.Output.PushSecret.Name, obj.Spec.Strategy.SourceStrategy.PullSecret.Name) == 0 {
+				obj.Spec.Output.PushSecret = nil
+			}
+		} else if obj.Spec.Strategy.CustomStrategy != nil && obj.Spec.Strategy.CustomStrategy.PullSecret != nil {
+			if strings.Compare(obj.Spec.Output.PushSecret.Name, obj.Spec.Strategy.CustomStrategy.PullSecret.Name) == 0 {
+				obj.Spec.Output.PushSecret = nil
+			}
+		}
+	}
+	rawJSON, err = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), obj)
+	if err != nil {
+		return
+	}
+
+	if len(obj.Namespace) > 0 {
+		d, o, e := p.readProject(obj.Namespace)
+		if e != nil {
+			data = make([]byte, 0)
+			obj = nil
+			err = fmt.Errorf("%+v: %+v", errUnexpected, e)
+			return
+		}
+		if len(d) == 0 || o == nil {
+			d, o, e = p.createProjectRequest(obj.Namespace)
+			if e != nil {
+				data = make([]byte, 0)
+				obj = nil
+				err = fmt.Errorf("%+v: %+v", errUnexpected, e)
+				return
+			}
+		}
+	}
+
+	var ok bool
+	ok, err = findBuildConfig(p.oc, obj.Namespace, obj.Name)
+	if err != nil {
+		data = make([]byte, 0)
+		obj = nil
+		return
+	}
+	if ok {
+		data = make([]byte, 0)
+		obj = nil
+		err = fmt.Errorf("%+v: build config conflict", errBadRequest)
+		return
+	}
+
+	data, obj, err = p.createBuildConfigWithJSON(rawJSON, obj.Namespace)
+	if err != nil {
+		data = make([]byte, 0)
+		obj = nil
+		err = fmt.Errorf("%+v: %+v", errUnexpected, err)
+	}
+	return
+}
+
+func (p *PaaS) RequestBuildCreation(name, message string, conf *buildapiv1.BuildConfig) ([]byte, *buildapiv1.Build, *buildapiv1.BuildConfig, error) {
+	var bc *buildapiv1.BuildConfig
+	var ok bool
+	var err error
+	ok, err = findBuildConfig(p.oc, conf.Namespace, conf.Name)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if !ok {
+		_, bc, err = createIntoBuildConfig(p.oc, nil, conf)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	} else {
+		bc = conf
+	}
+	buildRequestCauses := []buildapiv1.BuildTriggerCause{}
+	obj := &buildapiv1.Build{
+		TypeMeta: unversioned.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Build",
+		},
+		ObjectMeta: kapiv1.ObjectMeta{
+			Name:      name,
+			Namespace: bc.Namespace,
+		},
+		Spec: buildapiv1.BuildSpec{
+			CommonSpec: bc.Spec.CommonSpec,
+			TriggeredBy: append(buildRequestCauses,
+				buildapiv1.BuildTriggerCause{
+					Message: message,
+				},
+			),
+		},
+	}
+
+	if obj.Annotations == nil {
+		obj.Annotations = make(map[string]string)
+	}
+	obj.Annotations[buildapi.BuildConfigAnnotation] = bc.Name //"openshift.io/build-config.name"
+	obj.Annotations[buildapi.BuildNumberAnnotation] = "1"     //"openshift.io/build.number"
+	if obj.Labels == nil {
+		obj.Labels = make(map[string]string)
+	}
+	obj.Labels[buildapi.BuildConfigAnnotation] = bc.Name
+	obj.Labels[buildapi.BuildRunPolicyLabel] = "Serial" //"openshift.io/build.start-policy"
+	obj.Status.Config = &kapiv1.ObjectReference{
+		Kind:      bc.Kind,
+		Name:      bc.Name,
+		Namespace: bc.Namespace,
+	}
+
+	var raw []byte
+	var result *buildapiv1.Build
+	raw, result, err = createIntoBuild(p.oc, nil, obj)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return raw, result, bc, nil
 }
 
 func (p *PaaS) VerifyProject(project string) error {
@@ -178,16 +483,16 @@ func (p *PaaS) VerifyProject(project string) error {
 		return err
 	}
 	if !ok {
-		tgt := &projectapi.Project{
+		tgt := &projectapiv1.Project{
 			TypeMeta: unversioned.TypeMeta{
 				Kind:       "Project",
-				APIVersion: projectapi.SchemeGroupVersion.Version,
+				APIVersion: projectapiv1.SchemeGroupVersion.Version,
 			},
 			ObjectMeta: kapiv1.ObjectMeta{
 				Name: project,
 			},
-			Spec: projectapi.ProjectSpec{
-				Finalizers: []kapiv1.FinalizerName{projectapi.FinalizerOrigin,
+			Spec: projectapiv1.ProjectSpec{
+				Finalizers: []kapiv1.FinalizerName{projectapiv1.FinalizerOrigin,
 					kapiv1.FinalizerKubernetes},
 			},
 		}
@@ -243,6 +548,49 @@ func (p *PaaS) CreateNewBuild(obj *buildapiv1.Build, conf *buildapiv1.BuildConfi
 		return nil, nil, nil, err
 	}
 	return raw, result, bc, nil
+}
+
+const (
+	Openshift_origin_api_error_formatter = "Could not access openshift: %+v"
+	Helm_classic_setup_error_formatter   = "Faild to setup helm decode: %+v"
+	Helm_classic_decode_error_formatter  = "Could not decode metadata: %+v; JSON: %+v"
+	Kubernetes_deserialize_err_formatter = "Coude not deserialize into runtime object: %+v; JSON: %+v"
+)
+
+func validateRuntimeJSON(raw []byte, kind string) error {
+	if len(raw) == 0 {
+		glog.Warningln("Nothing should be to deserialize")
+		return nil
+	}
+	js := string(raw)
+	hco, err := codec.JSON.Decode(raw).One()
+	if err != nil {
+		glog.Errorf(Helm_classic_setup_error_formatter, err)
+		return fmt.Errorf("%+v; %+v", err, js)
+	}
+
+	meta := new(unversioned.TypeMeta)
+	if err := hco.Object(meta); err != nil {
+		glog.Errorf(Helm_classic_decode_error_formatter, err, js)
+		return fmt.Errorf("%+v; %+v", err, js)
+	}
+
+	switch {
+	case strings.EqualFold(kind, meta.Kind):
+		return nil
+	case strings.EqualFold("Status", meta.Kind):
+		status := new(unversioned.Status)
+		if err := hco.Object(status); err != nil {
+			glog.Warningf("Failed to decode into status: %+v", err)
+		} else {
+			glog.Warningf("Status message: %+v", status.Message)
+		}
+		err = fmt.Errorf("%+v; %+v", errBadRequest, js)
+	default:
+		glog.Errorf("Unexpected data: %+v", js)
+		err = fmt.Errorf("%+v; %+v", errUnexpected, js)
+	}
+	return err
 }
 
 func DirectlyRunOriginDockerBuilder(data *buildapiv1.Build) ([]byte, *buildapiv1.Build, error) {
@@ -971,12 +1319,12 @@ func overrideOptions(c *cobra.Command) {
 	c.Flags().Lookup("insecure-skip-tls-verify").NoOptDefVal = "false"
 
 	if val := c.Flags().Lookup("config"); val != nil {
-		val.Value.Set(oconfigPath)
+		val.Value.Set(osoconfig_path)
 	} else {
-		val = c.Flags().VarPF(stringValue{oconfigPath}, "config", "", "")
+		val = c.Flags().VarPF(stringValue{osoconfig_path}, "config", "", "")
 		fmt.Fprintf(os.Stdout, "[tangfx] config: %+v\n", val)
 	}
-	c.Flags().Lookup("config").NoOptDefVal = oconfigPath
+	c.Flags().Lookup("config").NoOptDefVal = osoconfig_path
 }
 
 func overrideRootCommandArgs() {
@@ -1000,10 +1348,10 @@ func overrideRootCommandArgs() {
 	//rootCommand.PersistentFlags().Var(flags.Lookup("config").Value, "config", "Specify a kubeconfig file to define the configuration")
 	if val := rootCommand.PersistentFlags().Lookup("config"); val != nil {
 		fmt.Println("configed")
-		val.Value.Set(oconfigPath)
+		val.Value.Set(osoconfig_path)
 	} else {
 		fmt.Println("setting")
-		val = rootCommand.PersistentFlags().VarPF(stringValue{oconfigPath}, "config", "", "")
+		val = rootCommand.PersistentFlags().VarPF(stringValue{osoconfig_path}, "config", "", "")
 		logger.Printf("config: %+v\n", val)
 	}
 	if val := rootCommand.PersistentFlags().Lookup("loglevel"); val != nil {

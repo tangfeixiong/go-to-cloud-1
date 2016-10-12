@@ -22,6 +22,102 @@ import (
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
 )
 
+func reapProject(data []byte) (*projectapiv1.Project, error) {
+	if err := validateRuntimeJSON(data, "Project"); err != nil {
+		return nil, err
+	}
+
+	obj := new(projectapiv1.Project)
+	kapi.Scheme.AddKnownTypes(projectapiv1.SchemeGroupVersion, obj)
+	if err := runtime.DecodeInto(kapi.Codecs.UniversalDeserializer(), data, obj); err != nil {
+		glog.Errorf(Kubernetes_deserialize_err_formatter, err, string(data))
+		return nil, err
+	}
+	return obj, nil
+}
+
+func (p *PaaS) readProject(name string) ([]byte, *projectapiv1.Project, error) {
+	if p == nil || p.oc == nil {
+		return nil, nil, errUnexpected
+	}
+	if len(name) == 0 {
+		return nil, nil, errBadRequest
+	}
+
+	raw, err := p.oc.RESTClient.Verb("GET").Resource("projects").Name(name).DoRaw()
+	if err != nil {
+		glog.Errorf(Openshift_origin_api_error_formatter, err)
+		return nil, nil, err
+	}
+	if len(raw) == 0 {
+		return raw, nil, nil
+	}
+	if err = validateRuntimeJSON(raw, "Project"); err != nil {
+		return nil, nil, err
+	}
+
+	obj, err := reapProject(raw)
+	if err != nil {
+		return raw, nil, err
+	}
+	return raw, obj, err
+}
+
+func (p *PaaS) createProjectRequest(namespace string) ([]byte, *projectapiv1.Project, error) {
+	// TODO eliminate this when we get better forbidden messages
+	_, err := p.oc.ProjectRequests().List(kapi.ListOptions{})
+	if err != nil {
+		glog.Errorf(Openshift_origin_api_error_formatter, err)
+		return nil, nil, err
+	}
+
+	projectRequest := &projectapiv1.ProjectRequest{}
+	projectRequest.Name = namespace
+	projectRequest.DisplayName = namespace
+	projectRequest.Description = namespace
+	projectRequest.Annotations = make(map[string]string)
+
+	raw, err := p.oc.RESTClient.Verb("POST").Resource("projectRequests").Body(projectRequest).DoRaw()
+	if err != nil {
+		glog.Errorf(Openshift_origin_api_error_formatter, err)
+		return nil, nil, err
+	}
+
+	obj, err := reapProject(raw)
+	if err != nil {
+		return raw, nil, err
+	}
+	return raw, obj, err
+}
+
+func (p *PaaS) createProject(namespace string) ([]byte, *projectapiv1.Project, error) {
+	obj := &projectapiv1.Project{
+		TypeMeta: unversioned.TypeMeta{
+			Kind:       "Project",
+			APIVersion: projectapiv1.SchemeGroupVersion.Version,
+		},
+		ObjectMeta: kapiv1.ObjectMeta{
+			Name: namespace,
+		},
+		Spec: projectapiv1.ProjectSpec{
+			Finalizers: []kapiv1.FinalizerName{projectapiv1.FinalizerOrigin,
+				kapiv1.FinalizerKubernetes},
+		},
+	}
+
+	raw, err := p.oc.RESTClient.Verb("POST").Resource("projects").Body(obj).DoRaw()
+	if err != nil {
+		glog.Errorf(Openshift_origin_api_error_formatter, err)
+		return nil, nil, err
+	}
+
+	obj, err = reapProject(raw)
+	if err != nil {
+		return raw, nil, err
+	}
+	return raw, obj, err
+}
+
 // Project and ProjectRequest
 //
 func CreateIntoProject(obj *projectapiv1.Project) ([]byte, *projectapiv1.Project, error) {
@@ -261,10 +357,6 @@ func CreateProject(name string, finalizers ...string) ([]byte, *projectapi.Proje
 	}
 
 	return createProject(b.Bytes(), nil)
-}
-
-func CreateProjectWith(obj *projectapi.Project) ([]byte, *projectapi.Project, error) {
-	return createProject(nil, obj)
 }
 
 func createProject(data []byte, obj *projectapi.Project) ([]byte, *projectapi.Project, error) {

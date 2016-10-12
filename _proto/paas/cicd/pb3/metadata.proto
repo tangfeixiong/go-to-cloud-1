@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = "pb3";
+option java_package = "com.qingyuanos.core.googleprotobuf.pb3";
+option java_outer_classname = "ObjectMetaDTO";
+
+package paas.cicd.pb3;
+
+import "google/api/annotations.proto";
+//import "google/protobuf/any.proto";
+
+message ObjectMeta {
+    map<string, string> annotations = 1;
+    map<string, string> labels      = 2;
+    string              name        = 3;
+    string              namespace   = 4;
+}
+
+message Template {
+    ObjectMeta     metadata = 1;
+    
+    message TemplateSpec {
+        enum SerializedFormat {
+            JSON = 0;
+            TOML = 1;
+            YAML = 2;
+        }
+        SerializedFormat format  = 1;
+        bytes            content = 2;
+    } 
+    TemplateSpec   spec     = 2;
+    
+    message TemplateStatus {
+        string phase   = 1;
+        string message = 2;
+        string reason  = 3;
+    }
+    TemplateStatus status   = 3;
+}
+
+message TemplateList {
+    repeated Template items = 1;
+}

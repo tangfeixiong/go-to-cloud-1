@@ -519,7 +519,9 @@ func (u *UserResource) scheduleDockerBuildTracker(ctx context.Context,
 func (u *UserResource) TrackDockerBuild(ctx context.Context, req *osopb3.DockerBuildRequestData) (*osopb3.DockerBuildResponseData, error) {
 	logger.SetPrefix("[service, .TrackDockerBuild] ")
 
-	if req.Name == "" {
+	if len(req.Name) == 0 || len(req.ProjectName) == 0 ||
+		req.Configuration == nil || len(req.Configuration.Name) == 0 ||
+		len(req.Configuration.ProjectName) == 0 {
 		logger.Println("Request body required")
 		return (*osopb3.DockerBuildResponseData)(nil), errUnexpected
 	}

@@ -3,21 +3,13 @@ package builder
 import (
 	"archive/tar"
 	"bytes"
-	"fmt"
 
 	"os"
 	"testing"
 	"time"
 
 	docker "github.com/fsouza/go-dockerclient"
-
-	"github.com/openshift/origin/pkg/version"
 )
-
-func TestOVersion(t *testing.T) {
-	thisVersion := version.Get().String()
-	fmt.Println(thisVersion)
-}
 
 func TestFsouzaBuild(t *testing.T) {
 	client, err := docker.NewClientFromEnv()

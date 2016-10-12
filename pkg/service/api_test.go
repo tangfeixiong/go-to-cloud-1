@@ -110,12 +110,6 @@ func stopServerGRPC() {
 	}
 }
 
-func TestMain(m *testing.M) {
-	ret := m.Run()
-
-	os.Exit(ret)
-}
-
 func TestDockerBuildRetrieve_gRPC(t *testing.T) {
 	go startServerGRPC()
 
@@ -176,7 +170,7 @@ func dockerbuildretrieve_gRPC() error {
 		Labels:      map[string]string{},
 		Annotations: map[string]string{},*/
 	}
-	respBuild, err := c.RetrieveIntoBuildDockerImage(context.Background(), reqBuild, opts...)
+	respBuild, err := c.RetrieveDockerBuild(context.Background(), reqBuild, opts...)
 	if err != nil {
 		return err
 	}
@@ -187,7 +181,7 @@ func dockerbuildretrieve_gRPC() error {
 
 func TestDirect_origindockerbuild(t *testing.T) {
 	reqBuild := origindockerbuild_data()
-	respBuild, err := Usrs.CreateIntoBuildDockerImage(context.Background(), reqBuild)
+	respBuild, err := Usrs.CreateDockerBuilderIntoImage(context.Background(), reqBuild)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -225,7 +219,7 @@ func origindockerbuild_grpc() error {
 	opts := []grpc.CallOption{}
 
 	reqBuild := origindockerbuild_data()
-	respBuild, err := c.CreateIntoBuildDockerImage(context.Background(), reqBuild, opts...)
+	respBuild, err := c.CreateDockerBuilderIntoImage(context.Background(), reqBuild, opts...)
 	if err != nil {
 		return err
 	}

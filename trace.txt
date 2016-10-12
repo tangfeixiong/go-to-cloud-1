@@ -1,3 +1,80 @@
+localhost:trusty64 fanhongling$ KUBECONFIG=/Users/fanhongling/Downloads/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig oc describe build/springbootms-web
+Name:		springbootms-web
+Namespace:	default
+Created:	3 minutes ago
+Labels:		openshift.io/build-config.name=springbootms-web
+		openshift.io/build.start-policy=Serial
+Annotations:	openshift.io/build-config.name=springbootms-web
+		openshift.io/build.number=1
+		openshift.io/build.pod-name=springbootms-web-build
+
+Status:		Pending
+Duration:	waiting for 3m45s
+Build Config:	springbootms-web
+Build Pod:	springbootms-web-build
+
+Strategy:		Source
+URL:			https://github.com/tangfeixiong/osev3-examples
+Ref:			master
+From Image:		DockerImage tangfeixiong/springboot-sti:gitcommit1125149-0901T2236
+Pull Secret Name:	172-17-4-50-colon-30005-slash-tangfx
+Output to:		DockerImage foo:latest
+Push Secret:		172-17-4-50-colon-30005-slash-tangfx
+Fail Build After:	15m0s
+
+Build trigger cause:	Manually build
+
+Events:
+  FirstSeen	LastSeen	Count	From			SubobjectPath	Type		Reason		Message
+  ---------	--------	-----	----			-------------	--------	------		-------
+  3m		3m		1	{default-scheduler }			Normal		Scheduled	Successfully assigned springbootms-web-build to 172.17.4.50
+  1m		1m		1	{kubelet 172.17.4.50}			Warning		FailedMount	Unable to mount volumes for pod "springbootms-web-build_default(0535d5ed-8ebd-11e6-8ad7-0800274654e7)": timeout expired waiting for volumes to attach/mount for pod "springbootms-web-build"/"default". list of unattached/unmounted volumes=[172-17-4-50-colon-30005-slash-tangfx-push]
+  1m		1m		1	{kubelet 172.17.4.50}			Warning		FailedSync	Error syncing pod, skipping: timeout expired waiting for volumes to attach/mount for pod "springbootms-web-build"/"default". list of unattached/unmounted volumes=[172-17-4-50-colon-30005-slash-tangfx-push]
+
+
+	template_test.go:349: TypeMeta:<kind:"BuildConfig" apiVersion:"v1" > metadata:<name:"springbootms-web" generateName:"" namespace:"default" selfLink:"/oapi/v1/namespaces/default/buildconfigs/springbootms-web" uid:"04f5e695-8ebd-11e6-bd7e-0242ac11000e" resourceVersion:"139" generation:0 creationTimestamp:<2016-10-10T07:41:56Z> > spec:<runPolicy:"Serial" commonSpec:<serviceAccount:"builder" source:<type:"Git" git:<uri:"https://github.com/tangfeixiong/osev3-examples" ref:"master" > contextDir:"" > strategy:<type:"Source" sourceStrategy:<from:<kind:"DockerImage" namespace:"" name:"tangfeixiong/springboot-sti:gitcommit1125149-0901T2236" uid:"" apiVersion:"" resourceVersion:"" fieldPath:"" > pullSecret:<name:"172-17-4-50-colon-30005-slash-tangfx" > scripts:"" incremental:false forcePull:false > > output:<to:<kind:"DockerImage" namespace:"" name:"foo:latest" uid:"" apiVersion:"" resourceVersion:"" fieldPath:"" > pushSecret:<name:"172-17-4-50-colon-30005-slash-tangfx" > > resources:<> postCommit:<script:"" > completionDeadlineSeconds:900 > > status:<lastVersion:0 > 
+panic: assignment to entry in nil map [recovered]
+
+
+
+
+
+localhost:trusty64 fanhongling$ KUBECONFIG=/Users/fanhongling/Downloads/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig oc describe pods/springbootms-web-build
+Name:		springbootms-web-build
+Namespace:	default
+Node:		172.17.4.50/172.17.4.50
+Start Time:	Mon, 10 Oct 2016 00:41:57 -0700
+Labels:		openshift.io/build.name=springbootms-web
+Status:		Pending
+...
+...
+...
+Volumes:
+  docker-socket:
+    Type:	HostPath (bare host directory volume)
+    Path:	/var/run/docker.sock
+  172-17-4-50-colon-30005-slash-tangfx-push:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	172-17-4-50-colon-30005-slash-tangfx
+  172-17-4-50-colon-30005-slash-tangfx-pull:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	172-17-4-50-colon-30005-slash-tangfx
+  builder-token-mxgbr:
+    Type:	Secret (a volume populated by a Secret)
+    SecretName:	builder-token-mxgbr
+Events:
+  FirstSeen	LastSeen	Count	From			SubobjectPath	Type		Reason		Message
+  ---------	--------	-----	----			-------------	--------	------		-------
+  7m		7m		1	{default-scheduler }			Normal		Scheduled	Successfully assigned springbootms-web-build to 172.17.4.50
+  5m		38s		3	{kubelet 172.17.4.50}			Warning		FailedMount	Unable to mount volumes for pod "springbootms-web-build_default(0535d5ed-8ebd-11e6-8ad7-0800274654e7)": timeout expired waiting for volumes to attach/mount for pod "springbootms-web-build"/"default". list of unattached/unmounted volumes=[172-17-4-50-colon-30005-slash-tangfx-push]
+  5m		38s		3	{kubelet 172.17.4.50}			Warning		FailedSync	Error syncing pod, skipping: timeout expired waiting for volumes to attach/mount for pod "springbootms-web-build"/"default". list of unattached/unmounted volumes=[172-17-4-50-colon-30005-slash-tangfx-push]
+
+
+
+
+
+
+
 [vagrant@localhost go-to-cloud-1]$ kubectl describe pods osobuilds-build --namespace=tangfx
 Name:		osobuilds-build
 Namespace:	tangfx

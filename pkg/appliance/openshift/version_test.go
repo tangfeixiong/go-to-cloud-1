@@ -2,6 +2,8 @@ package openshift
 
 import (
 	"testing"
+
+	"github.com/openshift/origin/pkg/version"
 )
 
 var (
@@ -10,6 +12,11 @@ var (
 	ns  = "tangfeixiong"
 	bld = "tangfeixiong"
 )
+
+func TestVersion(t *testing.T) {
+	thisVersion := version.Get().String()
+	t.Log(thisVersion)
+}
 
 func TestSignio(t *testing.T) {
 	token, err := SignIn(u, p)

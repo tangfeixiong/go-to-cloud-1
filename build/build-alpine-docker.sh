@@ -8,8 +8,8 @@ TAG=${VER}-$(git rev-parse --short=7 HEAD)
 if [[ $# > 0 ]]; then
 	TAG=$1
 elif [[ ! -z $(git status --porcelain) ]]; then
-    echo "$(date +%m%d%H%M)".gitref-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')
-    TAG=$(date +%m%d%H%M).gitref-$(git rev-parse --short=7 HEAD)
+    echo "$(date +%y%m%d%H%M)".gitref-$(git show-ref --abbrev=7 --heads | awk '{ print $1 }')
+    TAG=$(date +%y%m%d%H%M).gitrev-$(git rev-parse --short=7 HEAD)
 fi
 DOCKER_IMAGE="hub.qingyuanos.com/admin/apaas:${TAG}"
 

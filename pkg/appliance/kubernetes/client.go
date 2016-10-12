@@ -35,6 +35,11 @@ var (
 
 type Orchestration struct {
 	apiserver string
+	kc        *kclient.Client
+}
+
+func NewOrchestrationWith(kc *kclient.Client) *Orchestration {
+	return &Orchestration{kc: kc}
 }
 
 func NewOrchestration() *Orchestration {
@@ -54,13 +59,16 @@ func NewOrchestration() *Orchestration {
 	return &Orchestration{}
 }
 
-func (*Orchestration) VerifyDockerConfigJsonSecretAndServiceAccount(namespace, secret string,
+func (orc *Orchestration) VerifyDockerConfigJsonSecretAndServiceAccount(namespace, secret string,
 	dac types.AuthConfig, sa string) (*cliconfig.ConfigFile, *kapi.Secret, *kapi.ServiceAccount, error) {
-	c, _, err := withKubeconfig(_kubeconfig, _kube_context, _kube_apiserver)
-	if err != nil {
-		return nil, nil, nil, err
+	if orc.kc == nil {
+		c, _, err := withKubeconfig(_kubeconfig, _kube_context, _kube_apiserver)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		orc.kc = c
 	}
-	return verifyDockerConfigJsonSecretAndServiceAccount(c, namespace, secret, dac, sa)
+	return verifyDockerConfigJsonSecretAndServiceAccount(orc.kc, namespace, secret, dac, sa)
 }
 
 func withKubeconfig(kubeconfig, context, server string) (c *kclient.Client, cc kclientcmd.ClientConfig, e error) {

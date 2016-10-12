@@ -27,6 +27,10 @@ var (
 			"pullSecret": "base64:encoding"}}}
 )
 
+func TestBuildConfig_create(t *testing.T) {
+	p := NewPaaSWith(fakeKubeconfigPath, fakeKubectlContext, fakeOconfigPath, fakeOcContext)
+}
+
 func TestBuild_simplecreate(t *testing.T) {
 	data, _, err := CreateBuild(fakeBuild, fakeProject, nil, fakeGitURI, fakeGitRef, fakeContextDir, nil, fakeDockerfile, nil, nil)
 	if err != nil {

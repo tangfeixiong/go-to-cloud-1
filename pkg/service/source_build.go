@@ -39,15 +39,17 @@ func gitSourceBuildSkeleton(req *osopb3.DockerBuildRequestData) (*buildapi.Build
 		len(req.Configuration.CommonSpec.Output.To.Name) == 0 {
 		return nil, nil, errUnexpected
 	}
-	opt := builder.BuildCommonSpecTemplateOption{
-		GitURI:     req.Configuration.CommonSpec.Source.Git.Uri,
-		GitRef:     "master",
+	opt := builder.CommonSpecTemplateOption{
+		SimpleGitOption: builder.SimpleGitOption{
+			GitURI:    req.Configuration.CommonSpec.Source.Git.Uri,
+			GitRef:    "master",
+			FromKind:  "DockerImage",
+			FromName:  "",
+			ForcePull: false,
+			ToKind:    "DockerImage",
+			ToName:    "",
+		},
 		ContextDir: "/",
-		FromKind:   "DockerImage",
-		FromName:   "",
-		ForcePull:  false,
-		ToKind:     "DockerImage",
-		ToName:     "",
 	}
 	if len(req.Configuration.CommonSpec.Source.Git.Ref) > 0 {
 		opt.GitRef = req.Configuration.CommonSpec.Source.Git.Ref
@@ -62,12 +64,16 @@ func gitSourceBuildSkeleton(req *osopb3.DockerBuildRequestData) (*buildapi.Build
 	opt.ToName = req.Configuration.CommonSpec.Output.To.Name
 
 	bTmplOpt := builder.BuildTemplateOption{
-		Name:      req.Name,
-		Namespace: req.ProjectName,
+		ObjectMetaTemplateOption: builder.ObjectMetaTemplateOption{
+			Name:      req.Name,
+			Namespace: req.ProjectName,
+		},
 	}
 	bcTmplOpt := builder.BuildConfigTemplateOption{
-		Name:      req.Configuration.Name,
-		Namespace: req.Configuration.ProjectName,
+		ObjectMetaTemplateOption: builder.ObjectMetaTemplateOption{
+			Name:      req.Configuration.Name,
+			Namespace: req.Configuration.ProjectName,
+		},
 	}
 	bTmpl := builder.SourceBuildConfigTemplate["BuildForGitByManuallyTriggered"]
 	bcTmpl := builder.SourceBuildConfigTemplate["BuildConfigForGitWithoutTriggers"]

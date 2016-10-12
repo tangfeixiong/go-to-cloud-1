@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option go_package = "pb3";
+option java_package = "com.qingyuanos.core.googleprotobuf.pb3";
+option java_outer_classname = "DockerEngineApiModel";
+
+package paas.cicd.pb3;
+
+import "google/api/annotations.proto";
+//import "google/protobuf/any.proto";
+
+
+// https://github.com/docker/engine-api/blob/master/types/auth.go
+message DockerAuthConfig {
+	string username = 1;
+	string password = 2;
+	string auth = 3;
+
+	// Email is an optional value associated with the username.
+	// This field is deprecated and will be removed in a later
+	// version of docker.
+	string email = 4;
+
+	string serverAddress = 5;
+
+	// IdentityToken is used to authenticate the user and get
+	// an access token for the registry.
+	string identityToken = 6;
+
+	// RegistryToken is a bearer token to be sent to a registry
+	string registryToken = 7;
+}
+
+// https://github.com/docker/docker/blob/master/cliconfig/configfile/file.go
+message DockerConfigFile {
+	map<string, DockerAuthConfig> authConfigs = 1;
+	map<string, string> httpHeaders = 2;
+	string psFormat = 3;
+	string imagesFormat = 4;
+	string networksFormat = 5;
+	string volumesFormat = 6;
+	string detachKeys = 7;
+	string credentialsStore = 8;
+	string filename = 9;
+}

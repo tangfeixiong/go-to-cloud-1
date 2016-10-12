@@ -47,6 +47,85 @@ import (
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/gnatsd"
 )
 
+func (osop *PaaS) StreamBuildLog(data []byte, newBuild *buildapi.Build) error {
+	var err error
+	if newBuild == nil {
+		newBuild = &buildapi.Build{}
+		/*
+		          using
+				projectapi.AddToScheme(kapi.Scheme)
+				projectapiv1.AddToScheme(kapi.Scheme)
+							          instead
+		*/
+		//kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.Build{})
+		//kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.Build{})
+		//if err = runtime.DecodeInto(kapi.Codecs.UniversalDeserializer(), data, newBuild); err != nil {
+		if err = runtime.DecodeInto(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion, buildapi.SchemeGroupVersion), data, newBuild); err != nil {
+			glog.Errorf("Could not deserialize: %+v", err)
+			return err
+		}
+		if len(newBuild.Name) == 0 {
+			glog.Errorln("Unexpecd of empty build name")
+			return errUnexpected
+		}
+	}
+	//kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.BuildLogOptions{})
+	//kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.BuildLogOptions{})
+
+	var (
+		wg      sync.WaitGroup
+		exitErr error
+	)
+
+	// Wait for the build to complete
+	if osop.WaitForComplete {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			exitErr = WaitForBuildComplete(osop.oc.Builds(newBuild.Namespace), newBuild.Name)
+		}()
+	}
+
+	// Stream the logs from the build
+	if osop.Follow {
+		wg.Add(1)
+		go func() {
+			// if --wait option is set, then don't wait for logs to finish streaming
+			// but wait for the build to reach its final state
+			if osop.WaitForComplete {
+				wg.Done()
+			} else {
+				defer wg.Done()
+			}
+			opts := buildapi.BuildLogOptions{
+				Follow: true,
+				NoWait: false,
+			}
+			for {
+				rd, err := osop.oc.BuildLogs(newBuild.Namespace).Get(newBuild.Name, opts).Stream()
+				if err != nil {
+					// if --wait options is set, then retry the connection to build logs
+					// when we hit the timeout.
+					if osop.WaitForComplete && oerrors.IsTimeoutErr(err) {
+						continue
+					}
+					fmt.Fprintf(osop.ErrOut, "error getting logs: %v\n", err)
+					return
+				}
+				defer rd.Close()
+				if _, err = io.Copy(osop.Out, rd); err != nil {
+					fmt.Fprintf(osop.ErrOut, "error streaming logs: %v\n", err)
+				}
+				break
+			}
+		}()
+	}
+
+	wg.Wait()
+
+	return exitErr
+}
+
 type StartBuildOptions struct {
 	cmd.StartBuildOptions
 	Ctx   context.Context
@@ -65,7 +144,7 @@ func NewCmdStartBuild(fullName string, f *clientcmd.Factory, in io.Reader, out i
 		StartBuildOptions: cmd.StartBuildOptions{
 			LogLevel:        "5",
 			Follow:          true,
-			WaitForComplete: true,
+			WaitForComplete: false,
 		},
 		buf:   &bytes.Buffer{},
 		mutex: &sync.Mutex{},
@@ -449,6 +528,95 @@ func (o *StartBuildOptions) tracker() {
 	}
 }
 
+func (o *StartBuildOptions) completeWebHook(url, logLevel string) error {
+	o.FromWebhook = url
+	o.FromBuild = ""
+	o.FromFile = ""
+	o.FromDir = ""
+	o.FromRepo = ""
+	if len(logLevel) > 0 {
+		o.LogLevel = logLevel
+	}
+	o.ListWebhooks = ""
+	rootCommand.SetOutput(o.Out)
+	return o.Complete(o.OP.Factory(), o.In, o.Out, rootCommand, []string{})
+}
+
+func (o *StartBuildOptions) completeCloneBuild(buildName, logLevel string) error {
+	o.FromWebhook = ""
+	o.FromBuild = buildName
+	o.FromFile = ""
+	o.FromDir = ""
+	o.FromRepo = ""
+	if len(logLevel) > 0 {
+		o.LogLevel = logLevel
+	}
+	o.ListWebhooks = "all"
+	o.Env = []string{}
+	rootCommand.SetOutput(o.Out)
+	return o.Complete(o.OP.Factory(), o.In, o.Out, rootCommand, []string{})
+}
+
+func (o *StartBuildOptions) completeFile(buildconfigName, path, logLevel string) error {
+	o.FromWebhook = ""
+	o.FromBuild = ""
+	o.FromFile = path
+	o.FromDir = ""
+	o.FromRepo = ""
+	if len(logLevel) > 0 {
+		o.LogLevel = logLevel
+	}
+	o.ListWebhooks = ""
+	o.Env = []string{}
+	rootCommand.SetOutput(o.Out)
+	return o.Complete(o.OP.Factory(), o.In, o.Out, rootCommand, []string{buildconfigName})
+}
+
+func (o *StartBuildOptions) completeDir(buildconfigName, path, logLevel string) error {
+	o.FromWebhook = ""
+	o.FromBuild = ""
+	o.FromFile = ""
+	o.FromDir = path
+	o.FromRepo = ""
+	if len(logLevel) > 0 {
+		o.LogLevel = logLevel
+	}
+	o.ListWebhooks = ""
+	o.Env = []string{}
+	rootCommand.SetOutput(o.Out)
+	return o.Complete(o.OP.Factory(), o.In, o.Out, rootCommand, []string{buildconfigName})
+}
+
+func (o *StartBuildOptions) completeLocalRepo(buildconfigName, path, logLevel string) error {
+	o.FromWebhook = ""
+	o.FromBuild = ""
+	o.FromFile = ""
+	o.FromDir = ""
+	o.FromRepo = path
+	if len(logLevel) > 0 {
+		o.LogLevel = logLevel
+	}
+	o.ListWebhooks = ""
+	o.Env = []string{}
+	rootCommand.SetOutput(o.Out)
+	return o.Complete(o.OP.Factory(), o.In, o.Out, rootCommand, []string{buildconfigName})
+}
+
+func (o *StartBuildOptions) completeBuildConfig(buildconfigName, logLevel string) error {
+	o.FromWebhook = ""
+	o.FromBuild = ""
+	o.FromFile = ""
+	o.FromDir = ""
+	o.FromRepo = ""
+	if len(logLevel) > 0 {
+		o.LogLevel = logLevel
+	}
+	o.ListWebhooks = ""
+	o.Env = []string{}
+	rootCommand.SetOutput(o.Out)
+	return o.Complete(o.OP.Factory(), o.In, o.Out, rootCommand, []string{buildconfigName})
+}
+
 func (o *StartBuildOptions) Complete(f *clientcmd.Factory, in io.Reader, out io.Writer, cmd *cobra.Command, args []string) error {
 	o.In = in
 	o.Out = out
@@ -470,7 +638,7 @@ func (o *StartBuildOptions) Complete(f *clientcmd.Factory, in io.Reader, out io.
 		}
 		return nil
 
-	case len(args) != 1 && len(buildName) == 0:
+	case len(args) != 1 && len(buildName) == 0: /* e.g. oc start-build (buildconfigs/foo|--from-build=bar) */
 		return kcmdutil.UsageError(cmd, "Must pass a name of a build config or specify build name with '--from-build' flag")
 	}
 
@@ -497,7 +665,7 @@ func (o *StartBuildOptions) Complete(f *clientcmd.Factory, in io.Reader, out io.
 		resource = buildapi.Resource("builds")
 	)
 
-	if len(name) == 0 && len(args) > 0 && len(args[0]) > 0 {
+	if len(name) == 0 && len(args) > 0 && len(args[0]) > 0 { /* parse expression: buildconfigs/foo, --from-build --list-webhooks=all|generic|github */
 		mapper, _ := f.Object(false)
 		resource, name, err = cmdutil.ResolveResource(buildapi.Resource("buildconfigs"), args[0], mapper)
 		if err != nil {
@@ -1002,6 +1170,7 @@ func WaitForBuildComplete(c osclient.BuildInterface, name string) error {
 	for {
 		list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
 		if err != nil {
+			glog.Errorf("Could not list runtime object: %+v", err)
 			return err
 		}
 		for i := range list.Items {
@@ -1016,6 +1185,7 @@ func WaitForBuildComplete(c osclient.BuildInterface, name string) error {
 		rv := list.ResourceVersion
 		w, err := c.Watch(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector(), ResourceVersion: rv})
 		if err != nil {
+			glog.Errorf("Could not watch: %+v", err)
 			return err
 		}
 		defer w.Stop()

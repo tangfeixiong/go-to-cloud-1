@@ -10,6 +10,7 @@ import (
 	buildapi "github.com/openshift/origin/pkg/build/api/v1"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/utility"
 )
 
 type FakeCommonBuildTemplateOption struct {
@@ -130,8 +131,11 @@ var (
 	}
 )
 
+/*
+  GOPATH=/work:/go:/data go test -v -run=Source ./pkg/appliance/openshift/origin/build-builder --args --loglevel=2
+*/
 func TestSource_One(t *testing.T) {
-	tmpl := template.New("source build")
+	tmpl := template.New("source build").Funcs(utility.TplFns).Funcs(utility.SprigTxtTplFns)
 	tmpl = template.Must(tmpl.Parse(bTmpl))
 	buf := &bytes.Buffer{}
 	if err := tmpl.Execute(buf, bTmplOpt); err != nil {

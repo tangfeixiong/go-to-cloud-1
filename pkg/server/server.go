@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/cicd/pb3"
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/service"
 )
 
@@ -49,6 +50,7 @@ func (s *AppContext) GRPCServer(server *grpc.Server) *AppContext {
 	s.grpcServer = server
 	osopb3.RegisterSimpleServiceServer(server, service.Usrs)
 	//osopb3.RegisterSimpleManageServiceServer(server, service.Usrs)
+	pb3.RegisterContainerImageBuildServiceServer(server, service.Usrs)
 	return s
 }
 

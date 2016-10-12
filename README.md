@@ -1,8 +1,10 @@
 # Instruction
 
+A Kubernetes/Openshift integration
+
 ## Prerequisites
 
-* Primary dependency
+* Primary packages
 
 [Kubernetes](https://github.com/kubernetes/kubernetes)
 
@@ -10,7 +12,7 @@
 
 [OpenShift Origin](https://github.com/openshift/origin)
 
-* Networking dependency
+* Networking packages
 
 [gRPC for Golang](https://github.com/grpc/grpc-go)
 
@@ -18,19 +20,29 @@
 
 [Protobuf for Golang](https://github.com/golang/protobuf)
 
+[Protocol Buffers for Go with Gadgets](https://github.com/gogo/protobuf)
+
+>This gogoprotobuf is a fork of golang/protobuf with extra code generation features. It is widely used by such: etcd, cockroachdb, cloudfoundry, kubernetes, docker swarm, nats-io, tidb
+
 [gRPC to JSON proxy for Golang](https://github.com/grpc-ecosystem/grpc-gateway)
 
 ## Get, Make and Install Google Protobuf
 
-## Get, Build and Install Golang Protobuf
+## Get, Build or Install Golang Protobuf (gogoprotobuf)
 
-## Get Golang gRPC
+## Get, Build or Install Golang gRPC
 
-### Generate Golang stub code
+## Get, Build or Install Golang gRPC-gateway for JSON REST HTTP
+
+## Development
+
+### Generate Golang stub
 
 * Golang stub
 
 Generate gRPC and Protobuf stub
+
+    [vagrant@localhost go-to-cloud-1]$ protoc --proto_path=/usr/local/include --proto_path=/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --proto_path=/go/src --proto_path=/data/src --proto_path=/work/src/github.com/tangfeixiong/go-to-cloud-1/_proto --gofast_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:pkg/api/proto /work/src/github.com/tangfeixiong/go-to-cloud-1/_proto/paas/cicd/pb3/*.proto
 
     [vagrant@localhost go-to-cloud-1]$ protoc --proto_path=/usr/local/include --proto_path=/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --proto_path=/go/src --proto_path=/data/src --proto_path=/work/src/github.com/tangfeixiong/go-to-cloud-1/_proto --gofast_out=Mgoogle/protobuf/any.proto=github.com/golang/protobuf/ptypes/any,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:pkg/api/proto /work/src/github.com/tangfeixiong/go-to-cloud-1/_proto/paas/ci/osopb3/*.proto
 
@@ -66,6 +78,13 @@ Example GO environment
     /data/bin
 
 * Build
+
+CLI
+
+    [vagrant@localhost go-to-cloud-1]$ GOPATH=/work:/go:/data go build -o /data/bin/c5 -v ./cmd/c5/main.go
+    
+    [vagrant@localhost go-to-cloud-1]$ KUBECONFIG=/data/src/github.com/openshift/origin/openshift.local.config/master/admin.kubeconfig c5 g2c run-build
+    You can play it soon...
 
 Build with vendoring
 

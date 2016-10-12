@@ -1,4 +1,4 @@
-package builder
+package service
 
 import (
 	"flag"
@@ -6,15 +6,6 @@ import (
 	"os"
 	"strconv"
 	"testing"
-)
-
-var (
-	_nats_addrs    []string = []string{"10.3.0.39:4222"}
-	_nats_user     string   = "derek"
-	_nats_password string   = "T0pS3cr3t"
-
-	fake_username    string = "system:admin"
-	fake_projectname string = "tangfx"
 )
 
 func TestMain(m *testing.M) {

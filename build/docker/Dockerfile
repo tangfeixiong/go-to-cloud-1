@@ -35,4 +35,4 @@ CMD ["/bin/apaas"]
 
 #ENTRYPOINT ["/bin/apaas"]
 
-LABEL name="apaas-build" version="0.1" description="openshift origin, GitVersion: v1.3.0-alpha.2"
+LABEL name="apaas" version="0.2" description="openshift origin, GitVersion: v1.3.0-alpha.2"

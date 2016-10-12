@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/golang/glog"
-	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/docker-builder"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/build-builder/e2e-docker-builder"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 		level := lf.Value.(*glog.Level)
 		levelPtr := (*int32)(level)
 		//flag.Var(levelPtr, "loglevel", "Set the level of log output (0-9)")
-		log.New(os.Stdout, "[appliance/openshift/origin/tc-origin-docker-builder] ",
+		log.New(os.Stdout, "[appliance/openshift/origin/build-builder/e2e-docker-builder] ",
 			log.LstdFlags|log.Lshortfile).Printf("glog level: %+v\n", *levelPtr)
 	}
 	flag.Parse()

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package c5ctl
 
 import (
 	"fmt"
@@ -48,7 +48,7 @@ func Execute() {
 	}
 }
 
-func init() {
+/*func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -59,7 +59,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
+}*/
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {

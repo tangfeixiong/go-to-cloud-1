@@ -19,6 +19,44 @@ import (
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/appliance/openshift/origin/cmd-util"
 )
 
+func reapBuildConfig(data []byte) (*buildapiv1.BuildConfig, error) {
+	if err := validateRuntimeJSON(data, "BuildConfig"); err != nil {
+		return nil, err
+	}
+
+	obj := new(buildapiv1.BuildConfig)
+	kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, obj)
+	if err := runtime.DecodeInto(kapi.Codecs.UniversalDeserializer(), data, obj); err != nil {
+		glog.Errorf(Kubernetes_deserialize_err_formatter, err, string(data))
+		return nil, err
+	}
+	return obj, nil
+}
+
+func (p *PaaS) createBuildConfigWithJSON(data []byte, ns string) ([]byte, *buildapiv1.BuildConfig, error) {
+	if p == nil || p.oc == nil {
+		return nil, nil, errUnexpected
+	}
+	if len(data) == 0 {
+		return nil, nil, errBadRequest
+	}
+
+	raw, err := p.oc.RESTClient.Verb("POST").Namespace(ns).Resource("buildConfigs").Body(data).DoRaw()
+	if err != nil {
+		glog.Errorf(Openshift_origin_api_error_formatter, err)
+		return nil, nil, err
+	}
+	if err = validateRuntimeJSON(raw, "BuildConfig"); err != nil {
+		return nil, nil, err
+	}
+
+	obj, err := reapBuildConfig(raw)
+	if err != nil {
+		return raw, nil, err
+	}
+	return raw, obj, nil
+}
+
 func createIntoBuildConfig(oc *oclient.Client,
 	data []byte, obj *buildapiv1.BuildConfig) ([]byte, *buildapiv1.BuildConfig, error) {
 	logger.SetPrefix("[appliance/openshift/origin, createIntoBuildConfig] ")

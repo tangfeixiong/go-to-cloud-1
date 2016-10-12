@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/osopb3"
+	"github.com/tangfeixiong/go-to-cloud-1/pkg/api/proto/paas/ci/pb3"
 )
 
 type integrationFactory struct {
@@ -34,6 +35,47 @@ func NewIntegrationFactory(server string) *integrationFactory {
 		}
 	}
 	return &integrationFactory{server: server}
+}
+
+func (itft *integrationFactory) GrpcBuildImage(req *pb3.TemplatizedBuilderRequest) (*pb3.TemplatizedBuilderResponse, error) {
+	logger.SetPrefix("[client/osoc, .CreateDockerBuilderIntoImage] ")
+	cc, err := grpc.Dial(itft.server, grpc.WithInsecure())
+	if err != nil {
+		logger.Printf("Did not connect: %v\n", err)
+		return nil, err
+	}
+	defer cc.Close()
+
+	return GrpcBuildImage(pb3.NewContainerImageBuildServiceClient(cc), context.Background(), req)
+}
+
+func GrpcBuildImage(c pb3.ContainerImageBuildServiceClient,
+	ctx context.Context,
+	req *osopb3.DockerBuildRequestData) (resp *pb3.TemplatizedBuilderResponse, err error) {
+	logger.SetPrefix("[client/osoc, CreateDockerBuilderIntoImage] ")
+
+	opts := []grpc.CallOption{}
+	var streaming pb3.ContainerImageBuildService_TemplateBuildingOntoStreamClient
+	if ctx != nil {
+		streaming, err = c.TemplateBuildingOntoStream(ctx, opts...)
+	} else {
+		streaming, err = c.CreateDockerBuilderIntoImage(context.Background(), opts...)
+	}
+	if err != nil {
+		logger.Printf("Could not streaming: %v", err)
+		return nil, err
+	}
+
+	if err = streaming.Send(req); err != nil {
+		logger.Printf("Could not send: %v", err)
+		return nil, err
+	}
+	resp, err = streaming.Recv()
+	if err != nil {
+		logger.Printf("Could not receive: %v", err)
+		return nil, err
+	}
+	return
 }
 
 func CreateProject(client osopb3.SimpleServiceClient,

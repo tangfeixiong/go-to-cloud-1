@@ -1,0 +1,372 @@
+syntax = "proto3";
+
+option go_package = "pb3";
+option java_package = "com.qingyuanos.core.googleprotobuf.pb3";
+option java_outer_classname = "ConfigurableBuilderDTO";
+
+package paas.cicd.pb3;
+
+import "google/api/annotations.proto";
+//import "google/protobuf/any.proto";
+
+import "paas/cicd/pb3/metadata.proto";
+import "paas/cicd/pb3/docker-engine-api.proto";
+
+message TemplatizedBuilderRequest {
+    // Template and Option for build definition
+    Feed.FeedSpec     feed    = 1;
+    // File and Archive for binary build
+    Stream.StreamSpec archive = 2;
+}
+
+message TemplatizedBuilderResponse {
+    Feed feedback = 1;
+}
+
+message IdentifiedAuth {
+    // map Kubernetes secret name
+    string           id               = 1;
+    string           auth             = 2;
+    string           server           = 3;
+    // Credentials
+    string           username         = 4;
+    string           password         = 5;
+    string           token            = 6;
+    // SSH
+    string           sshAuthPrivate   = 7;
+    // TLS
+    string           tlsCert          = 8;
+    string           tlsPrivateKey    = 9;
+    // Docker config.json
+    DockerConfigFile dockerConfigFile = 10;
+}
+    
+message VendorAnnotation {
+    string              apiVersion = 1;
+    string              kind       = 2;
+    string              vendor     = 3;
+//    google.protobuf.Any object     = 4;
+}
+
+message Feed {
+    ObjectMeta metadata = 1;
+    // Spec
+    message FeedSpec {
+        enum BuilderType {
+            OPENSHIFT_ORIGIN_V3  = 0;
+            DRONE                = 1; 
+            DIRECT_DOCKER_ENGINE = 2;
+            FSOUZA_DOCKER_CLIENT = 3;
+        }
+        BuilderType             builder            = 1;
+        Template                template           = 2;
+        BuildConfigOption       option             = 3;
+        repeated IdentifiedAuth auth               = 4;
+    
+        string                  buildAtOnceName    = 5;
+        repeated string         archiveFilePath    = 6;
+        string                  buildAtOnceMessage = 7;    
+        bool                    disableBuildAtOnce = 8;
+    }
+    FeedSpec   spec     = 2;
+    // Status
+    message FeedStatus {
+        string phase   = 1;
+        string message = 2;
+        string reason  = 3;
+    }
+    FeedStatus status   = 3;
+}
+
+message FeedList {
+    repeated Feed items = 1;
+}
+
+message Stream {
+    message StreamMeta {
+        string name = 1;
+    }
+    StreamMeta metadata = 1;
+    // Spec
+    message StreamSpec {
+        enum StreamType {
+            FILE = 0;
+            URL  = 1;
+        }
+        StreamType streamType  = 1;
+        bytes      fileContent = 2;
+        string     url         = 3;
+        enum FileType {
+            REGULAR = 0;
+            ARCHIVE = 1;
+        }
+        FileType   fileType    = 4;
+        string     filePath    = 5;
+    }
+    StreamSpec spec     = 2;
+    // Status
+    message StreamStatus {
+        string phase  = 1;
+        string reason = 2;
+    }
+    StreamStatus status = 3;
+}
+
+message StreamList {
+    repeated Stream items = 1;
+}
+
+//
+//Definitions
+//-----------
+//Name: A non-empty string guaranteed to be unique within a given scope at a particular time; used in resource URLs; provided by clients at creation time and encouraged to be human friendly; intended to facilitate creation idempotence and space-uniqueness of singleton objects, distinguish distinct entities, and reference particular entities across operations.
+//rfc1035/rfc1123 label (DNS_LABEL): An alphanumeric (a-z, and 0-9) string, with a maximum length of 63 characters, with the '-' character allowed anywhere except the first or last character, suitable for use as a hostname or segment in a domain name.
+//
+message BuildConfigOption {
+    string                          name                      = 1;
+    string                          project                   = 2;
+    map<string, string>             labels                    = 3;
+    map<string, string>             annotations               = 4;
+    // Trigger
+    repeated GitHubWebHookTrigger   githubWebHook             = 5;
+    repeated GenericWebHookTrigger  genericWebHook            = 6;
+    repeated ImageChangeHookTrigger imageChangeHook           = 7;
+    bool                            configChangeHook          = 8;
+    // Run policy
+    string                          runPolicy                 = 9;
+    // Source
+    string                          sourceType                = 10;
+    string                          binaryAsFile              = 11;
+    string                          dockerfile                = 12;
+    GitSource                       gitSource                 = 13;
+    repeated ImageSource            sidecarImageSource        = 14;
+    string                          contextDir                = 15;
+    IdentifiedAuth                  repositoryAuth            = 16;
+    message AuthAsBuildSource {
+        IdentifiedAuth  auth  = 1;
+        string destinationDir = 2; 
+    }
+    repeated AuthAsBuildSource      authAsBuildSource         = 17;
+    // Source Revision
+    string                          sourceRevisionType        = 18;
+    GitSourceRevision               gitSourceRevision         = 19;
+    // Build Strategy
+    string                          buildStrategyType         = 20;
+    CustomBuildStrategy             customBuildStrategy       = 21;
+    DockerBuildStrategy             dockerBuildStrategy       = 22;
+    SourceBuildStrategy             sourceBuildStrategy       = 23;
+    JenkinsPipelineStrategy         jenkinsPipelineStrategy   = 24;
+    // Output
+    string                          imageKind = 25;
+    string                          imageName = 26;
+    IdentifiedAuth                  registryAuth              = 27;
+    // Resource
+    map<string, string>             resourceLimits            = 28;
+    map<string, string>             resourceRequests          = 29;
+    // Commit Hook    
+    repeated string                 postCommitCommand         = 30;
+    repeated string                 postCommitArgs            = 31;
+    string                          postCommitScript          = 32;
+    // Timeout
+    int64                           completionDeadlineSeconds = 33;
+}
+
+message GitSource {
+    string uri        = 1;
+    string ref        = 2;
+    string path       = 3;
+    string httpProxy  = 4;
+    string httpsProxy = 5;
+}
+
+message ImageSource {
+    string                       kind         = 1;
+    string                       name         = 2;
+    repeated ImagePathMappingDir paths        = 3;
+    IdentifiedAuth               registryAuth = 4;
+}
+
+message ImagePathMappingDir {
+    string sourcePath     = 1;
+    string destinationDir = 2;
+}
+
+message GitSourceRevision {
+    string            commit    = 1;
+    message SourceControlUser {
+        string name  = 1;
+        string email = 2;
+    }
+    SourceControlUser author    = 2;
+    SourceControlUser committer = 3;
+    string            message   = 4;
+}
+
+message CustomBuildStrategy {
+    string              imageKind          = 1;
+    string              imageName          = 2;
+    IdentifiedAuth      registryAuth       = 3;
+    map<string, string> env                = 4;
+    bool                exposeDockerSocket = 5;
+    bool                forcePull          = 6;
+    message AuthMount {
+        IdentifiedAuth auth      = 1;
+        string         mountPath = 2;
+    }
+    repeated AuthMount  authVol            = 7;
+    string              buildAPIVersion    = 8;
+}
+
+message DockerBuildStrategy {
+    string               imageKind      = 1;
+    string               imageName      = 2;
+    IdentifiedAuth       registryAuth   = 3;
+    bool                 noCache        = 4;
+    map<string, string>  env            = 5;
+    bool                 forcePull      = 6;
+    string               dockerfilePath = 7;
+}
+
+message SourceBuildStrategy {
+    string                       imageKind        = 1;
+    string                       imageName        = 2;
+    IdentifiedAuth               registryAuth     = 3;
+    map<string, string>          env              = 4;
+    string                       scripts          = 5;    
+    bool                         incremental      = 6;
+    bool                         forcePull        = 7;
+    string                       runtimeImageKind = 8;
+    string                       runtimeImageName = 9;
+    repeated ImagePathMappingDir runtimeArtifacts = 10;
+}
+
+message JenkinsPipelineStrategy {
+    string jenkinsfilePath = 1;
+    string jenkinsfile     = 2;
+}
+
+message GitHubWebHookTrigger {
+    IdentifiedAuth auth = 1;
+}
+
+message GenericWebHookTrigger {
+    IdentifiedAuth auth     = 1;
+    bool           allowEnv = 2;
+}
+
+message ImageChangeHookTrigger {
+    string kind = 1;
+    string name = 2;
+}
+
+
+enum BuildSourceType {
+	//BuildSourceGit instructs a build to use a Git source control repository as the build input.
+	Git = 0;
+	// BuildSourceDockerfile uses a Dockerfile as the start of a build
+	Dockerfile = 1;
+	// BuildSourceBinary indicates the build will accept a Binary file as input.
+	Binary = 2;
+	// BuildSourceImage indicates the build will accept an image as input
+	Image = 3;
+	// BuildSourceNone indicates the build has no predefined input (only valid for Source and Custom Strategies)
+	None = 4;
+}
+
+enum BuildStrategyType {
+	// DockerBuildStrategyType performs builds using a Dockerfile.
+	Docker = 0;
+
+	// SourceBuildStrategyType performs builds build using Source To Images with a Git repository
+	// and a builder image.
+	Source = 1;
+
+	// CustomBuildStrategyType performs builds using custom builder Docker image.
+	Custom = 2;
+
+	// JenkinsPipelineBuildStrategyType indicates the build will run via Jenkine Pipeline.
+	JenkinsPipeline = 3;    
+}
+
+enum ImageKindType {
+    DockerImage = 0;
+    
+    ImageStreamTag = 1;
+    
+    ImageStreamImage = 2;
+}
+
+enum SourceRevisionType {
+    Source_rev = 0;
+    
+    Dockerfile_rev = 1;
+    
+    Binary_rev = 2;
+    
+    Images_rev = 3;
+}
+
+enum BuildPolicyType {
+	// BuildRunPolicyParallel schedules new builds immediately after they are
+	// created. Builds will be executed in parallel.
+	Parallel = 0;
+
+	// BuildRunPolicySerial schedules new builds to execute in a sequence as
+	// they are created. Every build gets queued up and will execute when the
+	// previous build completes. This is the default policy.
+	Serial = 1;
+
+	// BuildRunPolicySerialLatestOnly schedules only the latest build to execute,
+	// cancelling all the previously queued build.
+	SerialLatestOnly = 2;
+}
+
+enum BuildTriggerType {
+    option allow_alias = true;
+    
+	// GitHubWebHookBuildTriggerType represents a trigger that launches builds on
+	// GitHub webhook invocations
+	GitHub = 0;
+	//GitHubWebHookBuildTriggerTypeDeprecated BuildTriggerType = "github"
+    github = 0;
+    
+	// GenericWebHookBuildTriggerType represents a trigger that launches builds on
+	// generic webhook invocations
+	Generic = 1;
+	//GenericWebHookBuildTriggerTypeDeprecated BuildTriggerType = "generic"
+    generic = 1;
+    
+	// ImageChangeBuildTriggerType represents a trigger that launches builds on
+	// availability of a new version of an image
+	ImageChange = 2;
+	//ImageChangeBuildTriggerTypeDeprecated BuildTriggerType = "imageChange"
+    imageChange = 2;
+
+	// ConfigChangeBuildTriggerType will trigger a build on an initial build config creation
+	// WARNING: In the future the behavior will change to trigger a build on any config change
+	ConfigChange = 3;
+}
+
+enum BuildPhaseType {
+	// BuildPhaseNew is automatically assigned to a newly created build.
+	New = 0;
+
+	// BuildPhasePending indicates that a pod name has been assigned and a build is
+	// about to start running.
+	Pending = 1;
+
+	// BuildPhaseRunning indicates that a pod has been created and a build is running.
+	Running = 2;
+
+	// BuildPhaseComplete indicates that a build has been successful.
+	Complete = 3;
+
+	// BuildPhaseFailed indicates that a build has executed and failed.
+	Failed = 4;
+
+	// BuildPhaseError indicates that an error prevented the build from executing.
+	Error = 5;
+
+	// BuildPhaseCancelled indicates that a running/pending build was stopped from executing.
+	Cancelled = 6;
+}

@@ -80,7 +80,7 @@ To view or setup config directly use the 'config' command.`)
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func directKClientConfig() *kclientcmd.DirectClientConfig {
-	data, err := ioutil.ReadFile(kubeconfigPath)
+	data, err := ioutil.ReadFile(kubeconfig_path)
 	if err != nil {
 		logger.Printf("kubeconfig not found: %v\n", err)
 		return nil
@@ -97,7 +97,7 @@ func directKClientConfig() *kclientcmd.DirectClientConfig {
 	logger.Printf("cmd client config: %+v\n", conf)
 
 	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		kubeconfigContext, &kclientcmd.ConfigOverrides{},
+		kubectl_context, &kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 	logger.Printf("rest kclient config: %+v\n", kClientConfig)
 	return kClientConfig.(*kclientcmd.DirectClientConfig)
@@ -105,7 +105,7 @@ func directKClientConfig() *kclientcmd.DirectClientConfig {
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func directOClientConfig() kclientcmd.ClientConfig {
-	conf, err := kclientcmd.LoadFromFile(oconfigPath)
+	conf, err := kclientcmd.LoadFromFile(osoconfig_path)
 	if err != nil {
 		logger.Printf("openshift cmd api client not configured: %v\n", err)
 		return nil
@@ -113,7 +113,7 @@ func directOClientConfig() kclientcmd.ClientConfig {
 	logger.Printf("openshift cmd api cmd client config: %+v\n", conf)
 
 	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		oconfigContext,
+		oc_context,
 		&kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 
@@ -191,7 +191,7 @@ func makeServerIdentificationConfig(info clientauth.Info) restclient.Config {
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func withKClientConfig() kclientcmd.ClientConfig {
-	data, err := ioutil.ReadFile(kubeconfigPath)
+	data, err := ioutil.ReadFile(kubeconfig_path)
 	if err != nil {
 		glog.Infof("kubeconfig not found: %v\n", err)
 		os.Exit(1)
@@ -208,7 +208,7 @@ func withKClientConfig() kclientcmd.ClientConfig {
 	glog.Infof("cmd client config: %+v\n", conf)
 
 	kClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		kubeconfigContext,
+		kubectl_context,
 		&kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 	glog.Infof("rest client config: %+v\n", kClientConfig)
@@ -217,7 +217,7 @@ func withKClientConfig() kclientcmd.ClientConfig {
 
 // k8s.io/kubernetes/pkg/client/unversioned/clientcmd/loader.go
 func withOClientConfig() kclientcmd.ClientConfig {
-	conf, err := kclientcmd.LoadFromFile(oconfigPath)
+	conf, err := kclientcmd.LoadFromFile(osoconfig_path)
 	if err != nil {
 		logger.Printf("openshift cmd api client not configured: %v\n", err)
 		os.Exit(1)
@@ -225,7 +225,7 @@ func withOClientConfig() kclientcmd.ClientConfig {
 	logger.Printf("openshift cmd api cmd client config: %+v\n", conf)
 
 	oClientConfig := kclientcmd.NewNonInteractiveClientConfig(*conf,
-		oconfigContext,
+		oc_context,
 		&kclientcmd.ConfigOverrides{},
 		kclientcmd.NewDefaultClientConfigLoadingRules())
 	logger.Printf("rest client config: %+v\n", oClientConfig)
@@ -241,7 +241,7 @@ func withAdminConfig() {
 		Burst:              10,
 	}
 	//configapi.SetProtobufClientDefaults(overrides)
-	if kClient, kConfig, err := configapi.GetKubeClient(kubeconfigPath, overrides); err != nil {
+	if kClient, kConfig, err := configapi.GetKubeClient(kubeconfig_path, overrides); err != nil {
 		logger.Printf("Could not get kubernetes admin client: %+v\n", err)
 	} else if kClient == nil || kConfig == nil {
 		logger.Println("Could not find kubernetes admin client\n")
@@ -249,7 +249,7 @@ func withAdminConfig() {
 		logger.Printf("Kubernetes admin client %v with config %+v", kClient, kConfig)
 	}
 
-	if oClient, oConfig, err := configapi.GetOpenShiftClient(oconfigPath, overrides); err != nil {
+	if oClient, oConfig, err := configapi.GetOpenShiftClient(osoconfig_path, overrides); err != nil {
 		logger.Printf("Could not get openshift admin client: %+v\n", err)
 	} else if oClient == nil || oConfig == nil {
 		logger.Println("Could not find openshift admin client\n")

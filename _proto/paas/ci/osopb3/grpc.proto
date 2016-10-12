@@ -6,10 +6,10 @@ option java_outer_classname = "GrpcServer";
 
 package paas.ci.osopb3;
 
-//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
-
 import "google/api/annotations.proto";
 //import "google/protobuf/any.proto";
+
+//import "github.com/openshift/origin/pkg/build/api/v1/generated.proto";
 
 import "k8s.io/kubernetes/pkg/api/unversioned/generated.proto";
 import "k8s.io/kubernetes/pkg/api/v1/generated.proto";
@@ -74,12 +74,6 @@ service SimpleService {
 	//rpc LookupProjects(LookupProjectsRequest) returns (LookupProjectsResponse);
 
 	//rpc OpenProject(OpenProjectRequest) returns (OpenProjectResponse);
-
-
-	//rpc EnterWorkspace(EnterWorkspaceRequest) returns (EnterWorkspaceResponse);
-
-	//rpc LeaveWorkspace(LeaveWorkspaceRequest) returns (LeaveWorkspaceResponse);
-
 	
 	rpc CreateDockerBuilderIntoImage(DockerBuildRequestData) returns (DockerBuildResponseData) {
 		option (google.api.http) = {
@@ -165,8 +159,9 @@ service SimpleService {
 		};
 	}
 
-	//rpc ArbitraryStream(RawData) returns (stream RawData) {
-	//}
+	//rpc CreateBuildTemplate(EnterWorkspaceRequest) returns (EnterWorkspaceResponse){}
+
+	//rpc LookoverContinousBuild(LeaveWorkspaceRequest) returns (stream RawData){}
 }
 
 enum K8sNamespacePhase {
