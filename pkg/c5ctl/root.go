@@ -19,7 +19,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	//"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -59,7 +59,7 @@ func Execute() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}*/
+}
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
@@ -75,4 +75,4 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
-}
+}*/

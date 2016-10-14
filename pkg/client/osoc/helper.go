@@ -296,28 +296,6 @@ func (b *DockerBuildRequestDataUtility) StiBuildStrategy(overrideBaseImage,
 	return b
 }
 
-func (b *DockerBuildRequestDataUtility) DockerPullCredential(addr, username, password string) *DockerBuildRequestDataUtility {
-	if b.target == nil {
-		b.target = internalDockerBuildRequestData()
-	}
-	if b.target.Configuration.CommonSpec.Strategy == nil {
-		b.target.Configuration.CommonSpec.Strategy = &osopb3.BuildStrategy{}
-	}
-	if b.target.Configuration.CommonSpec.Strategy.DockerStrategy == nil {
-		b.target.Configuration.CommonSpec.Strategy.DockerStrategy = &osopb3.DockerBuildStrategy{}
-	}
-	b.target.Configuration.CommonSpec.Strategy.DockerStrategy.DockerconfigJson = &osopb3.DockerConfigFile{
-		AuthConfigs: map[string]*osopb3.DockerAuthConfig{
-			addr: &osopb3.DockerAuthConfig{
-				Username:      username,
-				Password:      password,
-				ServerAddress: addr,
-			},
-		},
-	}
-	return b
-}
-
 func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
 	pushSecret string) *DockerBuildRequestDataUtility {
 	if b.target == nil {
@@ -341,12 +319,75 @@ func (b *DockerBuildRequestDataUtility) DockerBuildOutputOption(pushRepo,
 	return b
 }
 
+func (b *DockerBuildRequestDataUtility) DockerPullAuth(credential map[string]string) *DockerBuildRequestDataUtility {
+	if len(credential) == 0 {
+		return b
+	}
+	if v, ok := credential["serverAddress"]; !ok || len(v) == 0 {
+		return b
+	}
+	if v, ok := credential["username"]; !ok || len(v) == 0 {
+		return b
+	}
+	if v, ok := credential["password"]; !ok || len(v) == 0 {
+		return b
+	}
+	b.DockerPullCredential(credential["serverAddress"], credential["username"], credential["password"])
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) DockerPushAuth(credential map[string]string) *DockerBuildRequestDataUtility {
+	if len(credential) == 0 {
+		return b
+	}
+	if v, ok := credential["serverAddress"]; !ok || len(v) == 0 {
+		return b
+	}
+	if v, ok := credential["username"]; !ok || len(v) == 0 {
+		return b
+	}
+	if v, ok := credential["password"]; !ok || len(v) == 0 {
+		return b
+	}
+	b.DockerPushCredential(credential["serverAddress"], credential["username"], credential["password"])
+	return b
+}
+
+func (b *DockerBuildRequestDataUtility) DockerPullCredential(addr, username, password string) *DockerBuildRequestDataUtility {
+	if b.target == nil {
+		b.target = internalDockerBuildRequestData()
+	}
+	if b.target.Configuration.CommonSpec.Strategy == nil {
+		b.target.Configuration.CommonSpec.Strategy = &osopb3.BuildStrategy{}
+	}
+	if b.target.Configuration.CommonSpec.Strategy.DockerStrategy == nil {
+		b.target.Configuration.CommonSpec.Strategy.DockerStrategy = &osopb3.DockerBuildStrategy{}
+	}
+	if len(addr) == 0 || len(username) == 0 || len(password) == 0 {
+		return b
+	}
+
+	b.target.Configuration.CommonSpec.Strategy.DockerStrategy.DockerconfigJson = &osopb3.DockerConfigFile{
+		AuthConfigs: map[string]*osopb3.DockerAuthConfig{
+			addr: &osopb3.DockerAuthConfig{
+				Username:      username,
+				Password:      password,
+				ServerAddress: addr,
+			},
+		},
+	}
+	return b
+}
+
 func (b *DockerBuildRequestDataUtility) DockerPushCredential(addr, username, password string) *DockerBuildRequestDataUtility {
 	if b.target == nil {
 		b.target = internalDockerBuildRequestData()
 	}
 	if b.target.Configuration.CommonSpec.Output == nil {
 		b.target.Configuration.CommonSpec.Output = &osopb3.BuildOutput{}
+	}
+	if len(addr) == 0 || len(username) == 0 || len(password) == 0 {
+		return b
 	}
 
 	b.target.Configuration.CommonSpec.Output.DockerconfigJson = &osopb3.DockerConfigFile{

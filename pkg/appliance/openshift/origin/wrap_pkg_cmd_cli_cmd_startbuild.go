@@ -26,6 +26,7 @@ import (
 	kerrors "k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	//kapiv1 "k8s.io/kubernetes/pkg/api/v1"
+	//kapiv1 "k8s.io/kubernetes/pkg/api/v1"
 	"k8s.io/kubernetes/pkg/client/restclient"
 	"k8s.io/kubernetes/pkg/fields"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
@@ -52,10 +53,10 @@ func (osop *PaaS) StreamBuildLog(data []byte, newBuild *buildapi.Build) error {
 	if newBuild == nil {
 		newBuild = &buildapi.Build{}
 		/*
-		          using
-				projectapi.AddToScheme(kapi.Scheme)
-				projectapiv1.AddToScheme(kapi.Scheme)
-							          instead
+			          using
+					projectapi.AddToScheme(kapi.Scheme)
+					projectapiv1.AddToScheme(kapi.Scheme)
+								          instead
 		*/
 		//kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.Build{})
 		//kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.Build{})
@@ -69,8 +70,6 @@ func (osop *PaaS) StreamBuildLog(data []byte, newBuild *buildapi.Build) error {
 			return errUnexpected
 		}
 	}
-	//kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.BuildLogOptions{})
-	//kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.BuildLogOptions{})
 
 	var (
 		wg      sync.WaitGroup
@@ -184,20 +183,6 @@ func NewCmdStartBuild(fullName string, f *clientcmd.Factory, in io.Reader, out i
 
 	// cmdutil.AddOutputFlagsForMutation(cmd)
 	return cmd, o
-}
-
-func (o *StartBuildOptions) TrackWith(ctx context.Context,
-	req *osopb3.DockerBuildRequestData, resp *osopb3.DockerBuildResponseData,
-	op *PaaS, raw []byte, obj *buildapiv1.Build, bc *buildapiv1.BuildConfig) func() {
-	o.Ctx = ctx
-	o.Req = req
-	o.OP = op
-	o.Raw = raw
-	o.Obj = obj
-	o.BC = bc
-	o.Resp = resp
-	o.ClientConfig = o.OP.Factory().OpenShiftClientConfig
-	return o.tracker
 }
 
 func GenerateResponseData(raw []byte, obj *buildapiv1.Build) *osopb3.DockerBuildResponseData {
@@ -331,20 +316,52 @@ func (o *StartBuildOptions) cacheLogs() {
 	}
 }
 
+func (o *StartBuildOptions) TrackWith(ctx context.Context,
+	req *osopb3.DockerBuildRequestData, resp *osopb3.DockerBuildResponseData,
+	op *PaaS, raw []byte, obj *buildapiv1.Build, bc *buildapiv1.BuildConfig) func() {
+	o.Ctx = ctx
+	o.Req = req
+	o.OP = op
+	o.Raw = raw
+	o.Obj = obj
+	o.BC = bc
+	o.Resp = resp
+	o.ClientConfig = o.OP.Factory().OpenShiftClientConfig
+	return o.tracker
+}
+
 func (o *StartBuildOptions) tracker() {
 	var (
 		wg       sync.WaitGroup
 		exitErr  error
 		c        osclient.BuildInterface = o.Client.Builds(o.Namespace)
 		name     string                  = o.Obj.Name
-		newBuild *buildapi.Build         = V1ToBuild(o.Obj)
+		newBuild *buildapi.Build         = new(buildapi.Build)
+		data     []byte
 	)
-	o.Out = o.buf
-	o.ErrOut = o.buf
 	mapper, _ := o.OP.Factory().Object(false)
 	kapi.RegisterRESTMapper(mapper)
 	buildapi.AddToScheme(kapi.Scheme)
 	buildapiv1.AddToScheme(kapi.Scheme)
+	//kapi.Scheme.AddKnownTypes(buildapi.SchemeGroupVersion, &buildapi.BuildLogOptions{})
+	//kapi.Scheme.AddKnownTypes(buildapiv1.SchemeGroupVersion, &buildapiv1.BuildLogOptions{})
+
+	if data, exitErr = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), o.Obj); exitErr != nil {
+		glog.Errorf("Could not serialize: %+v", exitErr)
+		return
+	}
+	if exitErr = runtime.DecodeInto(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion, buildapi.SchemeGroupVersion), data, newBuild); exitErr != nil {
+		glog.Errorf("Could not deserialize: %+v", exitErr)
+		return
+	}
+	if len(newBuild.Name) == 0 {
+		glog.Errorln("Unexpecd of empty build name")
+		exitErr = errUnexpected
+		return
+	}
+
+	o.Out = o.buf
+	o.ErrOut = o.buf
 
 	// Wait for the build to complete
 	wg.Add(1)
@@ -352,57 +369,6 @@ func (o *StartBuildOptions) tracker() {
 		defer wg.Done()
 		//exitErr = WaitForBuildComplete(o.Client.Builds(o.Namespace), newBuild.Name)
 		for {
-			/*raw, err := o.OP.OC().RESTClient.Verb("GET").Namespace(o.Namespace).
-				Resource("Builds").Name(name).DoRaw()
-			if err != nil {
-				glog.Errorf("Failed to list builds (%s): %+v", name, err)
-				exitErr = err
-				return
-			}
-			hco, err := codec.JSON.Decode(raw).One()
-			if err != nil {
-				glog.Errorf("Failed to setup helm codec (%s): %+v", name, err)
-				exitErr = err
-				return
-			}
-			meta := new(unversioned.TypeMeta)
-			if err := hco.Object(meta); err != nil {
-				glog.Errorf("Failed to decode TypeMeta (%s): %+v", name, err)
-				exitErr = err
-				return
-			}
-			if !strings.EqualFold(meta.Kind, "Build") {
-				glog.Warningln("Nothing found, Unexpected")
-				exitErr = fmt.Errorf("Unexpected as nothing found")
-				return
-			}
-
-			obj := new(buildapiv1.Build)
-			if err := hco.Object(obj); err != nil {
-				glog.Errorf("Failed to decode build (%s): %+v", name, err)
-				exitErr = err
-				return
-			}
-			o.cacheBuilds(raw, obj)
-			list1 := buildapiv1.BuildList{
-				Items: []buildapiv1.Build{*obj},
-			}
-			for i := range list1.Items {
-				if name == list1.Items[i].Name &&
-					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseComplete {
-					glog.Infof("Build %+v is completed", name)
-					exitErr = nil
-					return
-				}
-				if name != list1.Items[i].Name ||
-					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseFailed ||
-					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseCancelled ||
-					list1.Items[i].Status.Phase == buildapiv1.BuildPhaseError {
-					glog.Errorf("Unexpected %s/%s status: %+v", list1.Items[i].Namespace, list1.Items[i].Name, list1.Items[i].Status.Phase)
-					exitErr = fmt.Errorf("the build %s/%s status is %q", list1.Items[i].Namespace, list1.Items[i].Name, list1.Items[i].Status.Phase)
-					return
-				}
-			}*/
 			time.Sleep(2 * time.Second)
 
 			list, err := c.List(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector()})
@@ -429,12 +395,7 @@ func (o *StartBuildOptions) tracker() {
 			}
 
 			rv := list.ResourceVersion
-			w, err := o.OP.OC().RESTClient.Verb("GET").Prefix("watch").Namespace(o.Namespace).Resource("builds").
-				VersionedParams(&kapi.ListOptions{
-					FieldSelector:   fields.Set{"name": name}.AsSelector(),
-					ResourceVersion: rv,
-				}, kapi.ParameterCodec).Watch()
-			//w, err := c.Watch(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector(), ResourceVersion: rv})
+			w, err := c.Watch(kapi.ListOptions{FieldSelector: fields.Set{"name": name}.AsSelector(), ResourceVersion: rv})
 			if err != nil {
 				glog.Errorf("Failed to setup watcher (%s): %+v", name, err)
 				exitErr = err
@@ -455,13 +416,25 @@ func (o *StartBuildOptions) tracker() {
 					break
 				}
 				if e, ok := val.Object.(*buildapi.Build); ok {
-					raw, v1, err := ConvertBuildIntoV1([]byte{}, e)
-					if err != nil {
-						exitErr = err
-						glog.Warningf("convert failed: %+v", exitErr)
+					if data, exitErr = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), e); exitErr != nil {
+						glog.Errorf("Could not serialize: %+v", exitErr)
 						return
 					}
-					o.cacheBuilds(raw, v1)
+					v1 := new(buildapiv1.Build)
+					if exitErr = runtime.DecodeInto(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), data, v1); exitErr != nil {
+						glog.Errorf("Could not deserialize: %+v", exitErr)
+						return
+					}
+					if len(v1.Name) == 0 {
+						glog.Warningf("Unexpecd as empty build name: %+v", v1)
+						exitErr = fmt.Errorf("Unexpecd as empty build name")
+						return
+					}
+					if data, exitErr = runtime.Encode(kapi.Codecs.LegacyCodec(buildapiv1.SchemeGroupVersion), v1); exitErr != nil {
+						glog.Errorf("Could not serialize: %+v", exitErr)
+						return
+					}
+					o.cacheBuilds(data, v1)
 					if name == e.Name && e.Status.Phase == buildapi.BuildPhaseComplete {
 						glog.Infoln("completed")
 						exitErr = nil
@@ -495,9 +468,6 @@ func (o *StartBuildOptions) tracker() {
 		}
 		for {
 			time.Sleep(3 * time.Second)
-			//raw, err := o.OP.OC().RESTClient.Verb("GET").
-			//	Namespace(o.Namespace).Resource("builds").Name(name).
-			//	SubResource("log").VersionedParams(&opts, kapi.ParameterCodec).DoRaw()
 			rd, err := o.Client.BuildLogs(o.Namespace).Get(newBuild.Name, opts).Stream()
 			if err != nil {
 				// if --wait options is set, then retry the connection to build logs
@@ -519,13 +489,6 @@ func (o *StartBuildOptions) tracker() {
 	}()
 
 	wg.Wait()
-	if exitErr != nil {
-		if glog.V(2) {
-			glog.V(2).Infof("Failed to watch building: %+v", exitErr)
-		} else {
-			glog.Warningf("Failed to watch building: %+v", exitErr)
-		}
-	}
 }
 
 func (o *StartBuildOptions) completeWebHook(url, logLevel string) error {

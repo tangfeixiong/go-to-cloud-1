@@ -485,7 +485,7 @@ func (u *UserResource) CreateDockerBuilderIntoImage(ctx context.Context,
 		logger.Printf("Failed to docker build with config (%+v)\n", bc)
 		return &osopb3.DockerBuildResponseData{}, err
 	}
-	if len(raw) == 0 || obj == nil {
+	if len(raw) == 0 || bc == nil || len(bc.Name) == 0 || obj == nil || len(obj.Name) == 0 {
 		logger.Printf("Nothing received from docker build with config (%+v)", bc)
 		return &osopb3.DockerBuildResponseData{}, nil
 	}
