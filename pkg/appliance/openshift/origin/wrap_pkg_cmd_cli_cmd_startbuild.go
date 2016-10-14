@@ -239,19 +239,24 @@ func Subject(ns, name string) string {
 	return fmt.Sprintf("/namespaces/%s/builds/%s", ns, name)
 }
 
-func EtcdV3BuildCacheKey(version, cluster, ns, buildername, buildname string, isBuildLog bool) string {
+func EtcdV3BuildCacheKey(version, cluster, namespace, buildername, buildname string, isBuildLog bool) string {
 	v := "v1"
-	if len(version) > 0 {
+	if len(version) != 0 {
 		v = version
 	}
 	c := "default"
-	if len(cluster) > 0 {
+	if len(cluster) != 0 {
 		c = cluster
 	}
-	key := fmt.Sprintf("/apaas/apis/%s/clusters/%s/projects/%s/builders/%s/builds/%s", v, c, ns, buildername, buildname)
-	//key = fmt.Sprintf("apaasapis%sclusters%projects%sbuilders%sbuilds%s", v, c, ns, buildername, buildname)
+	ns := "default"
+	if len(namespace) != 0 {
+		ns = namespace
+	}
+	key := fmt.Sprintf("apaasapis%sclusters%sprojects%sbuilders%sbuilds%s", v, c, ns, buildername, buildname)
 	if isBuildLog {
-		return fmt.Sprintf("%s/tracks", key)
+		key = fmt.Sprintf("/apaasapis/%s/clusters/%s/projects/%s/builders/%s/buildlogs/%s", v, c, ns, buildername, buildname)
+	} else {
+		key = fmt.Sprintf("/apaasapis/%s/clusters/%s/projects/%s/builders/%s/builds/%s", v, c, ns, buildername, buildname)
 	}
 	return key
 }
@@ -264,7 +269,6 @@ func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 		glog.Infof("Watched data: %+v", obj)
 	} else {
 		glog.Infoln("Watched data is same as previous")
-		return
 	}
 	o.Resp = resp
 	b, err := o.Resp.Marshal()
@@ -272,15 +276,20 @@ func (o *StartBuildOptions) cacheBuilds(raw []byte, obj *buildapiv1.Build) {
 		glog.Errorf("Faild to marshal data for cache: %+v", err)
 		return
 	}
-	if glog.V(2) {
-		glog.V(2).Infof("cache build object with phase: %+v", o.Resp)
-	} else {
-		glog.Infof("cache build object with phase: %+v", o.Resp)
-	}
 
+	key := EtcdV3BuildCacheKey("v1", "default", o.Namespace, o.Req.Configuration.Name, o.Req.Name, false)
+	if glog.V(2) {
+		glog.V(2).Infof("etcd key for build object: %+v", key)
+	} else {
+		glog.Infof("etcd key for build object: %+v", key)
+	}
 	if etcdctl := o.OP.EtcdCtl(); etcdctl != nil {
-		key := EtcdV3BuildCacheKey("v1", "default", o.Namespace, o.Req.Configuration.Name, o.Req.Name, false)
-		_, _ = etcdctl.Put(key, string(b))
+		presp, err := etcdctl.Put(key, string(b))
+		if err != nil {
+			glog.Errorf("Failed to store into etcd: %+v", err)
+		} else {
+			glog.Infof("Succeeded store into etcd: %+v", presp)
+		}
 	} else {
 		gnatsd.Publish([]string{}, nil, nil, Subject(o.Namespace, o.Req.Name), b)
 	}
@@ -291,7 +300,12 @@ func (o *StartBuildOptions) cacheLogs() {
 		key := EtcdV3BuildCacheKey("v1", "default", o.Namespace, o.Req.Configuration.Name, o.Req.Name, true)
 		o.mutex.Lock()
 		defer o.mutex.Unlock()
-		_, _ = etcdctl.Put(key, o.buf.String())
+		presp, err := etcdctl.Put(key, o.buf.String())
+		if err != nil {
+			glog.Errorf("Failed to cache logs into etcd: %+v", err)
+		} else {
+			glog.Infof("Succeeded cache logs into etcd: %+v", presp)
+		}
 		o.buf.Reset()
 		return
 	}

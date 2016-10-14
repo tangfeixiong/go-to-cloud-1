@@ -93,7 +93,7 @@ func newDockerBuildCmd(out io.Writer, in io.Reader) *cobra.Command {
 		go func() {
 			defer wg.Done()
 			for {
-				status, ok = c5cmd.TrackingDockerBuild()
+				status, ok = c5cmd.TrackingDockerBuild(options.values)
 				if !ok || status == 0 {
 					fmt.Fprintln(out, "tracking failed!")
 					return
