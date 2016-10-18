@@ -1,15 +1,22 @@
 #FROM quay.io/coreos/flannelbox:1.0
 #FROM alpine:3.4
-FROM gliderlabs/alpine
+#FROM gliderlabs/alpine
+FROM openshift/origin-base
 MAINTAINER tangfeixiong <fxtang@qingyuanos.com>
 
 #ADD ./flanneld /opt/bin/
 #ADD ./mk-docker-opts.sh /opt/bin/
 #CMD /opt/bin/flanneld
 
-RUN apk add --update bash ca-certificates git libc6-compat && rm -rf /var/cache/apk/*
+#RUN apk add --update bash ca-certificates git libc6-compat && rm -rf /var/cache/apk/*
+#RUN INSTALL_PKGS="which git tar wget hostname sysvinit-tools util-linux bsdtar epel-release \
+#    socat ethtool device-mapper iptables tree findutils nmap-ncat e2fsprogs xfsprogs lsof" && \
+#    yum install -y $INSTALL_PKGS && \
+#    rpm -V $INSTALL_PKGS && \
+#    yum clean all
 
-ADD apaas /bin/
+#ADD apaas /bin/
+ADD gotopaas /bin/apaas
 ADD ./openshift.local.config/ /openshift.local.config/
 ADD ./ssl/ /root/.kube/
 ADD ./openshift.local.config/kubeconfig /root/.kube/config
